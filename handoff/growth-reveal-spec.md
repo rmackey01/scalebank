@@ -3,7 +3,10 @@
 For Claude Code, working in the public repo `rmackey01/scalebank` (one file: `index.html`). Source checked: `https://raw.githubusercontent.com/rmackey01/scalebank/main/index.html` (1,065 lines, fetched 2026-10-04 00:41 CT). Line numbers below refer to that file.
 Rule: if a number isn't here, don't guess. Ask, or leave a TODO. Don't change the stage thresholds, the step buttons or the save format beyond what this file says.
 
-**Status today:** only the 7 Hatchling → Juvenile reveals exist (`art/reveals/<line>-h2j.*`). Juvenile → Adult (`j2a`) and Adult → Elder (`a2e`) files will be added later **with the same naming**. The code must:
+**Status (updated 2026-10-04 01:19 CT):**
+- In the repo: the 7 Hatchling → Juvenile reveals (`art/reveals/<line>-h2j.*`).
+- Rendered and ready to commit with the same naming: all 7 Juvenile → Adult (`j2a`) and 7 Adult → Elder (`a2e`) sets, in the handoff folder `art/reveals/`.
+- Until those are committed (and for any file that's ever missing), the code must:
 - play a reveal when its files exist,
 - fall back to the **current stage-up behaviour** (the toast plus the Dragon-screen grow-in, unchanged) when they don't,
 - pick up new files automatically, with no code change, once they're committed.
@@ -50,19 +53,34 @@ art/reveals/<line>-<key>-poster.webp   720×1280, the video's LAST frame (new st
 - `<key>` is `h2j | j2a | a2e`.
 - Sizes are about 2–4 MB per video.
 
-In the repo now:
+All 21 sets (h2j is in the repo; j2a and a2e are in the handoff folder, ready to commit):
 
-| Line | `-h2j.mp4` | `-h2j.webm` | `-h2j-poster.webp` |
-|---|---|---|---|
-| brine | 2,278,084 B | 2,495,990 B | 44,456 B |
-| cinder | 2,879,857 B | 3,231,681 B | 48,678 B |
-| inferno | 2,239,611 B | 2,462,814 B | 48,568 B |
-| moss | 1,930,144 B | 2,217,713 B | 45,156 B |
-| stormling | 3,317,641 B | 4,071,396 B | 42,858 B |
-| tempest | 1,972,317 B | 1,896,989 B | 47,442 B |
-| voidling | 1,939,926 B | 1,984,341 B | 45,570 B |
+| Line | Key | `.mp4` | `.webm` | `-poster.webp` |
+|---|---|---|---|---|
+| brine | h2j | 2,278,084 B | 2,495,990 B | 44,456 B |
+| brine | j2a | 2,742,678 B | 3,244,193 B | 49,458 B |
+| brine | a2e | 3,586,889 B | 4,555,376 B | 61,410 B |
+| cinder | h2j | 2,879,857 B | 3,231,681 B | 48,678 B |
+| cinder | j2a | 2,985,890 B | 3,500,872 B | 53,814 B |
+| cinder | a2e | 4,371,366 B | 5,450,847 B | 65,366 B |
+| inferno | h2j | 2,239,611 B | 2,462,814 B | 48,568 B |
+| inferno | j2a | 2,216,952 B | 2,560,739 B | 51,530 B |
+| inferno | a2e | 2,734,178 B | 3,185,939 B | 54,974 B |
+| moss | h2j | 1,930,144 B | 2,217,713 B | 45,156 B |
+| moss | j2a | 2,078,593 B | 2,524,261 B | 54,588 B |
+| moss | a2e | 2,395,130 B | 3,019,094 B | 58,210 B |
+| stormling | h2j | 3,317,641 B | 4,071,396 B | 42,858 B |
+| stormling | j2a | 3,342,587 B | 4,260,035 B | 45,314 B |
+| stormling | a2e | 4,361,717 B | 5,653,568 B | 54,062 B |
+| tempest | h2j | 1,972,317 B | 1,896,989 B | 47,442 B |
+| tempest | j2a | 2,077,385 B | 2,074,469 B | 49,346 B |
+| tempest | a2e | 2,542,735 B | 2,684,427 B | 55,150 B |
+| voidling | h2j | 1,939,926 B | 1,984,341 B | 45,570 B |
+| voidling | j2a | 2,190,984 B | 2,447,991 B | 46,788 B |
+| voidling | a2e | 2,662,951 B | 3,041,745 B | 54,528 B |
 
-Not there yet: all `-j2a.*` and `-a2e.*` (14 sets).
+- Durations: h2j and j2a 14.016 s (mp4) / 14.024 s (webm); a2e 15.466 s (mp4) / 15.474 s (webm).
+- Six files are over the 4 MB target at the shared settings: `cinder-a2e` (both), `stormling-a2e` (both), `brine-a2e.webm` and `stormling-j2a.webm`. The largest is 5.65 MB.
 
 ```js
 function revealSrc(line, key){ return `art/reveals/${line}-${key}`; }   // + ".webm" / ".mp4" / "-poster.webp"
@@ -187,13 +205,13 @@ These come from the render script's timeline (`growth_reveal.py`). Normal = `h2j
 - The Elder version stretches the cocoon build, so **every event after 4.6 s is later by `shift`**.
 - Compute `shift` from the file, so the code doesn't care which version it got:
 ```js
-const shift = video.duration > 14.5 ? video.duration - 14.0 : 0;   // h2j/j2a ≈ 0; a2e ≈ 1.45
+const shift = video.duration > 14.5 ? video.duration - 14.02 : 0;  // h2j/j2a: 0; a2e: 1.446–1.454 (true offset 1.446)
 const T = x => x + (x > 4.6 ? shift : 0);
 ```
 
 | Event | Normal (s) | Elder ≈ (s) | Use |
 |---|---|---|---|
-| Video length | 14.0 | 15.45 | `ended` → hold last frame |
+| Video length (repo files) | 14.016 / 14.024 | 15.466 / 15.474 | mp4 / webm. `ended` → hold last frame |
 | Burst (white flash) | 6.10 | 7.55 | `T(6.10)`: **skip unlocks here on a first viewing** (§9) |
 | New card fully visible | 6.30 | 7.75 | |
 | Card starts shrinking up | 9.80 | 11.25 | |
@@ -203,7 +221,12 @@ const T = x => x + (x > 4.6 ? shift : 0);
 | Continue button (baked) fades in | 12.45 → 12.90 | 13.90 → 14.35 | enable the real button at `T(12.45)` |
 | **Payoff ready** | **12.95** | **14.40** | **skip target**: `video.currentTime = T(12.95)` |
 
-Elder values assume duration 15.45 s. Always use `T()`, not the Elder column.
+Checked against the rendered files on 2026-10-04:
+- The Elder offset is exactly +1.446 s for every event after 4.6 s.
+- The first burst frame is 6.125 s (normal) and 7.583 s (Elder).
+- Elder files have 370 video frames; the last one shows from 15.375 s.
+
+Always use `T()`, not the Elder column.
 
 ### 7.1 Why there's a live payoff card
 
@@ -229,6 +252,8 @@ So the app draws its own **opaque payoff card exactly over the baked panel**, wi
 | tempest `-a2e` | 720 | 1004 |
 
 Put this table in code as `PANEL_H[line + "-" + key]`. A key that's missing defaults to 600.
+
+Checked on the last frame of all 21 files: the visible gold rim runs from y = `1739 − panelH` to y = 1745, inside the cover rect above.
 
 **Motion:** the card moves in lockstep with the baked slide.
 - Start at video time `T(10.25)`. Watch it with `requestVideoFrameCallback`, falling back to `timeupdate` plus rAF.
@@ -396,5 +421,6 @@ Set up with a fresh run (Reset), buy and hatch an Ember Egg so Cinder is the pri
 ## 14. Known limitations / open items
 
 - **The baked species name** shows on the opening banner and the reveal title. A renamed dragon shows its species there, while the live card uses the real name. The render script can export text-free "app" variants (`growth_reveal.py --app`) if Ryan wants every name drawn live. That would be new files, so don't build it now.
-- **Elder (`a2e`) times** come from the render script (duration ≈ 15.45 s). The code derives them from `video.duration` via `T()`, so it won't need changes. Re-check §7.2 alignment when the files land.
+- **Elder (`a2e`) times and panel positions** have been checked against the rendered files (§7, §7.2). The code derives the times from `video.duration` via `T()`.
+- **Repo size:** six j2a/a2e files are over 4 MB at the shared settings (§2). If that matters, re-encode those at a higher crf, e.g. x264 crf 30 / VP9 crf 41 (untested).
 - **Example data** (steps 12,400 / 121,400 / 402,000; "+15% Scale yield") exists only inside the videos and the posters. The live card always covers it.
