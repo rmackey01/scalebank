@@ -2,7 +2,7 @@
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Lato:wght@400;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lato:wght@400;700;900&display=swap">
 <style>
 /* Layout: one-column phone app, three screens over a fixed bottom tab bar; vendors swipe sideways with scroll-snap. */
 :root{
@@ -360,7 +360,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .rv-card{position:absolute;z-index:3;opacity:0;pointer-events:none;overflow:hidden}
 .rv-card.show{opacity:1}
 .rv-card.anim{transition:transform .6s cubic-bezier(.215,.61,.355,1),opacity .375s}
-.rv-card-inner{position:absolute;inset:0;border-style:solid;border-image:url(art/nest/info_card_panel.webp) 132 fill / calc(44px*var(--k)) stretch;box-sizing:border-box}
+.rv-card-inner{position:absolute;inset:0;background:#0d0b0a;border-style:solid;border-image:url(art/nest/info_card_panel.webp) 132 fill / calc(44px*var(--k)) stretch;box-sizing:border-box}
 .rv-portraits{position:absolute;left:0;right:0;top:calc(112px*var(--k));display:flex;align-items:center;justify-content:center;gap:calc(290px*var(--k))}
 .rv-portrait{position:relative;width:calc(210px*var(--k));height:calc(210px*var(--k));flex-shrink:0}
 .rv-portrait img{position:absolute;width:100%;height:100%}
@@ -371,7 +371,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .rv-label{font-family:"Lato",var(--body);font-weight:700;font-size:calc(24px*var(--k));letter-spacing:calc(4px*var(--k));text-transform:uppercase;text-shadow:0 calc(1px*var(--k)) calc(2px*var(--k)) rgba(0,0,0,.5);text-align:center;min-width:calc(210px*var(--k))}
 .rv-label.from{color:#c3b197}
 .rv-label.to{color:#eeca74}
-.rv-change{position:absolute;left:calc(80px*var(--k));right:calc(80px*var(--k));text-align:center;font-family:"Lato",var(--body);font-weight:400;color:#ededea;line-height:1.3}
+.rv-change{position:absolute;left:calc(80px*var(--k));right:calc(80px*var(--k));text-align:center;font-family:"Lato",var(--body);font-weight:400;color:#ededea;white-space:pre-line}
 .rv-divider{position:absolute;left:50%;transform:translateX(-50%);width:calc(760px*var(--k));height:calc(1px*var(--k));background:linear-gradient(90deg,transparent,#e1b567 20%,#e1b567 80%,transparent)}
 .rv-divider::after{content:"";position:absolute;left:50%;top:50%;width:calc(12px*var(--k));height:calc(12px*var(--k));background:#e1b567;transform:translate(-50%,-50%) rotate(45deg)}
 .rv-steps{position:absolute;left:0;right:0;text-align:center}
@@ -628,13 +628,13 @@ function openReveal(d, was, now, key){
   revealActive = {d, was, now, key, seen, reducedMotion, burstTime: 0, payoffReady: false, skipUnlocked: seen, panelH};
   revealFocusReturn = document.activeElement;
 
-  const arrowSVG = `<svg viewBox="0 0 170 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rvag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE6A0"/><stop offset=".5" stop-color="#F3C859"/><stop offset="1" stop-color="#C68A30"/></linearGradient></defs><path d="M25 17L55 32L25 47Z M75 17L105 32L75 47Z M125 17L155 32L125 47Z" fill="url(#rvag)"/></svg>`;
+  const arrowSVG = `<svg viewBox="0 0 170 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rvag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE6A0"/><stop offset=".5" stop-color="#F3C859"/><stop offset="1" stop-color="#C68A30"/></linearGradient></defs><path d="M15 14L45 32L15 50 M65 14L95 32L65 50 M115 14L145 32L115 50" stroke="url(#rvag)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
   let mediaHTML;
   if (reducedMotion){
     mediaHTML = `<img class="rv-still" src="${revealSrc(d.line, key)}-poster.webp" alt="">`;
   } else {
-    mediaHTML = `<video id="rvVideo" muted playsinline autoplay preload="auto" disablepictureinpicture poster="${revealSrc(d.line, key)}-poster.webp">
+    mediaHTML = `<video id="rvVideo" muted playsinline autoplay preload="auto" disablepictureinpicture style="opacity:0">
       <source src="${revealSrc(d.line, key)}.webm" type="video/webm">
       <source src="${revealSrc(d.line, key)}.mp4" type="video/mp4">
     </video>`;
@@ -651,7 +651,7 @@ function openReveal(d, was, now, key){
       </div>
       <div class="rv-arrow">${arrowSVG}</div>
       <div class="rv-labels"><span class="rv-label from">${STAGES[was].name}</span><span class="rv-label to">${STAGES[now].name}</span></div>
-      <div class="rv-change" data-extra="${extra}" style="font-size:calc(${fontSize}*var(--k));line-height:calc(${lineHeight}*var(--k))">${esc(lines.join(" · "))}</div>
+      <div class="rv-change" data-extra="${extra}" style="font-size:calc(${fontSize}px*var(--k));line-height:calc(${lineHeight}px*var(--k))">${lines.map(l => esc(l)).join("\n")}</div>
       <div class="rv-divider" data-extra="${extra}"></div>
       <div class="rv-steps" data-extra="${extra}"><span class="num">${fmt(d.xp)}</span> <span class="txt">steps walked together</span></div>
     </div>
@@ -672,6 +672,7 @@ function openReveal(d, was, now, key){
         if (!video.currentSrc && loadTimeout) closeRevealFallback();
       }, {once:true});
     }
+    video.addEventListener("playing", () => { video.style.opacity = "1"; }, {once:true});
     video.play().catch(() => { closeRevealFallback(); });
     video.addEventListener("timeupdate", onRevealTime);
     video.addEventListener("ended", onRevealEnded);
@@ -777,6 +778,7 @@ function skipReveal(){
   const ra = revealActive, video = $("#rvVideo");
   if (!ra || !ra.skipUnlocked) return;
   if (video){
+    video.style.opacity = "1";
     const T = getT(video);
     video.currentTime = T(12.95);
     video.play().catch(() => {});
