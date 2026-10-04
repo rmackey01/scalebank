@@ -360,7 +360,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .rv-card{position:absolute;z-index:3;opacity:0;pointer-events:none;overflow:hidden}
 .rv-card.show{opacity:1}
 .rv-card.anim{transition:transform .6s cubic-bezier(.215,.61,.355,1),opacity .375s}
-.rv-card-inner{position:absolute;inset:0;background:#0d0b0a;border-style:solid;border-image:url(art/nest/info_card_panel.webp) 132 fill / calc(44px*var(--k)) stretch;box-sizing:border-box}
+.rv-card-inner{position:absolute;inset:0;background:#0d0b0a;border-style:solid;border-image:url(art/nest/info_card_panel.webp) 132 fill / calc(121.85px*var(--k)) stretch;box-sizing:border-box}
 .rv-portraits{position:absolute;left:0;right:0;top:calc(112px*var(--k));display:flex;align-items:center;justify-content:center;gap:calc(290px*var(--k))}
 .rv-portrait{position:relative;width:calc(210px*var(--k));height:calc(210px*var(--k));flex-shrink:0}
 .rv-portrait img{position:absolute;width:100%;height:100%}
@@ -372,7 +372,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .rv-label.from{color:#c3b197}
 .rv-label.to{color:#eeca74}
 .rv-change{position:absolute;left:calc(80px*var(--k));right:calc(80px*var(--k));text-align:center;font-family:"Lato",var(--body);font-weight:400;color:#ededea;white-space:pre-line}
-.rv-divider{position:absolute;left:50%;transform:translateX(-50%);width:calc(760px*var(--k));height:calc(1px*var(--k));background:linear-gradient(90deg,transparent,#e1b567 20%,#e1b567 80%,transparent)}
+.rv-divider{position:absolute;left:50%;transform:translateX(-50%);width:calc(760px*var(--k));height:calc(2px*var(--k));background:linear-gradient(90deg,transparent,#e1b567 10%,#e1b567 90%,transparent)}
 .rv-divider::after{content:"";position:absolute;left:50%;top:50%;width:calc(12px*var(--k));height:calc(12px*var(--k));background:#e1b567;transform:translate(-50%,-50%) rotate(45deg)}
 .rv-steps{position:absolute;left:0;right:0;text-align:center}
 .rv-steps .num{font-family:"Cormorant Garamond",var(--display);font-weight:700;font-size:calc(56px*var(--k));color:#f3c859}
@@ -628,7 +628,7 @@ function openReveal(d, was, now, key){
   revealActive = {d, was, now, key, seen, reducedMotion, burstTime: 0, payoffReady: false, skipUnlocked: seen, panelH};
   revealFocusReturn = document.activeElement;
 
-  const arrowSVG = `<svg viewBox="0 0 170 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rvag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE6A0"/><stop offset=".5" stop-color="#F3C859"/><stop offset="1" stop-color="#C68A30"/></linearGradient></defs><path d="M15 14L45 32L15 50 M65 14L95 32L65 50 M115 14L145 32L115 50" stroke="url(#rvag)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const arrowSVG = `<svg viewBox="0 0 170 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rvag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE6A0"/><stop offset=".5" stop-color="#F3C859"/><stop offset="1" stop-color="#C68A30"/></linearGradient></defs><path d="M5 4L45 32L5 60 M65 4L105 32L65 60 M125 4L165 32L125 60" stroke="url(#rvag)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
   let mediaHTML;
   if (reducedMotion){
@@ -711,13 +711,13 @@ function sizeRevealFrame(){
     const arrow = card.querySelector(".rv-arrow");
     if (arrow) arrow.style.top = `${(148 - 32) * k}px`;
     const labels = card.querySelector(".rv-labels");
-    if (labels) labels.style.top = `${(276 - 12) * k}px`;
+    if (labels) labels.style.top = `${259 * k}px`;
     const change = card.querySelector(".rv-change");
     if (change) change.style.top = `${328 * k}px`;
     const divider = card.querySelector(".rv-divider");
     if (divider) divider.style.top = `${(398 + extra) * k}px`;
     const steps = card.querySelector(".rv-steps");
-    if (steps) steps.style.top = `${(456 + extra) * k}px`;
+    if (steps) steps.style.top = `${(416 + extra) * k}px`;
   }
   frame.querySelectorAll(".rv-continue").forEach(c => c.style.setProperty("--k", k));
 }
@@ -743,8 +743,10 @@ function onRevealTime(){
       const k = parseFloat(card.style.getPropertyValue("--k")) || 1;
       const d = (2280 - (1742 - panelH/2)) * k;
       card.style.transform = `translateY(${d}px)`;
-      card.classList.add("show", "anim");
-      requestAnimationFrame(() => { card.style.transform = "translateY(0)"; });
+      card.offsetHeight;
+      card.classList.add("anim");
+      card.classList.add("show");
+      card.style.transform = "translateY(0)";
     }
   }
   if (!ra.continueEnabled && t >= T(12.45)){
