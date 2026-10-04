@@ -19,10 +19,10 @@ Rule: if a number isn't here, don't guess. Ask, or leave it as a TODO.
 |---|---|---|---|---|---|
 | Background | `background.webp` | 0, 0, 390 × 844 | 0, 0, 100 × 100 | 0 | `background: #03060B url(art/nest/background.webp) center top / cover no-repeat` |
 | Banner (canvas) | `banner_panel.webp` | 21, 24, 348 × 78 | 5.385, 2.844, 89.231 × 9.242 | 12 | visible panel 27, 30, 336 × 66, radius 14 |
-| Banner text | live text | left 50.5; line-box top 41.31; 2 lines × 21 | 12.949, 4.895 | 12 | baselines **58 / 79**. Width: TODO (the spec gives none; index uses right padding 30, so text ends at x 339) |
+| Banner text | live text | left 50.5; line-box top 41.31; 2 lines × 21 | 12.949, 4.895 | 12 | baselines **58 / 79**. Width: x 50.5 to 339 (keep index's current box). Max 2 lines, then cut off with an ellipsis (…) |
 | Cabinet back | `cabinet_back.webp` | 20, 90, 350 × 488 | 5.128, 10.664, 89.744 × 57.82 | 2 | 9-slice (§8). Interior 34, 103, 322 × 449 |
 | Cabinet frame | `cabinet_frame.webp` | 20, 90, 350 × 488 | 5.128, 10.664, 89.744 × 57.82 | 11 | 9-slice, transparent centre, `pointer-events: none`. Glass body 25, 94, 340 × 466; plinth y 550–571 |
-| Status line | live text | centred on x 195; line-box top 581.31; 2 lines × 21 | top 68.876 | 13 | baselines **598 / 619**. Width: TODO (index uses 14…376) |
+| Status line | live text | centred on x 195; line-box top 581.31; 2 lines × 21 | top 68.876 | 13 | baselines **598 / 619**. Width: x 14 to 376 (keep index's current box). Max 2 lines, then cut off with an ellipsis (…) |
 | Info card (canvas) | `info_card_panel.webp` | 18, 628, 354 × 136 | 4.615, 74.408, 90.769 × 16.114 | 14 | visible panel 24, 634, 342 × 124, radius 18 |
 | Portrait backing | `portrait_backing.webp` | 37.5, 639, 112 × 112 | 9.615, 75.711, 28.718 × 13.27 | 15a | circle centre (93.5, 695), r 52 |
 | Portrait egg | `<dragon>_egg.webp` | egg fitted in the 84 × 84 box 51.5, 653 | 13.205, 77.37, 21.538 × 9.953 | 15b | exact img placement per egg in §6 |
@@ -30,7 +30,7 @@ Rule: if a number isn't here, don't guess. Ask, or leave it as a TODO.
 | Card caps | live text | left 164.5; line-box top 651.64, h 12.6 | 42.179, 77.209 | 15 | baseline **662** |
 | Card title | live text | left 164; line-box top 665.13, h 33.91 | 42.051, 78.807 | 15 | baseline **691** |
 | Card body | live text | left 164.5; line-box top 706.72; 2 lines × 18.5 | 42.179, 83.735 | 15 | baselines **721 / 739.5** |
-| Card text width | n/a | TODO | n/a | n/a | the spec gives none; index uses 190 (to x 354.5) |
+| Card text width | n/a | 190 (to x 354.5), keep index's current box | n/a | n/a | body max 2 lines, then cut off with an ellipsis (…) |
 | Nav bar (canvas) | `nav_bar_bg.webp` | 2, 756, 386 × 83 | 0.513, 89.573, 98.974 × 9.834 | 16 | visible panel 8, 762, 374 × 71, radius 16 |
 
 The line-box tops are computed from the fonts' vertical metrics: Lato ascent 0.987 em, descent 0.213 em; Cormorant Garamond ascent 0.924 em, descent 0.287 em. With `line-height: L` and `font-size: F`, top = baseline − (L − F·(ascent + descent)) / 2 − F·ascent. Put each text block at that top with `margin: 0` and the stated line-height, and the baselines land on the spec.
@@ -230,7 +230,7 @@ The spec takes `<dragon>_egg.webp`, crops it to its alpha bounds, fits it into a
 | `brine` | Tide Egg (teal) | Brine | Common | `#128399` | `#033F4E` / `#2EC3D9` / `#9BEFF8` | Pearl |
 | `stormling` | Squall Egg (indigo lattice) | Stormling | Rare | `#3C35A6` | `#1B1650` / `#6C62EE` / `#BDB6FF` | Sapphire |
 | `moss` | Grove Egg (green) | Moss | Uncommon | `#3E7A16` | `#1D3806` / `#6FBE2C` / `#BDF07E` | Emerald |
-| `voidling` | Night Egg (purple) | Voidling | Prize | `#6A2C90` | `#2D0E43` / `#A64FD6` / `#DCA2F5` | Amethyst |
+| `voidling` | Night Egg (purple) | Voidling | Epic | `#6A2C90` | `#2D0E43` / `#A64FD6` / `#DCA2F5` | Amethyst |
 | `tempest` | Storm Egg (slate, lightning crack) | Tempest | Legendary | `#5D6470` | `#2A2C32` / `#9EA8B8` / `#EEF3FA` | Ice-blue topaz |
 | ready state | n/a | n/a | n/a | `#DC8A1A` (light spill uses `#FFBE3E`) | `#8A3A04` / `#FFBE3E` / `#FFF3BE` | n/a |
 
@@ -329,7 +329,7 @@ I measured these in headless Chrome at a 390 × 844 viewport, using the mockup's
 1. **Ready state: resolved, keep auto-hatch (Ryan, Oct 4).**
    - Keep `autoHatch()` and the ring at `stepsLeft(e) <= RING_STEPS` (2,000 steps left). No code change is needed for the hatch flow itself.
    - Make sure the ring shows at exactly 2,000 left, and that a big step jump past the window still hatches cleanly (§5).
-2. **Night Egg rarity.** `ITEMS` has `rarity:"Epic"` for `void`, but the spec says **Prize**. The card caps would read "EPIC EGG". Fix: rename it to `"Prize"`, and rename the matching key in `RARITY` (`Epic:{mut:.12}`) and the `.r-epic` class, or have Ryan confirm Epic.
+2. **Night Egg rarity: resolved, it's Epic (Ryan, Oct 4).** The code is already correct, so leave it alone. "Prize" isn't a rarity; it's the label for whichever dragon is currently getting the steps.
 3. **Tube leading edge is square.**
    - Current: `clip-path: inset(0 X% 0 0 round 0 7.6u 7.6u 0)`. That rounds the corners of the full 28 px canvas, not the 15.2 px liquid, so the liquid end reads square.
    - Fix: use the two-layer mask in §4, with JS setting `--edge`.
@@ -364,18 +364,16 @@ I measured these in headless Chrome at a 390 × 844 viewport, using the mockup's
     - Current: `.hx-portrait .pe` at left −2.5%, top −11.4%, size 105% for every egg, so the egg is about 85.6 px tall instead of fitting 84.
     - Fix: use the per-egg values in §6 (e.g. cinder −1.72%, −10.78%, 103.45%).
 15. **Default selection**: with auto-hatch, ready eggs never persist, so the current "most-progressed egg" default is fine. No change.
-16. **Fonts outside the Nest (decision).**
-    - The Nest correctly uses Lato and Cormorant Garamond 600.
-    - The other screens use `--display: Gloock` and `--body: Albert Sans`.
-    - If Cormorant Garamond / Lato should be app-wide, set `--display: "Cormorant Garamond", …` and `--body: "Lato", …`, then drop Gloock and Albert Sans from the Google Fonts URL.
+16. **Fonts: use Cormorant Garamond + Lato app-wide (decided Oct 4).**
+    - Set `--display: "Cormorant Garamond", serif` (weight 600 for headings) and `--body: "Lato", sans-serif`.
+    - Remove Gloock and Albert Sans from the Google Fonts URL.
+    - Check that the other screens don't overflow after the swap. Cormorant runs narrower than Gloock, so headings should only get shorter.
 17. **Wobble jitter**: fixed 3.1 s period plus a per-egg phase. The spec wants the rest to vary ±0.4 s per egg. Minor; it would need the Web Animations API.
 18. Ready banner copy: keep whatever the current code says. The spec's "ready to crack" copy belonged to the dropped tap-to-hatch flow.
 
 Not Nest-specific, but visible on the Nest: the empty `#toast` peeks 2.4 px into the top of the screen. It's 24 px tall when empty and `translateY(-140%)` only moves it 33.6 px. Fix: `transform: translateY(calc(-100% - 16px))`, or `visibility: hidden` when it lacks `.show`.
 
-## 12. Open TODOs (not determinable from the inputs)
+## 12. Settled defaults (formerly TODOs)
 
-- Text box widths for the banner, status line, and card text. The spec gives only x positions and baselines.
-- Night Egg rarity: Prize (spec) or Epic (code).
-- Whether to ship the sharper 512 px ring sheet (not in the repo) for 3× screens.
-- Empty-nest opacity: index uses 0.55, and the spec doesn't say.
+- Ring sheet: keep the current 256 px `ring_sheet.webp`. Don't add a 512 px sheet for now, since it would roughly 4× the file size.
+- Empty-nest opacity: keep index's 0.55.
