@@ -359,7 +359,6 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .rv-hit.locked{cursor:default}
 .rv-card{position:absolute;z-index:3;opacity:0;pointer-events:none;overflow:hidden}
 .rv-card.show{opacity:1}
-.rv-card.anim{transition:transform .6s cubic-bezier(.215,.61,.355,1),opacity .375s}
 .rv-card-inner{position:absolute;inset:calc(16px*var(--k));background:#0d0b0a;border-radius:calc(24px*var(--k))}.rv-card-border{position:absolute;inset:0;border-style:solid;border-image:url(art/nest/info_card_panel.webp) 132 fill / calc(121.85px*var(--k)) stretch;pointer-events:none}
 .rv-portraits{position:absolute;left:0;right:0;top:calc(112px*var(--k));display:flex;align-items:center;justify-content:center;gap:calc(290px*var(--k))}
 .rv-portrait{position:relative;width:calc(210px*var(--k));height:calc(210px*var(--k));flex-shrink:0}
@@ -763,10 +762,12 @@ function onRevealTime(){
       const progress = Math.min(1, late / 0.6);
       const startD = fullD * (1 - progress);
       const remainDur = Math.max(0.05, 0.6 - late);
-      card.style.transition = `transform ${remainDur}s cubic-bezier(.215,.61,.355,1), opacity ${Math.min(0.375, remainDur)}s`;
+      const startOpacity = Math.min(1, late / 0.375);
+      card.style.transition = "none";
       card.style.transform = `translateY(${startD}px)`;
-      card.style.opacity = String(Math.min(1, late / 0.375));
+      card.style.opacity = String(startOpacity);
       card.offsetHeight;
+      card.style.transition = `transform ${remainDur}s cubic-bezier(.215,.61,.355,1), opacity ${Math.min(0.375, remainDur)}s`;
       card.classList.add("show");
       card.style.transform = "translateY(0)";
       card.style.opacity = "1";
