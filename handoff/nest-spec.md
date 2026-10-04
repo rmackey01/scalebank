@@ -78,7 +78,7 @@ Grid order (the demo in the mockup): row 1 = cinder (READY), brine, inferno; row
 
 Glows (CSS only, no asset), copied from `build_mockup.py`:
 - **Back-light**: ellipse, fill `#5A3216` at alpha 0.22, `filter: blur(calc(18 * var(--u)))`, `border-radius: 50%`.
-- **Light spill**: ellipse, fill = the tube base hex (§7.1), or `#FFBE3E` when ready. Alpha 0.40 (warming) / 0.55 (ready), `filter: blur(calc(5 * var(--u)))`.
+- **Light spill**: ellipse, fill = the tube base hex (§7.1), or `#FFBE3E` when ready (unused with auto-hatch). Alpha 0.40 (warming) / 0.55 (ready), `filter: blur(calc(5 * var(--u)))`.
 - The mockup composites each glow normally and then screens the same layer once more. In CSS, use two stacked copies: one normal, one `mix-blend-mode: screen`.
 
 ### 2.3 Nav (shared bottom bar)
@@ -101,13 +101,13 @@ Relative to the nav canvas top (756), so you can place it inside a bottom-docked
 | 1 | back embers (`ember_0n.webp`) |
 | 2 | `cabinet_back.webp` |
 | 3 | row back-light glow |
-| 4 | ready ring (`ring_sheet.webp` sprite / `ring.webp`), only on ready cells |
+| 4 | ring (`ring_sheet.webp` sprite / `ring.webp`), only on eggs with ≤ 2,000 steps left |
 | 5 | `shelf.webp` (hides the ring's faint lowest wisps) |
 | 6 | shelf light spill |
 | 7 | egg on nest (`<dragon>_nest.webp`) / `nest_empty.webp` |
 | 8 | (optional ring front strands. The mask asset isn't in the repo, so skip this.) |
 | 9 | `tube_connector.webp` |
-| 10 | tube stack. Warming: `tube_track_back` → `fill_<dragon>` (cropped) → sheen → meniscus → `tube_track_front`. Ready: `tube_track_back` → `tube_ready_full` → `tube_ready_label`. |
+| 10 | tube stack. Warming: `tube_track_back` → `fill_<dragon>` (cropped) → sheen → meniscus → `tube_track_front`. Ready (unused with auto-hatch): `tube_track_back` → `tube_ready_full` → `tube_ready_label`. |
 | 11 | `cabinet_frame.webp` |
 | 12 | `banner_panel.webp` + banner text |
 | 13 | status line |
@@ -154,27 +154,21 @@ SPEC.md draws per row (row 2's ring after row 1's tubes). Putting all rings at z
 - **Progress changes** animate over **600 ms easeOutCubic** (`cubic-bezier(.33,1,.68,1)`). Animate `--edge` (register it with `@property --edge { syntax: '<number>'; inherits: true; initial-value: 0 }`) or use the Web Animations API. The tube must not be re-created on every render, or the transition can't run. Never animate backwards, except on reset.
 - Sparkles twinkle (opacity 0.4 ↔ 1, 1.2–2.0 s random periods) and bubbles drift up 1–2 px on a 2.5 s loop. These are optional polish, and the spec gives no sprite for them (they're baked into the fill image).
 
-## 5. Ready state (p ≥ 1)
+## 5. Near-ready state (≤ 2,000 steps left), then auto-hatch
 
-What changes when an egg is ready:
+**Ryan's decision (Oct 4, 2026): keep auto-hatch.** Eggs hatch on their own at 0 steps left. There is no tap-to-hatch and no persistent "ready" egg. Keep the current code (`RING_STEPS = 2000`, `stepsLeft(e) <= RING_STEPS`, `autoHatch()`). Don't change it to `eggReady(e)`.
 
-1. **Tube**: draw `tube_track_back` → `tube_ready_full` → `tube_ready_label`, with no `fill_<dragon>` and no `tube_track_front`.
-   - `tube_ready_full` breathes `filter: brightness(1 → 1.12 → 1)` on a **2 s** sine.
-   - On the transition to ready, crossfade from the egg-colour fill to gold over **500 ms**, then fade in the label over **250 ms**.
-   - Live-text alternative for the label: "Ready", Lato Bold 13, letter-spacing 0.2 px, `#FFF6E0`, shadow `#5A2400`.
-2. **Ring**: behind the shelf and egg (z 4), box = slot grown 25% left, 25% right, 50% up, and 0% down. That's left slotX − 25, top slotY − 50, 150 × 150. The ring centre lands at (slotX + 50, slotY + 25), and the band's outer radius is about 59 px.
-3. **Egg wobble**:
+What changes when an egg has 2,000 steps or fewer left:
+
+1. **Ring**: behind the shelf and egg (z 4), box = slot grown 25% left, 25% right, 50% up, and 0% down. That's left slotX − 25, top slotY − 50, 150 × 150. The ring centre lands at (slotX + 50, slotY + 25), and the band's outer radius is about 59 px.
+   - It fades in once (`ring-in`, 0.6 s) when the egg crosses into the window. It must **not** restart the fade on every re-render (see §11, item 3).
+   - Edge cases: show it at exactly 2,000 left (not at 2,001). If one big step add jumps from more than 2,000 left straight to 0, skip the ring and hatch normally.
+2. **Tube**: keeps the egg-colour `fill_<dragon>` filling as usual. The gold ready tube (`tube_ready_full`, `tube_ready_label`, `fill_ready.webp`) isn't used with auto-hatch. Leave those files in `art/nest/`; they're unused for now.
+3. **Egg wobble**: during the same window, the egg wobbles so the "almost there" moment reads at a glance. If the code already wobbles near-ready eggs, keep it and match these timings.
    - Rotate the slot around its bottom centre (`transform-origin: 50% 95%`; the nest base sits at y 342 of the 360 px file) through 0° → −4° → +4° → −2.5° → +1.5° → 0° over **0.9 s** easeInOutSine.
    - Add scaleX 1.02 / scaleY 0.98 on the first swing.
-   - Rest **2.2 s**. The spec adds ±0.4 s per egg; the CSS version uses a per-egg random negative delay, and exact jitter needs JS.
-4. **Copy**:
-   - Card caps become `<RARITY> EGG · READY`.
-   - Banner: `<Egg> is ready to crack! Tap it to hatch.`
-   - Status line: `{n} eggs warming · **{k} ready to crack**. Every step you walk warms all of them at once.` The bold span appears only when k ≥ 1.
-5. **Nav dot** on NEST:
-   - Visible while k ≥ 1, including when the Nest tab is active.
-   - Pops in with scale 0 → 1.15 → 1 over **300 ms** easeOutBack (`cubic-bezier(.34,1.56,.64,1)`).
-   - Idles with opacity 0.7 ↔ 1 on a **1.6 s** sine.
+   - Rest **2.2 s**, with a per-egg random negative delay so the eggs don't wobble in sync.
+4. **Copy**: keep the current copy. The "ready to crack" banner, status-line span, `· READY` card caps, and NEST nav dot belong to the dropped tap-to-hatch flow, so don't add them.
 
 ### 5.1 Ring sprite: `ring_sheet.webp`
 
@@ -189,7 +183,7 @@ What changes when an egg is ready:
 ```css
 .ring { position:absolute; width:calc(150*var(--u)); height:calc(150*var(--u)); z-index:4;
         overflow:hidden; pointer-events:none;
-        animation: ring-in .6s cubic-bezier(.33,1,.68,1) both; }          /* fade in when the egg becomes ready */
+        animation: ring-in .6s cubic-bezier(.33,1,.68,1) both; }          /* fade in once when the egg reaches 2,000 steps left */
 .ring .rs { width:100%; height:100%;
         background: url(art/nest/ring_sheet.webp) 0 0 / 1200% 800% no-repeat;   /* 12 × 8 cells */
         animation: ring-x .5s steps(12) infinite, ring-y 4s steps(8) infinite; }
@@ -332,11 +326,9 @@ Selection: the banner and card describe the selected egg. By default that's the 
 
 I measured these in headless Chrome at a 390 × 844 viewport, using the mockup's 9-egg state, at commit `8b75456`. The positions in `renderNest()` (slots, rings, shelves, tubes, connectors, banner, cabinet, card panel, portrait box) already match the spec exactly. These are the differences:
 
-1. **The Ready state basically never appears (decision for Ryan).**
-   - `autoHatch()` hatches an egg as soon as it's ready. It runs after every step add (line 875) and on load (line 1058).
-   - The ring is shown at `stepsLeft(e) <= RING_STEPS` (2000 steps left, line 746) instead of at p ≥ 1.
-   - Result: the ready tube, wobble, "ready to crack" status, and NEST dot never get a chance to show.
-   - Fix if following the spec: drop auto-hatch (hatch on tap / "Crack it") and change line 746 to `if (e && eggReady(e))`. Otherwise, update the spec so the ring means "nearly ready".
+1. **Ready state: resolved, keep auto-hatch (Ryan, Oct 4).**
+   - Keep `autoHatch()` and the ring at `stepsLeft(e) <= RING_STEPS` (2,000 steps left). No code change is needed for the hatch flow itself.
+   - Make sure the ring shows at exactly 2,000 left, and that a big step jump past the window still hatches cleanly (§5).
 2. **Night Egg rarity.** `ITEMS` has `rarity:"Epic"` for `void`, but the spec says **Prize**. The card caps would read "EPIC EGG". Fix: rename it to `"Prize"`, and rename the matching key in `RARITY` (`Epic:{mut:.12}`) and the `.r-epic` class, or have Ryan confirm Epic.
 3. **Tube leading edge is square.**
    - Current: `clip-path: inset(0 X% 0 0 round 0 7.6u 7.6u 0)`. That rounds the corners of the full 28 px canvas, not the 15.2 px liquid, so the liquid end reads square.
@@ -366,28 +358,24 @@ I measured these in headless Chrome at a 390 × 844 viewport, using the mockup's
 11. **Sheen is too wide and not confined to the liquid.**
     - Current: the band is about 58 px wide (20% of a 300% background) at 28% opacity, clipped with the same rect as the fill, so it also covers the glow.
     - Fix: 12 px band at 25%, masked to the liquid area (x 7.4…edge, y 6.4…21.6). Keep 3.2 s with about 1.2 s of motion.
-12. **No egg-colour → gold crossfade** (500 ms) **or label fade-in** (250 ms) when a tube becomes ready.
-    - `fill_ready.webp` is unused.
-    - The ready tube also skips `tube_track_back`. Visually that's negligible (I measured a 0.17/255 mean difference), so it's optional.
-13. **NEST dot has no pop-in** (scale 0 → 1.15 → 1, 300 ms, easeOutBack). **The tab underline doesn't slide** (250 ms); it's a per-tab `::before`, so make it one shared element that moves.
+12. ~~Gold crossfade on ready~~: not needed with auto-hatch. `fill_ready.webp` and the gold tube stay unused.
+13. **The tab underline doesn't slide** (250 ms); it's a per-tab `::before`, so make it one shared element that moves.
 14. **Portrait egg slightly too big.**
     - Current: `.hx-portrait .pe` at left −2.5%, top −11.4%, size 105% for every egg, so the egg is about 85.6 px tall instead of fitting 84.
     - Fix: use the per-egg values in §6 (e.g. cinder −1.72%, −10.78%, 103.45%).
-15. **Default selection.** Index selects the most-progressed egg, which can be a ready egg. The spec says the warming egg closest to cracking. This only matters once ready eggs persist (see item 1).
+15. **Default selection**: with auto-hatch, ready eggs never persist, so the current "most-progressed egg" default is fine. No change.
 16. **Fonts outside the Nest (decision).**
     - The Nest correctly uses Lato and Cormorant Garamond 600.
     - The other screens use `--display: Gloock` and `--body: Albert Sans`.
     - If Cormorant Garamond / Lato should be app-wide, set `--display: "Cormorant Garamond", …` and `--body: "Lato", …`, then drop Gloock and Albert Sans from the Google Fonts URL.
 17. **Wobble jitter**: fixed 3.1 s period plus a per-egg phase. The spec wants the rest to vary ±0.4 s per egg. Minor; it would need the Web Animations API.
-18. Ready banner copy reads "Tap Crack it below to hatch it." (spec: "Tap it to hatch."). Probably intentional because of the "Crack it" button. Confirm.
+18. Ready banner copy: keep whatever the current code says. The spec's "ready to crack" copy belonged to the dropped tap-to-hatch flow.
 
 Not Nest-specific, but visible on the Nest: the empty `#toast` peeks 2.4 px into the top of the screen. It's 24 px tall when empty and `translateY(-140%)` only moves it 33.6 px. Fix: `transform: translateY(calc(-100% - 16px))`, or `visibility: hidden` when it lacks `.show`.
 
 ## 12. Open TODOs (not determinable from the inputs)
 
 - Text box widths for the banner, status line, and card text. The spec gives only x positions and baselines.
-- Whether `fill_ready.webp` is used for the colour → gold crossfade, or dropped.
-- Whether the Ready state should wait for a tap (spec) or auto-hatch (current game).
 - Night Egg rarity: Prize (spec) or Epic (code).
 - Whether to ship the sharper 512 px ring sheet (not in the repo) for 3× screens.
 - Empty-nest opacity: index uses 0.55, and the spec doesn't say.
