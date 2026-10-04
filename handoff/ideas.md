@@ -11,7 +11,7 @@ Status key: **wanted** (Ryan approved), **maybe**, **later**. Everything starts 
 
 ## Eggs and hatching
 - **Crack stages.** Eggs wobble and crack more as warming steps run out (hairline, spreading, glowing seams). Animator is planning this. (maybe)
-- **Mutation tease.** If an egg will hatch a mutation, the glowing seams in the last crack stage show an off color, like cold teal instead of ember red. (maybe)
+- **Mutation tease.** If an egg will hatch a mutation, the glow shows an off color (like cold teal instead of ember red) during the last 2,000 steps while the ring is up. Eggs still auto-hatch. (maybe)
 - **Eggs tied to real time.** Some eggs only hatch at night or on weekends. (later)
 
 ## Dragons

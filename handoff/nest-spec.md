@@ -230,7 +230,7 @@ The spec takes `<dragon>_egg.webp`, crops it to its alpha bounds, fits it into a
 | `brine` | Tide Egg (teal) | Brine | Common | `#128399` | `#033F4E` / `#2EC3D9` / `#9BEFF8` | Pearl |
 | `stormling` | Squall Egg (indigo lattice) | Stormling | Rare | `#3C35A6` | `#1B1650` / `#6C62EE` / `#BDB6FF` | Sapphire |
 | `moss` | Grove Egg (green) | Moss | Uncommon | `#3E7A16` | `#1D3806` / `#6FBE2C` / `#BDF07E` | Emerald |
-| `voidling` | Night Egg (purple) | Voidling | Prize | `#6A2C90` | `#2D0E43` / `#A64FD6` / `#DCA2F5` | Amethyst |
+| `voidling` | Night Egg (purple) | Voidling | Epic | `#6A2C90` | `#2D0E43` / `#A64FD6` / `#DCA2F5` | Amethyst |
 | `tempest` | Storm Egg (slate, lightning crack) | Tempest | Legendary | `#5D6470` | `#2A2C32` / `#9EA8B8` / `#EEF3FA` | Ice-blue topaz |
 | ready state | n/a | n/a | n/a | `#DC8A1A` (light spill uses `#FFBE3E`) | `#8A3A04` / `#FFBE3E` / `#FFF3BE` | n/a |
 
@@ -329,7 +329,7 @@ I measured these in headless Chrome at a 390 × 844 viewport, using the mockup's
 1. **Ready state: resolved, keep auto-hatch (Ryan, Oct 4).**
    - Keep `autoHatch()` and the ring at `stepsLeft(e) <= RING_STEPS` (2,000 steps left). No code change is needed for the hatch flow itself.
    - Make sure the ring shows at exactly 2,000 left, and that a big step jump past the window still hatches cleanly (§5).
-2. **Night Egg rarity.** `ITEMS` has `rarity:"Epic"` for `void`, but the spec says **Prize**. The card caps would read "EPIC EGG". Fix: rename it to `"Prize"`, and rename the matching key in `RARITY` (`Epic:{mut:.12}`) and the `.r-epic` class, or have Ryan confirm Epic.
+2. **Night Egg rarity: resolved, it's Epic (Ryan, Oct 4).** The code is already correct, so leave it alone. "Prize" isn't a rarity; it's the label for whichever dragon is currently getting the steps.
 3. **Tube leading edge is square.**
    - Current: `clip-path: inset(0 X% 0 0 round 0 7.6u 7.6u 0)`. That rounds the corners of the full 28 px canvas, not the 15.2 px liquid, so the liquid end reads square.
    - Fix: use the two-layer mask in §4, with JS setting `--edge`.
@@ -376,6 +376,5 @@ Not Nest-specific, but visible on the Nest: the empty `#toast` peeks 2.4 px into
 ## 12. Open TODOs (not determinable from the inputs)
 
 - Text box widths for the banner, status line, and card text. The spec gives only x positions and baselines.
-- Night Egg rarity: Prize (spec) or Epic (code).
 - Whether to ship the sharper 512 px ring sheet (not in the repo) for 3× screens.
 - Empty-nest opacity: index uses 0.55, and the spec doesn't say.
