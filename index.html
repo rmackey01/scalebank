@@ -360,7 +360,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .rv-card{position:absolute;z-index:3;opacity:0;pointer-events:none;overflow:hidden}
 .rv-card.show{opacity:1}
 .rv-card.anim{transition:transform .6s cubic-bezier(.215,.61,.355,1),opacity .375s}
-.rv-card-inner{position:absolute;inset:0;background:#0d0b0a;border-style:solid;border-image:url(art/nest/info_card_panel.webp) 132 fill / calc(121.85px*var(--k)) stretch;box-sizing:border-box}
+.rv-card-inner{position:absolute;inset:calc(16px*var(--k));background:#0d0b0a;border-radius:calc(24px*var(--k))}.rv-card-border{position:absolute;inset:0;border-style:solid;border-image:url(art/nest/info_card_panel.webp) 132 fill / calc(121.85px*var(--k)) stretch;pointer-events:none}
 .rv-portraits{position:absolute;left:0;right:0;top:calc(112px*var(--k));display:flex;align-items:center;justify-content:center;gap:calc(290px*var(--k))}
 .rv-portrait{position:relative;width:calc(210px*var(--k));height:calc(210px*var(--k));flex-shrink:0}
 .rv-portrait img{position:absolute;width:100%;height:100%}
@@ -371,7 +371,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .rv-label{font-family:"Lato",var(--body);font-weight:700;font-size:calc(24px*var(--k));letter-spacing:calc(4px*var(--k));text-transform:uppercase;text-shadow:0 calc(1px*var(--k)) calc(2px*var(--k)) rgba(0,0,0,.5);text-align:center;min-width:calc(210px*var(--k))}
 .rv-label.from{color:#c3b197}
 .rv-label.to{color:#eeca74}
-.rv-change{position:absolute;left:calc(80px*var(--k));right:calc(80px*var(--k));text-align:center;font-family:"Lato",var(--body);font-weight:400;color:#ededea;white-space:pre-line}
+.rv-change{position:absolute;left:calc(36px*var(--k));right:calc(36px*var(--k));text-align:center;font-family:"Lato",var(--body);font-weight:400;color:#ededea;white-space:pre-line}
 .rv-divider{position:absolute;left:50%;transform:translateX(-50%);width:calc(760px*var(--k));height:calc(2px*var(--k));background:linear-gradient(90deg,transparent,#e1b567 10%,#e1b567 90%,transparent)}
 .rv-divider::after{content:"";position:absolute;left:50%;top:50%;width:calc(12px*var(--k));height:calc(12px*var(--k));background:#e1b567;transform:translate(-50%,-50%) rotate(45deg)}
 .rv-steps{position:absolute;left:0;right:0;text-align:center}
@@ -582,6 +582,15 @@ function toast(msg){
 
 /* ================= growth reveal system (growth-reveal-spec) ================= */
 function revealSrc(line, key){ return `art/reveals/${line}-${key}`; }
+function packPhrases(phrases, maxLines){
+  if (phrases.length <= maxLines) return phrases;
+  const result = [];
+  const perLine = Math.ceil(phrases.length / maxLines);
+  for (let i = 0; i < phrases.length; i += perLine){
+    result.push(phrases.slice(i, i + perLine).join(" · "));
+  }
+  return result;
+}
 const REVEAL_OK = new Map();
 function revealAvailable(line, key){
   const id = `${line}-${key}`;
@@ -623,12 +632,14 @@ function openReveal(d, was, now, key){
   const changeLine = CHANGE_LINES[changeKey] || "";
   const fontSize = (panelH === 636 || panelH === 672) ? 28 : 31;
   const lineHeight = fontSize === 28 ? 36 : 40;
-  const lines = changeLine.split(" · ");
+  const phrases = changeLine.split(" · ");
+  const maxLines = Math.round((panelH - 600) / lineHeight) + 1;
+  const lines = packPhrases(phrases, maxLines);
 
   revealActive = {d, was, now, key, seen, reducedMotion, burstTime: 0, payoffReady: false, skipUnlocked: seen, panelH};
   revealFocusReturn = document.activeElement;
 
-  const arrowSVG = `<svg viewBox="0 0 170 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rvag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE6A0"/><stop offset=".5" stop-color="#F3C859"/><stop offset="1" stop-color="#C68A30"/></linearGradient></defs><path d="M5 4L45 32L5 60 M65 4L105 32L65 60 M125 4L165 32L125 60" stroke="url(#rvag)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const arrowSVG = `<svg viewBox="0 0 170 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rvag" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFE6A0"/><stop offset=".5" stop-color="#F3C859"/><stop offset="1" stop-color="#C68A30"/></linearGradient></defs><path d="M2 4L42 32L2 60L12 32Z M57 4L97 32L57 60L67 32Z M112 4L152 32L112 60L122 32Z" fill="url(#rvag)"/></svg>`;
 
   let mediaHTML;
   if (reducedMotion){
@@ -645,6 +656,7 @@ function openReveal(d, was, now, key){
     <button class="rv-hit${seen ? "" : " locked"}" id="rvHit" aria-label="Skip to the result"></button>
     <div class="rv-card${reducedMotion ? " show" : ""}" id="rvCard" data-panel-h="${panelH}">
       <div class="rv-card-inner"></div>
+      <div class="rv-card-border"></div>
       <div class="rv-portraits">
         <div class="rv-portrait"><img src="art/nest/portrait_backing.webp" alt=""><img class="pe" src="${stageSrc(d.line, was)}.webp" alt=""><img src="art/nest/portrait_frame.webp" alt=""></div>
         <div class="rv-portrait"><img src="art/nest/portrait_backing.webp" alt=""><img class="pe" src="${stageSrc(d.line, now)}.webp" alt=""><img src="art/nest/portrait_frame.webp" alt=""></div>
@@ -674,7 +686,12 @@ function openReveal(d, was, now, key){
     }
     video.addEventListener("playing", () => { video.style.opacity = "1"; }, {once:true});
     video.play().catch(() => { closeRevealFallback(); });
-    video.addEventListener("timeupdate", onRevealTime);
+    if (video.requestVideoFrameCallback) {
+      const rvfc = () => { onRevealTime(); if (!revealActive?.payoffReady) video.requestVideoFrameCallback(rvfc); };
+      video.requestVideoFrameCallback(rvfc);
+    } else {
+      video.addEventListener("timeupdate", onRevealTime);
+    }
     video.addEventListener("ended", onRevealEnded);
     document.addEventListener("visibilitychange", onRevealVisibility);
   } else {
@@ -741,12 +758,18 @@ function onRevealTime(){
     if (card){
       const panelH = PANEL_H[`${ra.d.line}-${ra.key}`] || 600;
       const k = parseFloat(card.style.getPropertyValue("--k")) || 1;
-      const d = (2280 - (1742 - panelH/2)) * k;
-      card.style.transform = `translateY(${d}px)`;
+      const fullD = (2280 - (1742 - panelH/2)) * k;
+      const late = Math.max(0, t - T(10.25));
+      const progress = Math.min(1, late / 0.6);
+      const startD = fullD * (1 - progress);
+      const remainDur = Math.max(0.05, 0.6 - late);
+      card.style.transition = `transform ${remainDur}s cubic-bezier(.215,.61,.355,1), opacity ${Math.min(0.375, remainDur)}s`;
+      card.style.transform = `translateY(${startD}px)`;
+      card.style.opacity = String(Math.min(1, late / 0.375));
       card.offsetHeight;
-      card.classList.add("anim");
       card.classList.add("show");
       card.style.transform = "translateY(0)";
+      card.style.opacity = "1";
     }
   }
   if (!ra.continueEnabled && t >= T(12.45)){
@@ -779,6 +802,9 @@ function onRevealVisibility(){
 function skipReveal(){
   const ra = revealActive, video = $("#rvVideo");
   if (!ra || !ra.skipUnlocked) return;
+  ra.cardStarted = true;
+  ra.payoffReady = true;
+  ra.continueEnabled = true;
   if (video){
     video.style.opacity = "1";
     const T = getT(video);
@@ -786,11 +812,9 @@ function skipReveal(){
     video.play().catch(() => {});
   }
   const card = $("#rvCard");
-  if (card){ card.classList.add("show"); card.classList.remove("anim"); card.style.transform = ""; }
+  if (card){ card.style.transition = "none"; card.style.transform = ""; card.style.opacity = "1"; card.classList.add("show"); }
   const btn = $("#rvContinue"); if (btn){ btn.hidden = false; btn.focus(); }
   const hit = $("#rvHit"); if (hit) hit.style.pointerEvents = "none";
-  ra.payoffReady = true;
-  ra.continueEnabled = true;
   markRevealSeen();
 }
 
