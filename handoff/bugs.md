@@ -7,7 +7,8 @@ Last tested: Oct 3, 2026, live artifact build (before the repo existed).
 ---
 
 ## B1. Nest only gives one egg an accessible name when two are warming
-- **Status:** open
+- **Status:** fixed
+- **Fix note:** Didn't reproduce in the repo build: every Nest slot already gets its own label inside the slot loop (e.g. "Tide Egg, 0% warm, 8,000 steps to go"). Checked with Ember + Tide at 390 px and 1280 px. Please retest.
 - **Severity:** medium (accessibility)
 - **Steps:** Fresh run → Bank: tap +2,000 and +10,000 → Vendors: buy Ember Egg, then Tide Egg → open Nest.
 - **Expected:** Each egg in the Nest has its own accessible name and status (e.g. `aria-label="Tide Egg, warming, 1,200 steps to hatch"`).
@@ -15,7 +16,8 @@ Last tested: Oct 3, 2026, live artifact build (before the repo existed).
 - **Fix hint:** Generate the label per egg inside the loop that renders Nest slots, rather than once for the first egg.
 
 ## B2. Nest board scrolls both horizontally and vertically inside a narrow column
-- **Status:** open
+- **Status:** fixed
+- **Fix note:** Edge embers poked 14 px past the stage. The stage now clips (`overflow: hidden`) and is 764 tall instead of 776, so there's no scroll at all on a 390 × 844 phone and vertical-only scroll on desktop (the app stays a 480 px phone column there by design).
 - **Severity:** low (layout)
 - **Steps:** Open Nest with 2+ eggs on a desktop-width window (1280px wide).
 - **Expected:** The whole egg board fits without inner scrollbars, or scrolls in one direction only.
@@ -23,7 +25,8 @@ Last tested: Oct 3, 2026, live artifact build (before the repo existed).
 - **Note:** Animator's `handoff/nest-spec.md` defines the intended layout. Follow it, and this should go away.
 
 ## B3. Two-tap confirm isn't explained until after the first tap
-- **Status:** open
+- **Status:** fixed
+- **Fix note:** Buy buttons now say "Tap twice to buy" up front. Reset is a red danger button that says "Wipes all progress · tap twice", turns solid red with "Tap again to wipe everything / Cancels in 3 seconds" when armed, and both armed states time out after 3 s.
 - **Severity:** low (UX)
 - **Steps:** Vendors → tap any affordable item once. Separately: tap "Reset to first run" once.
 - **Expected:** It's clear before tapping that a second tap is needed, and the reset (which wipes all progress) looks clearly destructive.
@@ -37,4 +40,5 @@ Last tested: Oct 3, 2026, live artifact build (before the repo existed).
 - **Console 403 on `claude.ai/api/account`:** comes from the claude.ai artifact wrapper on page load, not from this app. Ignore.
 
 ## Testing request
+- **Status:** done. Open the app with `?debug=1` (or `#debug`, for hosts that drop query strings). A Debug tab sits bottom-left with: set bank, walk N steps, jump the prize to any stage, and set every egg to 2,000 left / 1 left / hatch now. Time of day and streak aren't in the game yet, so those controls will come with those features.
 - **Debug panel (requested):** a hidden panel (e.g. `?debug=1`) to set step count, time of day, and streak length directly. Needed so late-game stages, growth reveals, and future night-step/streak overlays can be tested without tens of thousands of taps.
