@@ -257,6 +257,10 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .growth-note{font-size:11px;color:var(--muted);text-align:right}
 .grew-note{font-family:var(--display);font-weight:600;color:var(--gold-hi);font-size:18px;margin:-4px 0 2px;animation:grewnote 2.4s ease-out both}
 @keyframes grewnote{0%,30%{opacity:0;transform:translateY(6px)}50%,100%{opacity:1;transform:none}}
+.replay-reveal{margin-top:10px;background:transparent;border:1px solid var(--gold-lo);color:var(--gold);padding:6px 12px;border-radius:8px;font-size:13px;font-weight:600}
+.growth .bar{height:8px;background:var(--stone-2);border-radius:4px;margin-top:8px;overflow:hidden}
+.growth .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-lo),var(--gold));border-radius:4px}
+.growth .prog{font-size:13px;color:var(--muted);margin-top:6px}
 
 /* ---------- overlays ---------- */
 .overlay{position:absolute;inset:0;z-index:20;background:rgba(6,8,11,.88);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px}
@@ -347,6 +351,37 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .dbg button{background:var(--stone-2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px}
 .dbg p{margin:4px 10px 0;max-width:30ch;color:var(--muted);font-size:11px}
 
+/* ---------- growth reveal overlay (§4 of growth-reveal-spec) ---------- */
+.reveal-ov{padding:0;background:#03060b;backdrop-filter:none;z-index:50;display:flex;align-items:center;justify-content:center}
+.rv-frame{position:relative;overflow:hidden}
+.rv-frame video,.rv-frame .rv-still{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block}
+.rv-hit{position:absolute;inset:0;background:none;border:0;padding:0;cursor:pointer;z-index:2}
+.rv-hit.locked{cursor:default}
+.rv-card{position:absolute;z-index:3;opacity:0;pointer-events:none;overflow:hidden}
+.rv-card.show{opacity:1}
+.rv-card.anim{transition:transform .6s cubic-bezier(.215,.61,.355,1),opacity .375s}
+.rv-card-inner{position:absolute;inset:0;border-style:solid;border-image:url(art/nest/info_card_panel.webp) 132 fill / calc(44*var(--k)) stretch;box-sizing:border-box}
+.rv-portraits{position:absolute;left:0;right:0;top:calc(112*var(--k));display:flex;align-items:center;justify-content:center;gap:calc(290*var(--k))}
+.rv-portrait{position:relative;width:calc(210*var(--k));height:calc(210*var(--k));flex-shrink:0}
+.rv-portrait img{position:absolute;width:100%;height:100%}
+.rv-portrait .pe{position:absolute;left:50%;top:50%;width:calc(191*var(--k));height:calc(191*var(--k));transform:translate(-50%,-50%);border-radius:50%;object-fit:cover}
+.rv-arrow{position:absolute;left:50%;top:calc(112*var(--k));width:calc(170*var(--k));height:calc(64*var(--k));transform:translateX(-50%);display:flex;align-items:center;justify-content:center}
+.rv-arrow svg{width:100%;height:100%;display:block}
+.rv-labels{position:absolute;left:0;right:0;top:calc(240*var(--k));display:flex;align-items:center;justify-content:center;gap:calc(290*var(--k))}
+.rv-label{font-family:"Lato",var(--body);font-weight:700;font-size:calc(24*var(--k));letter-spacing:calc(4*var(--k));text-transform:uppercase;text-shadow:0 calc(1*var(--k)) calc(2*var(--k)) rgba(0,0,0,.5);text-align:center;min-width:calc(210*var(--k))}
+.rv-label.from{color:#c3b197}
+.rv-label.to{color:#eeca74}
+.rv-change{position:absolute;left:calc(80*var(--k));right:calc(80*var(--k));text-align:center;font-family:"Lato",var(--body);font-weight:400;color:#ededea;line-height:1.3}
+.rv-divider{position:absolute;left:50%;transform:translateX(-50%);width:calc(760*var(--k));height:calc(1*var(--k));background:linear-gradient(90deg,transparent,#e1b567 20%,#e1b567 80%,transparent)}
+.rv-divider::after{content:"";position:absolute;left:50%;top:50%;width:calc(12*var(--k));height:calc(12*var(--k));background:#e1b567;transform:translate(-50%,-50%) rotate(45deg)}
+.rv-steps{position:absolute;left:0;right:0;text-align:center}
+.rv-steps .num{font-family:"Cormorant Garamond",var(--display);font-weight:700;font-size:calc(56*var(--k));color:#f3c859}
+.rv-steps .txt{font-family:"Cormorant Garamond",var(--display);font-weight:600;font-size:calc(46*var(--k));color:#f3dba0}
+.rv-continue{position:absolute;z-index:4;left:22.222%;top:91.979%;width:55.556%;height:5.625%;background:transparent;border:0;padding:0;cursor:pointer;color:transparent;font-size:0}
+.rv-continue:focus-visible{outline:2px solid var(--gold-hi);outline-offset:4px;border-radius:calc(54*var(--k))}
+.rv-continue[hidden]{display:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
   .scenes{scroll-behavior:auto}
@@ -401,6 +436,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 
   <div class="overlay" id="hatchOv" hidden></div>
   <div class="overlay" id="shareOv" hidden></div>
+  <div class="overlay reveal-ov" id="revealOv" hidden></div>
 </div>
 
 <script>
@@ -450,6 +486,45 @@ const MUTATIONS = {
 /* Only the prize dragon grows, from steps added while it holds the slot. */
 /* Tuned to roughly 7,500 real steps a day: Juvenile in about 4 days, Adult in about 2 weeks, Elder in about 2 months. */
 const STAGES = [{name:"Hatchling", at:0}, {name:"Juvenile", at:30000}, {name:"Adult", at:120000}, {name:"Elder", at:400000}];
+
+/* Growth reveal keys by new stage index (§1 of growth-reveal-spec) */
+const REVEAL_KEY = [null, "h2j", "j2a", "a2e"];
+
+/* Panel height per line+key for payoff card positioning (§7.2) */
+const PANEL_H = {
+  "cinder-h2j":600, "brine-h2j":600, "moss-h2j":600, "voidling-h2j":600, "stormling-h2j":600,
+  "inferno-h2j":640, "tempest-h2j":640,
+  "cinder-j2a":600, "brine-j2a":600, "moss-j2a":600, "voidling-j2a":600, "stormling-j2a":600, "inferno-j2a":600,
+  "tempest-j2a":640,
+  "moss-a2e":636, "cinder-a2e":672, "inferno-a2e":672, "brine-a2e":672, "stormling-a2e":672,
+  "voidling-a2e":680, "tempest-a2e":720
+};
+
+/* Change line text from §7.4 */
+const CHANGE_LINES = {
+  "cinder-h2j":"The body lengthens · The frill opens halfway",
+  "cinder-j2a":"Full disc frill, long wick tail and wings",
+  "cinder-a2e":"The frill is huge and edged with embers · The ash-crust is thick and the ember glow shows through deep cracks · The tail flame is steady and bright",
+  "inferno-h2j":"Plates harden · The horns make half a curl · A stubby mace appears",
+  "inferno-j2a":"Full armor, full ram curl and bright seams",
+  "inferno-a2e":"Massive · Horns curl twice · Plates are cracked like a lava field and the back cones smoke constantly · The rock pedestal is scorched",
+  "brine-h2j":"The body stretches into an S · The crest fin grows",
+  "brine-j2a":"Full fin-wings and long barbels",
+  "brine-a2e":"Very long trailing barbels and a few barnacles and coral crusting on the shoulders · Fins are ragged and frilly · The rock is wet with seaweed",
+  "moss-h2j":"Antlers branch once · Ferns appear · The leaf wings unfurl",
+  "moss-j2a":"Full antler crown and a mossy shell with flowers",
+  "moss-a2e":"Antlers become a small tree canopy with birds' nests and blossoms · The shell is a tiny landscape with mushrooms · Roots grip the pedestal",
+  "tempest-h2j":"Long legs · Horns fork once · Wings now outgrow the body · Markings reach the shoulders",
+  "tempest-j2a":"Double-forked horns · Huge tattered wings held high · Markings cover the whole body",
+  "tempest-a2e":"Horns branch three or more times into a lightning crown · Wing membranes are scorched and torn · Markings glow constantly · A beard of thin crackling filaments · The tallest dragon in the roster",
+  "voidling-h2j":"Lengthens and gets slinkier · The first constellations appear",
+  "voidling-j2a":"Full cloak wings and crisp constellations",
+  "voidling-a2e":"Wing edges fray into living smoke · Constellations cover the body · The eyes glow faintly in the dark",
+  "stormling-h2j":"Wings straighten · The second streamer grows",
+  "stormling-j2a":"Full four-wing \"X\" · Long streamers",
+  "stormling-a2e":"Streamers become long and trailing · The wings have a stained-glass shimmer and the fins look like lace · A small swirl of cloud orbits it"
+};
+
 const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 /* Each vendor has a specialty. A scene opens once you own its keys from the vendor before it, and stays open. */
 const SCENES = [
@@ -504,6 +579,263 @@ function toast(msg){
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
   clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 3200);
 }
+
+/* ================= growth reveal system (growth-reveal-spec) ================= */
+function revealSrc(line, key){ return `art/reveals/${line}-${key}`; }
+const REVEAL_OK = new Map();
+function revealAvailable(line, key){
+  const id = `${line}-${key}`;
+  if (!REVEAL_OK.has(id)){
+    REVEAL_OK.set(id, Promise.race([
+      fetch(`${revealSrc(line, key)}-poster.webp`, {method:"HEAD", cache:"no-cache"}).then(r => r.ok).catch(() => false),
+      new Promise(res => setTimeout(() => res(false), 1500))
+    ]));
+  }
+  return REVEAL_OK.get(id);
+}
+
+let revealActive = null, revealFocusReturn = null;
+
+function startGrowth(grow, msgs){
+  const {d, was, now} = grow;
+  const key = REVEAL_KEY[now];
+  if (!key){ fallbackGrowth(d, now, msgs); return; }
+  revealAvailable(d.line, key).then(ok => {
+    if (ok) openReveal(d, was, now, key);
+    else fallbackGrowth(d, now, msgs);
+  });
+}
+
+function fallbackGrowth(d, now, msgs){
+  toast(`${d.name} grew into ${an(STAGES[now].name)}.`);
+  autoHatch();
+}
+
+function openReveal(d, was, now, key){
+  const ov = $("#revealOv");
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const seen = d.reveals && d.reveals[key];
+  const panelH = PANEL_H[`${d.line}-${key}`] || 600;
+  const cardTop = 1724 - panelH;
+  const cardH = 36 + panelH;
+  const extra = panelH - 600;
+  const changeKey = `${d.line}-${key}`;
+  const changeLine = CHANGE_LINES[changeKey] || "";
+  const fontSize = (panelH === 636 || panelH === 672) ? 28 : 31;
+  const lineHeight = fontSize === 28 ? 36 : 40;
+  const lines = changeLine.split(" · ");
+
+  revealActive = {d, was, now, key, seen, reducedMotion, burstTime: 0, payoffReady: false, skipUnlocked: seen, panelH};
+  revealFocusReturn = document.activeElement;
+
+  const arrowSVG = `<svg viewBox="0 0 170 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rvag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE6A0"/><stop offset=".5" stop-color="#F3C859"/><stop offset="1" stop-color="#C68A30"/></linearGradient></defs><path d="M15 32L45 17V47L15 32Z M65 32L95 17V47L65 32Z M115 32L145 17V47L115 32Z" fill="url(#rvag)"/></svg>`;
+
+  let mediaHTML;
+  if (reducedMotion){
+    mediaHTML = `<img class="rv-still" src="${revealSrc(d.line, key)}-poster.webp" alt="">`;
+  } else {
+    mediaHTML = `<video id="rvVideo" muted playsinline autoplay preload="auto" disablepictureinpicture poster="${revealSrc(d.line, key)}-poster.webp">
+      <source src="${revealSrc(d.line, key)}.webm" type="video/webm">
+      <source src="${revealSrc(d.line, key)}.mp4" type="video/mp4">
+    </video>`;
+  }
+
+  ov.innerHTML = `<div class="rv-frame" id="rvFrame" role="dialog" aria-modal="true" aria-label="${d.name} grew into ${an(STAGES[now].name)}">
+    ${mediaHTML}
+    <button class="rv-hit${seen ? "" : " locked"}" id="rvHit" aria-label="Skip to the result"></button>
+    <div class="rv-card${reducedMotion ? " show" : ""}" id="rvCard" data-panel-h="${panelH}">
+      <div class="rv-card-inner"></div>
+      <div class="rv-portraits">
+        <div class="rv-portrait"><img src="art/nest/portrait_backing.webp" alt=""><img class="pe" src="${stageSrc(d.line, was)}.webp" alt=""><img src="art/nest/portrait_frame.webp" alt=""></div>
+        <div class="rv-portrait"><img src="art/nest/portrait_backing.webp" alt=""><img class="pe" src="${stageSrc(d.line, now)}.webp" alt=""><img src="art/nest/portrait_frame.webp" alt=""></div>
+      </div>
+      <div class="rv-arrow">${arrowSVG}</div>
+      <div class="rv-labels"><span class="rv-label from">${STAGES[was].name}</span><span class="rv-label to">${STAGES[now].name}</span></div>
+      <div class="rv-change" data-extra="${extra}" style="font-size:calc(${fontSize}*var(--k));line-height:calc(${lineHeight}*var(--k))">${esc(lines.join(" · "))}</div>
+      <div class="rv-divider" data-extra="${extra}"></div>
+      <div class="rv-steps" data-extra="${extra}"><span class="num">${fmt(d.xp)}</span> <span class="txt">steps walked together</span></div>
+    </div>
+    <button class="rv-continue" id="rvContinue"${reducedMotion ? "" : " hidden"}>Continue</button>
+    <p class="sr-only" aria-live="polite">${d.name} grew into ${an(STAGES[now].name)}.</p>
+  </div>`;
+  ov.hidden = false;
+  sizeRevealFrame();
+
+  if (!reducedMotion){
+    const video = $("#rvVideo");
+    let loadTimeout = setTimeout(() => { closeRevealFallback(); }, 4000);
+    const clearLoad = () => { clearTimeout(loadTimeout); loadTimeout = null; };
+    video.addEventListener("loadeddata", clearLoad, {once:true});
+    video.addEventListener("error", () => { if (loadTimeout) closeRevealFallback(); }, {once:true});
+    for (const src of video.querySelectorAll("source")){
+      src.addEventListener("error", () => {
+        if (!video.currentSrc && loadTimeout) closeRevealFallback();
+      }, {once:true});
+    }
+    video.play().catch(() => { closeRevealFallback(); });
+    video.addEventListener("timeupdate", onRevealTime);
+    video.addEventListener("ended", onRevealEnded);
+    document.addEventListener("visibilitychange", onRevealVisibility);
+  } else {
+    markRevealSeen();
+  }
+}
+
+function closeRevealFallback(){
+  const ov = $("#revealOv");
+  if (ov.hidden) return;
+  ov.hidden = true; ov.innerHTML = "";
+  if (revealActive) fallbackGrowth(revealActive.d, revealActive.now, []);
+  revealActive = null;
+}
+
+function sizeRevealFrame(){
+  const ov = $("#revealOv"), frame = $("#rvFrame"), card = $("#rvCard");
+  if (!frame) return;
+  const k = Math.min(ov.clientWidth / 1080, ov.clientHeight / 1920);
+  frame.style.width = `${1080 * k}px`;
+  frame.style.height = `${1920 * k}px`;
+  if (card){
+    const panelH = parseInt(card.dataset.panelH) || 600;
+    const cardTop = 1724 - panelH;
+    const cardH = 36 + panelH;
+    const extra = panelH - 600;
+    card.style.setProperty("--k", k);
+    card.style.left = `${36 * k}px`;
+    card.style.top = `${cardTop * k}px`;
+    card.style.width = `${1008 * k}px`;
+    card.style.height = `${cardH * k}px`;
+    const portraits = card.querySelector(".rv-portraits");
+    if (portraits) portraits.style.top = `${43 * k}px`;
+    const arrow = card.querySelector(".rv-arrow");
+    if (arrow) arrow.style.top = `${(148 - 32) * k}px`;
+    const labels = card.querySelector(".rv-labels");
+    if (labels) labels.style.top = `${(276 - 12) * k}px`;
+    const change = card.querySelector(".rv-change");
+    if (change) change.style.top = `${328 * k}px`;
+    const divider = card.querySelector(".rv-divider");
+    if (divider) divider.style.top = `${(398 + extra) * k}px`;
+    const steps = card.querySelector(".rv-steps");
+    if (steps) steps.style.top = `${(456 + extra) * k}px`;
+  }
+  frame.querySelectorAll(".rv-continue").forEach(c => c.style.setProperty("--k", k));
+}
+
+function getT(video){
+  const shift = video.duration > 14.5 ? video.duration - 14.02 : 0;
+  return x => x + (x > 4.6 ? shift : 0);
+}
+
+function onRevealTime(){
+  const video = $("#rvVideo"), ra = revealActive;
+  if (!video || !ra) return;
+  const T = getT(video), t = video.currentTime;
+  if (!ra.skipUnlocked && t >= T(6.10)){
+    ra.skipUnlocked = true;
+    const hit = $("#rvHit"); if (hit) hit.classList.remove("locked");
+  }
+  if (!ra.cardStarted && t >= T(10.25)){
+    ra.cardStarted = true;
+    const card = $("#rvCard");
+    if (card){
+      const panelH = PANEL_H[`${ra.d.line}-${ra.key}`] || 600;
+      const k = parseFloat(card.style.getPropertyValue("--k")) || 1;
+      const d = (2280 - (1742 - panelH/2)) * k;
+      card.style.transform = `translateY(${d}px)`;
+      card.classList.add("show", "anim");
+      requestAnimationFrame(() => { card.style.transform = "translateY(0)"; });
+    }
+  }
+  if (!ra.continueEnabled && t >= T(12.45)){
+    ra.continueEnabled = true;
+    const btn = $("#rvContinue"); if (btn){ btn.hidden = false; btn.focus(); }
+    markRevealSeen();
+  }
+  if (t >= T(12.95) && !ra.payoffReady){
+    ra.payoffReady = true;
+    const hit = $("#rvHit"); if (hit) hit.style.pointerEvents = "none";
+  }
+}
+
+function onRevealEnded(){
+  const ra = revealActive;
+  if (!ra) return;
+  ra.payoffReady = true;
+  const btn = $("#rvContinue");
+  if (btn && btn.hidden){ btn.hidden = false; btn.focus(); }
+  const hit = $("#rvHit"); if (hit) hit.style.pointerEvents = "none";
+  markRevealSeen();
+}
+
+function onRevealVisibility(){
+  const video = $("#rvVideo");
+  if (!video) return;
+  if (document.hidden) video.pause(); else video.play().catch(() => {});
+}
+
+function skipReveal(){
+  const ra = revealActive, video = $("#rvVideo");
+  if (!ra || !ra.skipUnlocked) return;
+  if (video){
+    const T = getT(video);
+    video.currentTime = T(12.95);
+    video.play().catch(() => {});
+  }
+  const card = $("#rvCard");
+  if (card){ card.classList.add("show"); card.classList.remove("anim"); card.style.transform = ""; }
+  const btn = $("#rvContinue"); if (btn){ btn.hidden = false; btn.focus(); }
+  const hit = $("#rvHit"); if (hit) hit.style.pointerEvents = "none";
+  ra.payoffReady = true;
+  ra.continueEnabled = true;
+  markRevealSeen();
+}
+
+function markRevealSeen(){
+  const ra = revealActive;
+  if (!ra || ra.markedSeen) return;
+  ra.markedSeen = true;
+  if (!ra.d.reveals) ra.d.reveals = {};
+  ra.d.reveals[ra.key] = true;
+  save();
+}
+
+function closeReveal(){
+  const ov = $("#revealOv"), ra = revealActive;
+  if (!ra) return;
+  ra.d.seenStage = ra.now;
+  markRevealSeen();
+  save();
+
+  const video = $("#rvVideo");
+  if (video){
+    video.removeEventListener("timeupdate", onRevealTime);
+    video.removeEventListener("ended", onRevealEnded);
+    document.removeEventListener("visibilitychange", onRevealVisibility);
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+  }
+
+  ov.hidden = true; ov.innerHTML = "";
+  revealActive = null;
+  render();
+  autoHatch();
+  if (revealFocusReturn && revealFocusReturn.focus) revealFocusReturn.focus();
+  revealFocusReturn = null;
+}
+
+function replayReveal(d){
+  const si = stageIdx(d);
+  if (si < 1) return;
+  const key = REVEAL_KEY[si];
+  if (!key) return;
+  revealAvailable(d.line, key).then(ok => {
+    if (ok) openReveal(d, si - 1, si, key);
+    else toast("Reveal video not available.");
+  });
+}
+
+window.addEventListener("resize", () => { if (!$("#revealOv").hidden) sizeRevealFrame(); });
 
 /* ================= art: helpers ================= */
 function hex2rgb(h){ h = h.replace("#",""); return [0,2,4].map(i => parseInt(h.substr(i,2),16)); }
@@ -895,13 +1227,14 @@ function renderDragon(){
       ? `<div class="bar"><i style="width:${((xp - st.at) / (nx.at - st.at) * 100).toFixed(1)}%"></i></div>
          <div class="prog">${fmt(xp - st.at)} of ${fmt(nx.at - st.at)} steps to ${nx.name}</div>`
       : `<div class="prog">Fully grown. ${fmt(xp)} steps walked as your prize.</div>`;
+    const replayKey = si >= 1 ? REVEAL_KEY[si] : null;
     h += `<div class="frame"><span class="plaque">Prize dragon</span>
         <div class="stage">${dragonArt(p, {live:true, grow:grew})}</div>
         ${grew ? `<div class="grew-note">Grew into ${an(st.name)}</div>` : ""}
         <p class="pname" id="pname">${esc(p.name)}</p>
         <div class="species">${esc(p.species)} \u00B7 <span class="r ${rcls(rarityOf(p))}">${rarityOf(p)}</span>, from ${an(esc(ITEM[p.item].name))}</div>
         ${p.mut ? `<div class="mutb">${MUTATIONS[p.mut].name} mutation</div>` : ""}
-        <div class="growth"><div class="growth-head"><span class="stage-pill">${st.name}</span><span class="growth-note">Steps you add while it\u2019s your prize grow it</span></div>${growth}</div>
+        <div class="growth"><div class="growth-head"><span class="stage-pill">${st.name}</span><span class="growth-note">Steps you add while it\u2019s your prize grow it</span></div>${growth}${replayKey ? `<button class="reset replay-reveal" data-act="replay-reveal" data-id="${p.id}" hidden>Watch it grow again</button>` : ""}</div>
       </div>
       <button class="btn share-btn" data-act="share">Make share card</button>
       <div class="section"><h2>Customize</h2>
@@ -937,6 +1270,12 @@ function renderDragon(){
     d.name = inp.value.trim() || d.species;
     $("#pname").textContent = d.name; save();
   });
+  /* Show replay button if reveal is available */
+  const replayBtn = $("#dragonBody .replay-reveal");
+  if (replayBtn && p){
+    const si = stageIdx(p), key = si >= 1 ? REVEAL_KEY[si] : null;
+    if (key) revealAvailable(p.line, key).then(ok => { if (ok) replayBtn.hidden = false; });
+  }
 }
 
 function render(){
@@ -951,13 +1290,15 @@ function render(){
 function addSteps(n){
   S.bank += n; S.lifetime += n;
   const msgs = [], p = prizeDragon();
+  let grow = null;
   if (p){
     const was = stageIdx(p); p.xp = (p.xp || 0) + n;
     const now = stageIdx(p);
-    if (now > was) msgs.push(`${p.name} grew into ${an(STAGES[now].name)}.`);
+    if (now > was) grow = {d: p, was, now};
   }
-  if (msgs.length) toast(msgs.join(" "));
-  save(); render(); autoHatch();
+  save(); render();
+  if (grow) startGrowth(grow, msgs);
+  else { if (msgs.length) toast(msgs.join(" ")); autoHatch(); }
 }
 function buy(id){
   const it = ITEM[id];
@@ -1008,7 +1349,7 @@ function hatch(eggId){
   const e = S.eggs.find(x => x.id === eggId);
   if (!e || !eggReady(e)) return;
   const it = ITEM[e.item], mut = rollMutation(it), species = DRAGONS[it.line].name;
-  const d = {id: "drg" + (S.seq++), item: it.id, line: it.line, species, mut, xp: 0, seenStage: 0, name: species, trail: null};
+  const d = {id: "drg" + (S.seq++), item: it.id, line: it.line, species, mut, xp: 0, seenStage: 0, name: species, trail: null, reveals: {}};
   S.eggs = S.eggs.filter(x => x !== e);
   S.dragons.push(d);
   const toPrize = !S.prize;
@@ -1064,6 +1405,15 @@ function openShare(){
 let resetArmed = false, resetT;
 const RESET_IDLE = "Reset to first run<small>Wipes all progress \u00B7 tap twice</small>", RESET_ARMED = "Tap again to wipe everything<small>Cancels in 3 seconds</small>";
 document.addEventListener("click", ev => {
+  /* Handle reveal overlay clicks */
+  if (!$("#revealOv").hidden){
+    if (ev.target.id === "rvHit" || ev.target.closest("#rvHit")){
+      skipReveal(); return;
+    }
+    if (ev.target.id === "rvContinue" || ev.target.closest("#rvContinue")){
+      closeReveal(); return;
+    }
+  }
   const tab = ev.target.closest(".tab");
   if (tab){ setTab(tab.dataset.tab); return; }
   const b = ev.target.closest("[data-act]");
@@ -1081,6 +1431,7 @@ document.addEventListener("click", ev => {
   else if (a === "close-hatch") closeHatch();
   else if (a === "equip"){ const d = prizeDragon(); if (d){ d[b.dataset.k] = b.dataset.v || null; save(); render(); } }
   else if (a === "prize"){ S.prize = b.dataset.id; save(); render(); }
+  else if (a === "replay-reveal"){ const d = S.dragons.find(x => x.id === b.dataset.id); if (d) replayReveal(d); }
   else if (a === "share") openShare();
   else if (a === "close-share"){ $("#shareOv").hidden = true; $("#shareOv").innerHTML = ""; autoHatch(); }
   else if (a === "copy"){
@@ -1098,7 +1449,7 @@ document.addEventListener("click", ev => {
   }
 });
 document.addEventListener("keydown", ev => {
-  if (S.tab === "vendors" && (ev.key === "ArrowLeft" || ev.key === "ArrowRight") && $("#shareOv").hidden && $("#hatchOv").hidden
+  if (S.tab === "vendors" && (ev.key === "ArrowLeft" || ev.key === "ArrowRight") && $("#shareOv").hidden && $("#hatchOv").hidden && $("#revealOv").hidden
       && !(ev.target.closest && ev.target.closest("input,textarea,.fchips"))){
     ev.preventDefault();
     scrollToScene(S.scene + (ev.key === "ArrowLeft" ? -1 : 1), true);
@@ -1106,6 +1457,12 @@ document.addEventListener("keydown", ev => {
     return;
   }
   if (ev.key !== "Escape") return;
+  /* Reveal overlay: Escape skips (if allowed) or closes (if payoff ready) */
+  if (!$("#revealOv").hidden && revealActive){
+    if (revealActive.payoffReady){ closeReveal(); return; }
+    if (revealActive.skipUnlocked){ skipReveal(); return; }
+    return;
+  }
   if (!$("#shareOv").hidden){ $("#shareOv").hidden = true; }
   else if (!$("#hatchOv").hidden && $("#hafter")?.classList.contains("show")) closeHatch();
 });
@@ -1114,6 +1471,35 @@ window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene
 /* ================= debug panel ================= */
 /* For testing late-game states without thousands of taps. Only shown with ?debug=1 or #debug. */
 const DEBUG = /[?&]debug=1(&|$)/.test(location.search) || location.hash === "#debug";
+
+/* Debug URL params: ?debug=1&xp=N sets prize dragon xp, &dragon=line picks dragon, &eggsteps=N sets eggs' steps-left */
+function applyDebugParams(){
+  if (!DEBUG) return;
+  const params = new URLSearchParams(location.search);
+  const xpVal = params.get("xp");
+  const dragonLine = params.get("dragon");
+  const eggStepsLeft = params.get("eggsteps");
+
+  /* Select dragon by line if specified */
+  if (dragonLine){
+    const d = S.dragons.find(x => x.line === dragonLine.toLowerCase());
+    if (d){ S.prize = d.id; }
+  }
+
+  /* Set xp on prize dragon */
+  if (xpVal !== null){
+    const p = prizeDragon();
+    if (p){ p.xp = Math.max(0, parseInt(xpVal, 10) || 0); }
+  }
+
+  /* Set egg steps-left */
+  if (eggStepsLeft !== null){
+    const left = Math.max(0, parseInt(eggStepsLeft, 10) || 0);
+    S.eggs.forEach(e => { e.at = S.lifetime - (ITEM[e.item].hatch - left); });
+  }
+
+  save();
+}
 function debugPanel(){
   const el = document.createElement("details");
   el.className = "dbg";
@@ -1149,6 +1535,7 @@ function migrate(){
     }
     if (d.mut && !MUTATIONS[d.mut]) d.mut = null;
     if (d.trail && !ITEM[d.trail]) d.trail = null;
+    if (!d.reveals) d.reveals = {};
     delete d.color; delete d.horns; delete d.base;
   });
   S.eggs.forEach(e => { if (!ITEM[e.item]) e.item = OLD_EGG[e.item] || "ember"; });
@@ -1160,6 +1547,7 @@ function start(data){
   if (!S.opened) S.opened = {};
   migrate();
   ITEMS.forEach(it => { if (S.owned[it.id]) for (let k = 1; k <= it.scene; k++) S.opened[k] = true; });
+  applyDebugParams();
   shown = S.bank;
   $("#balance").textContent = fmt(S.bank);
   buildScenes();
