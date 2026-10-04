@@ -2,7 +2,7 @@
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Albert+Sans:wght@400;500;600;700&family=Lato:wght@400;700;900&family=Cormorant+Garamond:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Lato:wght@400;700;900&display=swap">
 <style>
 /* Layout: one-column phone app, three screens over a fixed bottom tab bar; vendors swipe sideways with scroll-snap. */
 :root{
@@ -17,8 +17,8 @@
   --gold-lo:#7b5517;
   --lantern:#e2583e;
   --jade:#6fbf9f;
-  --display:"Gloock","Iowan Old Style","Palatino Linotype",Georgia,serif;
-  --body:"Albert Sans","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --display:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;  /* headings at weight 600 */
+  --body:"Lato","Avenir Next","Segoe UI",system-ui,sans-serif;
   color-scheme:dark;
 }
 [hidden]{display:none!important}
@@ -33,20 +33,21 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .pad{padding-inline:16px}
 
 /* ---------- tab bar ---------- */
-.tabs{flex:none;position:relative;display:grid;grid-template-columns:repeat(4,1fr);margin:0 8px 6px;padding:6px 0 4px;font-family:"Lato",var(--body)}
+.tabs{flex:none;position:relative;display:grid;grid-template-columns:repeat(4,1fr);margin:0 8px 11px;padding:6px 0 4px;font-family:"Lato",var(--body)}
 .tabs::before{content:"";position:absolute;inset:-6px;pointer-events:none;border-style:solid;border-width:26px 24px;border-image:url(art/nest/nav_bar_bg.webp) 78 72 fill / 26px 24px stretch}
-.tab{position:relative;background:none;border:0;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#c3b197;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tab{position:relative;background:none;border:0;padding:4px 2px 9.55px;display:flex;flex-direction:column;align-items:center;gap:3.65px;color:#c3b197;font-size:11.5px;line-height:13.8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .tab .ti{width:30px;height:30px;display:block}
 .tab .ti.on,.tab[aria-current="page"] .ti.off{display:none}
 .tab[aria-current="page"] .ti.on{display:block}
 .tab[aria-current="page"]{color:#eeca74}
-.tab[aria-current="page"]::before{content:"";position:absolute;top:-8px;left:50%;width:50px;height:12px;transform:translateX(-50%);background:url(art/nest/nav_active_underline.webp) center/contain no-repeat}
-.tab .dot{position:absolute;top:0;left:calc(50% + 5px);width:20px;height:20px;animation:dotpulse 1.6s ease-in-out infinite}
+/* One shared underline that slides to the active tab (--ti is set by setTab). */
+.tab-ul{position:absolute;z-index:1;top:-4.2px;left:calc((var(--ti,0) + .5) * 25%);width:50px;height:12px;margin-left:-25px;pointer-events:none;background:url(art/nest/nav_active_underline.webp) center/100% 100% no-repeat;transition:left .25s cubic-bezier(.65,0,.35,1)}
+.tab .dot{position:absolute;top:-2px;left:calc(50% + 5px);width:20px;height:20px;animation:dotpulse 1.6s ease-in-out infinite}
 @keyframes dotpulse{0%,100%{opacity:.7}50%{opacity:1}}
 
 /* ---------- shared bits ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
-.topbar h1{font-family:var(--display);font-weight:400;font-size:24px;margin:0;letter-spacing:.01em}
+.topbar h1{font-family:var(--display);font-weight:600;font-size:24px;margin:0;letter-spacing:.01em}
 .chip{display:inline-flex;align-items:baseline;gap:5px;padding:5px 11px;border-radius:999px;border:1px solid var(--gold-lo);background:var(--stone);font-variant-numeric:tabular-nums;font-weight:600;font-size:14px;color:var(--gold-hi);white-space:nowrap}
 .chip small{font-weight:500;color:var(--muted);font-size:12px}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
@@ -54,13 +55,13 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .btn:active{transform:translateY(1px);box-shadow:inset 0 1px 0 rgba(255,240,200,.5),0 1px 0 #5c3d0c}
 .btn.ghost{background:transparent;color:var(--gold-hi);box-shadow:none;border-color:var(--gold-lo)}
 .btn[disabled]{background:var(--stone-2);border-color:var(--line);color:var(--muted);box-shadow:none;cursor:default}
-.toast{position:absolute;left:16px;right:16px;top:12px;z-index:30;background:#1b2229;border:1px solid var(--gold-lo);color:var(--fg);padding:11px 14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:14px;transform:translateY(-140%);transition:transform .3s ease}
+.toast{position:absolute;left:16px;right:16px;top:12px;z-index:30;background:#1b2229;border:1px solid var(--gold-lo);color:var(--fg);padding:11px 14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:14px;transform:translateY(calc(-100% - 16px));transition:transform .3s ease}
 .toast.show{transform:none}
 
 /* ---------- bank ---------- */
 #bank{display:flex;flex-direction:column;background:radial-gradient(120% 60% at 50% -10%,rgba(216,169,75,.10),transparent 60%),var(--ink)}
 .bank-main{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px;padding-block:24px}
-.balance{font-family:var(--display);font-size:clamp(64px,22vw,104px);line-height:1;letter-spacing:-.01em;color:var(--fg);font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(216,169,75,.18)}
+.balance{font-family:var(--display);font-weight:600;font-size:clamp(64px,22vw,104px);line-height:1;letter-spacing:-.01em;color:var(--fg);font-variant-numeric:lining-nums tabular-nums;text-shadow:0 0 40px rgba(216,169,75,.18)}
 .balance-unit{font-size:15px;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;font-weight:600}
 .afford{max-width:30ch;margin:18px auto 0;color:var(--fg);opacity:.82;font-size:15px;text-wrap:balance}
 .lifetime{margin-top:22px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -69,14 +70,17 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .step-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .step-btns .btn{padding:15px 10px;font-size:16px}
 .sim-note{text-align:center;font-size:12px;color:var(--muted)}
-.reset{background:none;border:0;color:var(--muted);font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:4px;align-self:center}
-.reset.armed{color:var(--lantern)}
+/* Destructive: red from the start, solid red once armed. The armed state times out after 3 s. */
+.reset{align-self:center;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 16px;border-radius:10px;border:1px solid rgba(226,88,62,.55);background:rgba(226,88,62,.07);color:#f0907a;font-size:13px;font-weight:700;transition:background .15s,color .15s}
+.reset small{font-size:11px;font-weight:400;color:#c98f80}
+.reset.armed{background:#c2412a;border-color:#f3a08b;color:#fff}
+.reset.armed small{color:#ffe0d6}
 
 /* ---------- vendors ---------- */
 #vendors{display:flex;flex-direction:column;overflow:hidden}
 .vrail{position:relative;flex:none;display:grid;grid-template-columns:repeat(3,1fr);margin:12px 16px 6px;padding:4px;background:var(--stone);border:1px solid var(--line);border-radius:14px}
 .vtab{position:relative;z-index:1;background:none;border:0;padding:7px 4px 6px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);min-width:0;transition:color .2s}
-.vtab b{font-family:var(--display);font-weight:400;font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.vtab b{font-family:var(--display);font-weight:600;font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .vtab small{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;gap:3px;align-items:center;opacity:.85}
 .vtab small svg{width:10px;height:10px}
 .vtab[aria-selected="true"]{color:var(--gold-hi)}
@@ -91,7 +95,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .art .shade{position:absolute;inset:auto 0 0 0;height:58%;background:linear-gradient(180deg,transparent,rgba(8,10,13,.92));pointer-events:none}
 .vtitle{position:absolute;left:14px;right:14px;bottom:12px;pointer-events:none}
 .vtitle .eyebrow{color:#d9cfbd}
-.vtitle h2{font-family:var(--display);font-weight:400;font-size:28px;line-height:1.05;margin:3px 0 3px;color:#fff6e6;text-wrap:balance;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.vtitle h2{font-family:var(--display);font-weight:600;font-size:28px;line-height:1.05;margin:3px 0 3px;color:#fff6e6;text-wrap:balance;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .quip{margin:0;color:#d4cab8;font-style:italic;font-size:13px}
 .lockbadge{position:absolute;inset:10px 10px auto auto;display:flex;align-items:center;gap:6px;background:rgba(12,16,21,.85);border:1px solid var(--gold-lo);color:var(--gold-hi);padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .vnav{position:absolute;top:38%;transform:translateY(-50%);width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(244,215,143,.55);background:rgba(10,12,16,.62);color:var(--gold-hi);display:grid;place-items:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
@@ -134,7 +138,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .odds .mut b{color:#e6dcff}
 .buyrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .bought{font-size:12px;color:var(--jade);font-weight:600}
-.iname{font-family:var(--display);font-size:19px;line-height:1.2;margin:1px 0 2px}
+.iname{font-family:var(--display);font-weight:600;font-size:19px;line-height:1.2;margin:1px 0 2px}
 .hint{font-size:13px;color:var(--muted);margin:0 0 8px}
 .buy{min-width:118px;padding:8px 12px;border-radius:10px;font-variant-numeric:tabular-nums;text-align:left;display:inline-flex;flex-direction:column;line-height:1.2}
 .buy small{font-weight:500;font-size:11px;opacity:.85}
@@ -147,7 +151,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .plaque{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#1b1206;background:linear-gradient(180deg,var(--gold-hi),var(--gold));padding:4px 12px;border-radius:4px}
 .stage{display:grid;place-items:center;margin-block:4px}
 .stage .dart{width:min(240px,62vw)}
-.pname{font-family:var(--display);font-size:30px;line-height:1.1;margin:0;overflow-wrap:anywhere}
+.pname{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.1;margin:0;overflow-wrap:anywhere}
 .species{font-size:13px;color:var(--muted)}
 .frame.empty .stage{position:relative;width:min(240px,62vw);margin-inline:auto}
 .padlock{position:absolute;inset:0;display:grid;place-items:center}
@@ -155,7 +159,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .frame.empty .pname{color:var(--muted)}
 .frame.empty p{margin:8px auto 14px;max-width:32ch;color:var(--fg);opacity:.85;text-wrap:balance}
 .section{margin-top:22px}
-.section h2{font-family:var(--display);font-weight:400;font-size:21px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.section h2{font-family:var(--display);font-weight:600;font-size:21px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .section h2 small{font-family:var(--body);font-size:12px;color:var(--muted)}
 .custom{display:flex;flex-direction:column;gap:14px;background:var(--stone);border:1px solid var(--line);border-radius:16px;padding:14px}
 .crow{display:flex;flex-direction:column;gap:7px}
@@ -167,58 +171,75 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .sw{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.25)}
 .none-note{font-size:13px;color:var(--muted);margin:0}
 .share-btn{width:100%;margin-top:14px;padding:14px;font-size:16px}
-/* ---------- nest (asset pack, SPEC.md) ---------- */
-#nest{padding-inline:0;background:#03060b url(art/nest/background.webp) center top/cover no-repeat}
+/* ---------- nest (asset pack, handoff/nest-spec.md) ---------- */
+/* Every length is in spec px on the 390-wide frame (--u). z-index values are the spec's layer numbers (§3). */
+@property --edge{syntax:"<number>";inherits:true;initial-value:0}
+@property --sp{syntax:"<number>";inherits:true;initial-value:0}
+#nest{padding-inline:0;overflow-x:hidden;background:#03060b url(art/nest/background.webp) center top/cover no-repeat}
 .hx{container-type:inline-size;width:100%}
-.hx-in{--u:calc(100cqw / 390);position:relative;width:100%;font-family:"Lato",var(--body)}
-.hx-in > *{position:absolute}
+/* The backdrop lives on the stage too, so the screen-blended embers and glows have something to blend with. */
+.hx-in{--u:calc(100cqw / 390);position:relative;width:100%;overflow:hidden;font-family:"Lato",var(--body);background:#03060b url(art/nest/background.webp) center top/100% auto no-repeat}
+.hx-in > *,.hx-dyn > *{position:absolute}
+.hx-dyn{inset:0}
 .hx-in img{display:block;user-select:none;-webkit-user-drag:none}
-.hx-banner{background:url(art/nest/banner_panel.webp) center/100% 100% no-repeat;display:flex;align-items:center;padding:0 calc(30*var(--u)) 0 calc(29.5*var(--u))}
-.hx-banner p{margin:0;font-size:calc(16*var(--u));line-height:calc(21*var(--u));color:#f5e5c1;text-shadow:0 calc(.6*var(--u)) calc(.8*var(--u)) rgba(0,0,0,.6);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.hx-cab-back{border-style:solid;border-width:calc(24*var(--u)) calc(22*var(--u)) calc(30*var(--u));border-image:url(art/nest/cabinet_back.webp) 72 66 90 fill / calc(24*var(--u)) calc(22*var(--u)) calc(30*var(--u)) stretch;box-sizing:border-box}
-.hx-cab-frame{pointer-events:none;border-style:solid;border-image:url(art/nest/cabinet_frame.webp) 168 102 126 / calc(56*var(--u)) calc(34*var(--u)) calc(42*var(--u)) stretch;border-width:calc(56*var(--u)) calc(34*var(--u)) calc(42*var(--u));box-sizing:border-box;z-index:6}
-.hx-shelf{z-index:2}
-.hx-conn{z-index:4}
-.hx-ring{z-index:1;overflow:hidden;pointer-events:none;animation:ringin .6s cubic-bezier(.33,1,.68,1) both}
-.hx-ring > img{width:100%;height:100%;animation:spin 4s linear infinite}
+.hx-in .em{left:0;top:0;width:calc(24*var(--u));height:calc(24*var(--u));pointer-events:none;mix-blend-mode:screen}
+.hx-in .em img{width:100%;height:100%}
+.hx-banner{z-index:12;background:url(art/nest/banner_panel.webp) center/100% 100% no-repeat}
+.hx-btext,.hx-status,.hx-caps,.hx-body{margin:0;text-shadow:0 calc(.6*var(--u)) calc(.8*var(--u)) rgba(0,0,0,.6)}
+.hx-btext,.hx-status,.hx-body{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hx-btext{z-index:12;font-size:calc(16*var(--u));line-height:calc(21*var(--u));color:#f5e5c1}
+.hx-cab-back{z-index:2;border-style:solid;border-width:calc(24*var(--u)) calc(22*var(--u)) calc(30*var(--u));border-image:url(art/nest/cabinet_back.webp) 72 66 90 fill / calc(24*var(--u)) calc(22*var(--u)) calc(30*var(--u)) stretch;box-sizing:border-box}
+.hx-cab-frame{z-index:11;pointer-events:none;border-style:solid;border-image:url(art/nest/cabinet_frame.webp) 168 102 126 / calc(56*var(--u)) calc(34*var(--u)) calc(42*var(--u)) stretch;border-width:calc(56*var(--u)) calc(34*var(--u)) calc(42*var(--u));box-sizing:border-box}
+/* Glows from build_mockup.py: each is drawn twice, once normally and once screened. */
+.hx-blight{z-index:3;border-radius:50%;background:#5a3216;opacity:.22;filter:blur(calc(18*var(--u)))}
+.hx-spill{z-index:6;height:calc(16*var(--u));width:calc(92*max(var(--sp),.35)*var(--u));border-radius:50%;background:var(--c);opacity:.4;filter:blur(calc(5*var(--u)));transition:--sp .6s cubic-bezier(.33,1,.68,1)}
+.hx-blight.scr,.hx-spill.scr{mix-blend-mode:screen}
+.hx-shelf{z-index:5}
+.hx-conn{z-index:9}
+.hx-ring{z-index:4;overflow:hidden;pointer-events:none;animation:ringin .6s cubic-bezier(.33,1,.68,1) both}
+.hx-ring.held{animation:none}
+.hx-ring > img{width:100%;height:100%}
 /* The 12x8 sprite sheet is stepped by background position, so only the ring's own box is ever
-   painted (moving a transformed sheet 12x8 times its size is too large a layer for Safari). */
-.hx-ring .rs{width:100%;height:100%;background:url(art/nest/ring_sheet.webp) 0 0/1200% 800% no-repeat;animation:rsx .5s steps(12) infinite,rsy 4s steps(8) infinite}
+   painted (moving a transformed sheet 12x8 times its size is too large a layer for Safari).
+   --rd keeps the loop's phase when the Nest re-renders. */
+.hx-ring .rs{width:100%;height:100%;background:url(art/nest/ring_sheet.webp) 0 0/1200% 800% no-repeat;animation:rsx .5s steps(12) infinite,rsy 4s steps(8) infinite;animation-delay:var(--rd,0s)}
 @keyframes rsx{to{background-position-x:109.0909%}}
 @keyframes rsy{to{background-position-y:114.2857%}}
 @keyframes ringin{from{opacity:0;transform:scale(.85)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-.hx-slot{z-index:3;padding:0;border:0;background:none;cursor:pointer;transform-origin:50% 96%;transition:transform .12s}
+.hx-slot{z-index:7;padding:0;border:0;background:none;cursor:pointer;transform-origin:50% 95%;transition:transform .12s}
 .hx-slot img{position:relative;width:100%;height:100%}
 .hx-slot:active{transform:scale(.96)}
 .hx-slot .glow{position:absolute;left:10%;right:10%;top:0;bottom:12%;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,176,90,calc(.05 + var(--p) * .22)),transparent)}
 .hx-slot.sel .glow{background:radial-gradient(closest-side,rgba(255,214,130,calc(.22 + var(--p) * .2)),transparent);box-shadow:0 calc(30*var(--u)) calc(20*var(--u)) calc(-14*var(--u)) rgba(244,215,143,.55)}
-.hx-slot.ready{animation:eggwobble 3.1s ease-in-out infinite}
+/* Within 2,000 steps of hatching: a 0.9 s wobble, then 2.2 s of rest. */
+.hx-slot.near{animation:eggwobble 3.1s cubic-bezier(.37,0,.63,1) infinite}
 @keyframes eggwobble{0%{transform:rotate(0)}6%{transform:rotate(-4deg) scale(1.02,.98)}12%{transform:rotate(4deg)}18%{transform:rotate(-2.5deg)}24%{transform:rotate(1.5deg)}29%,100%{transform:rotate(0)}}
-.hx-slot.empty{z-index:3;opacity:.55;pointer-events:none}
+.hx-slot.empty{opacity:.55;pointer-events:none}
 .hx-slot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:-4px;border-radius:24%}
-.hx-tube{z-index:5}
-.hx-tube > img,.hx-tube .sheen{position:absolute;inset:0;width:100%;height:100%}
-.hx-tube .sheen{background:linear-gradient(100deg,transparent 0 40%,rgba(255,255,255,.28) 50%,transparent 60%) 0 0/300% 100% no-repeat;animation:sheen 3.2s ease-in-out infinite;mix-blend-mode:screen}
-@keyframes sheen{0%{background-position:140% 0}37%,100%{background-position:-40% 0}}
-.hx-tube.ready > img:first-child{animation:readybreathe 2s ease-in-out infinite}
-@keyframes readybreathe{50%{filter:brightness(1.12)}}
-.hx-status{margin:0;z-index:7;display:grid;place-items:center;text-align:center;font-size:calc(15.5*var(--u));line-height:calc(19.5*var(--u));color:#f4da9a;text-shadow:0 0 calc(2*var(--u)) rgba(244,200,100,.35),0 calc(.6*var(--u)) calc(.8*var(--u)) rgba(0,0,0,.6);text-wrap:balance;padding:0 calc(6*var(--u))}
+/* Tube (§4): the fill image is never scaled, only masked up to --edge. --edge is registered so it animates. */
+.hx-tube{z-index:10;transition:--edge .6s cubic-bezier(.33,1,.68,1)}
+.hx-tube > *{position:absolute;inset:0;width:100%;height:100%}
+.hx-tube .fill{
+  -webkit-mask:linear-gradient(#000 0 0) 0 0/calc((var(--edge) - 7.6)*var(--u)) 100% no-repeat,radial-gradient(closest-side,#000 calc(100% - 1px),transparent) calc((var(--edge) - 15.2)*var(--u)) calc(4.4*var(--u))/calc(15.2*var(--u)) calc(19.2*var(--u)) no-repeat;
+          mask:linear-gradient(#000 0 0) 0 0/calc((var(--edge) - 7.6)*var(--u)) 100% no-repeat,radial-gradient(closest-side,#000 calc(100% - 1px),transparent) calc((var(--edge) - 15.2)*var(--u)) calc(4.4*var(--u))/calc(15.2*var(--u)) calc(19.2*var(--u)) no-repeat}
+.hx-tube .sheen{inset:auto;left:calc(7.4*var(--u));top:calc(6.4*var(--u));width:calc((var(--edge) - 7.4)*var(--u));height:calc(15.2*var(--u));border-radius:calc(7.6*var(--u));overflow:hidden}
+.hx-tube .sheen::before{content:"";position:absolute;top:0;bottom:0;left:calc(-12*var(--u));width:calc(12*var(--u));background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:sheen 3.2s infinite;animation-delay:var(--sd,0s)}
+@keyframes sheen{0%{left:calc(-12*var(--u));animation-timing-function:cubic-bezier(.37,0,.63,1)}37.5%,100%{left:100%}}
+.hx-tube .men{inset:auto;left:calc((var(--edge) - 3.2)*var(--u));top:calc(7.6*var(--u));width:calc(3.4*var(--u));height:calc(12.8*var(--u));border-right:calc(.67*var(--u)) solid rgba(255,255,255,.65);border-radius:50%;filter:blur(calc(.25*var(--u)))}
+.hx-status{z-index:13;text-align:center;font-size:calc(16*var(--u));line-height:calc(21*var(--u));color:#f4da9a;text-shadow:0 0 calc(2*var(--u)) rgba(244,200,100,.35),0 calc(.6*var(--u)) calc(.8*var(--u)) rgba(0,0,0,.6);text-wrap:balance}
 .hx-status b{color:#ffe3a0;font-weight:700}
-.hx-card{background:url(art/nest/info_card_panel.webp) center/100% 100% no-repeat;z-index:7}
-.hx-portrait{z-index:8}
+.hx-card{z-index:14;background:url(art/nest/info_card_panel.webp) center/100% 100% no-repeat}
+.hx-portrait,.hx-caps,.hx-title,.hx-body,.hx-cta{z-index:15}
 .hx-portrait > img{position:absolute;inset:0;width:100%;height:100%}
-.hx-portrait .pe{inset:auto;left:-2.5%;top:-11.4%;width:105%;height:105%}
-.hx-portrait.ready .pe{animation:eggwobble 3.1s ease-in-out infinite;transform-origin:50% 90%}
-.hx-cardtext{z-index:8;display:flex;flex-direction:column;justify-content:center;gap:calc(3*var(--u))}
-.hx-cardtext .caps{font-size:calc(10.5*var(--u));font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#e1b567}
-.hx-cardtext .title{font-family:"Cormorant Garamond",var(--display);font-weight:600;font-size:calc(28*var(--u));line-height:1.05;background:linear-gradient(180deg,#fff1cc,#e9c27e);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 calc(2*var(--u)) rgba(233,194,126,.45))}
-.hx-cardtext .body{margin:calc(2*var(--u)) 0 0;font-size:calc(13*var(--u));line-height:calc(18.5*var(--u));color:#ededea}
-.hx-btn{align-self:flex-start;white-space:nowrap;margin-top:calc(4*var(--u));padding:calc(7*var(--u)) calc(16*var(--u));border-radius:calc(10*var(--u));border:1px solid #f3c859;background:linear-gradient(180deg,#ffe9a8,#e8b451 45%,#9a5e18);color:#2a1606;font-family:"Lato",var(--body);font-weight:900;font-size:calc(14*var(--u));box-shadow:inset 0 1px 0 rgba(255,250,220,.7),0 calc(2*var(--u)) 0 #5c3d0c}
+.hx-portrait .pe{inset:auto}
+.hx-caps{font-size:calc(10.5*var(--u));line-height:calc(12.6*var(--u));font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#e1b567;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hx-title{margin:0;font-family:"Cormorant Garamond",var(--display);font-weight:600;font-size:calc(28*var(--u));line-height:calc(33.91*var(--u));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(180deg,#fff1cc,#e9c27e);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 calc(2*var(--u)) rgba(233,194,126,.45))}
+.hx-body{font-size:calc(13*var(--u));line-height:calc(18.5*var(--u));color:#ededea}
+.hx-cta{display:flex;align-items:flex-start}
+.xf{animation:xf .2s ease-out both}
+@keyframes xf{from{opacity:0}}
+.hx-btn{white-space:nowrap;padding:calc(7*var(--u)) calc(16*var(--u));border-radius:calc(10*var(--u));border:1px solid #f3c859;background:linear-gradient(180deg,#ffe9a8,#e8b451 45%,#9a5e18);color:#2a1606;font-family:"Lato",var(--body);font-weight:900;font-size:calc(14*var(--u));box-shadow:inset 0 1px 0 rgba(255,250,220,.7),0 calc(2*var(--u)) 0 #5c3d0c}
 .hx-btn:active{transform:translateY(1px)}
-#nest .embers{position:absolute;inset:0;pointer-events:none;z-index:9}
-#nest .ember{position:absolute;width:calc(14*var(--u));height:auto;mix-blend-mode:screen;opacity:0;animation:emberrise 6s linear infinite}
-@keyframes emberrise{0%{transform:translate(0,0) scale(.6);opacity:0}8%{opacity:1}50%{transform:translate(calc(8*var(--u)),calc(-90*var(--u))) scale(1)}75%{opacity:.8}100%{transform:translate(calc(-4*var(--u)),calc(-180*var(--u))) scale(.7);opacity:0}}
 .hoard{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
 .hd{background:var(--stone);border:1px solid var(--line);border-radius:14px;padding:6px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;font-weight:600;min-width:0}
 .hd .dart{width:72px;border-radius:8px}
@@ -234,7 +255,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .growth-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .stage-pill{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#1b1206;background:linear-gradient(180deg,var(--gold-hi),var(--gold));padding:3px 9px;border-radius:4px}
 .growth-note{font-size:11px;color:var(--muted);text-align:right}
-.grew-note{font-family:var(--display);color:var(--gold-hi);font-size:18px;margin:-4px 0 2px;animation:grewnote 2.4s ease-out both}
+.grew-note{font-family:var(--display);font-weight:600;color:var(--gold-hi);font-size:18px;margin:-4px 0 2px;animation:grewnote 2.4s ease-out both}
 @keyframes grewnote{0%,30%{opacity:0;transform:translateY(6px)}50%,100%{opacity:1;transform:none}}
 
 /* ---------- overlays ---------- */
@@ -258,7 +279,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .hstage.mutated .flash{background:radial-gradient(circle,rgba(230,215,255,.98),rgba(170,140,255,.4) 40%,transparent 68%)}
 @keyframes flash{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
 @keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
-.hatch h3{font-family:var(--display);font-weight:400;font-size:26px;margin:0;line-height:1.15}
+.hatch h3{font-family:var(--display);font-weight:600;font-size:26px;margin:0;line-height:1.15}
 .hlead{display:flex;flex-direction:column;align-items:center;gap:4px;animation:hlead .5s ease-out both}
 .hlead .eyebrow{color:var(--gold)}
 @keyframes hlead{from{opacity:0;transform:translateY(-8px)}}
@@ -269,7 +290,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .card-wrap{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
 .sharecard{border-radius:22px;padding:20px 18px 18px;text-align:center;background:radial-gradient(90% 55% at 50% 50%,rgba(226,88,62,.18),transparent 70%),radial-gradient(60% 40% at 50% 100%,rgba(216,169,75,.18),transparent 70%),linear-gradient(180deg,#1a1410,#0e1116);border:1px solid var(--gold);box-shadow:inset 0 0 0 5px #0e1116,inset 0 0 0 6px rgba(216,169,75,.45),0 20px 60px rgba(0,0,0,.6)}
 .sharecard .brand{font-size:10px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
-.sharecard .cname{font-family:var(--display);font-size:34px;line-height:1.05;margin:6px 0 0;overflow-wrap:anywhere}
+.sharecard .cname{font-family:var(--display);font-weight:600;font-size:34px;line-height:1.05;margin:6px 0 0;overflow-wrap:anywhere}
 .sharecard .stage .dart{width:170px}
 .parts{list-style:none;margin:4px 0 0;padding:12px 0 0;border-top:1px solid rgba(216,169,75,.3);display:flex;flex-direction:column;gap:5px;font-size:14px;text-align:left}
 .parts li{display:flex;justify-content:space-between;gap:10px}
@@ -316,6 +337,16 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .wind{stroke-dasharray:30 200;animation:wind 4s linear infinite}
 @keyframes wind{from{stroke-dashoffset:230}to{stroke-dashoffset:0}}
 
+/* ---------- debug panel (?debug=1 or #debug) ---------- */
+.dbg{position:absolute;z-index:40;bottom:104px;left:8px;max-width:calc(100% - 16px);background:rgba(12,16,21,.96);border:1px dashed var(--jade);border-radius:10px;font-size:12px;color:var(--fg)}
+.dbg summary{cursor:pointer;padding:5px 10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--jade)}
+.dbg[open]{padding-bottom:8px}
+.dbg .row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:4px 10px}
+.dbg .row > span{min-width:52px;color:var(--muted)}
+.dbg input{width:96px;background:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 6px;color:var(--fg);font:inherit}
+.dbg button{background:var(--stone-2);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px}
+.dbg p{margin:4px 10px 0;max-width:30ch;color:var(--muted);font-size:11px}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
   .scenes{scroll-behavior:auto}
@@ -339,7 +370,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
         <button class="btn" data-act="add" data-n="10000" id="add2000">+10,000 steps</button>
       </div>
       <div class="sim-note">Simulated walking. Real step tracking comes in a later build.</div>
-      <button class="reset" id="reset" data-act="reset">Reset to first run</button>
+      <button class="reset" id="reset" data-act="reset">Reset to first run<small>Wipes all progress · tap twice</small></button>
     </div>
   </main>
 
@@ -365,6 +396,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
     <button class="tab" data-tab="vendors"><img class="ti off" src="art/nest/icon_vendors_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_vendors_active.webp" alt="">Vendors</button>
     <button class="tab" data-tab="nest"><img class="ti off" src="art/nest/icon_nest_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_nest_active.webp" alt="">Nest<img class="dot" id="readyDot" src="art/nest/nav_notification_dot.webp" alt="" hidden></button>
     <button class="tab" data-tab="dragon"><img class="ti off" src="art/nest/icon_dragon_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_dragon_active.webp" alt="">Dragon</button>
+    <i class="tab-ul" aria-hidden="true"></i>
   </nav>
 
   <div class="overlay" id="hatchOv" hidden></div>
@@ -544,10 +576,11 @@ function artRoostVideo(){ return sceneVideo("roost", "A hooded stranger crouches
 function setTab(t){
   S.tab = t;
   for (const id of ["bank","vendors","nest","dragon"]) document.getElementById(id).hidden = id !== t;
-  document.querySelectorAll(".tab").forEach(b => { if (b.dataset.tab === t) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  document.querySelectorAll(".tab").forEach((b, i) => { if (b.dataset.tab === t){ b.setAttribute("aria-current","page"); $(".tabs").style.setProperty("--ti", i); } else b.removeAttribute("aria-current"); });
   if (t === "vendors") requestAnimationFrame(() => scrollToScene(S.scene, false));
   syncVideos();
   render(); save();
+  syncEmbers();
 }
 
 /* --- bank --- */
@@ -651,7 +684,7 @@ function itemRow(it, teaser){
   } else if (pending === it.id){
     action = `<button class="btn buy confirm" data-act="buy" data-id="${it.id}">Confirm ${fmt(it.price)}<small>Tap again to buy</small></button>`;
   } else if (S.bank >= it.price){
-    action = `<button class="btn buy" data-act="buy" data-id="${it.id}">${fmt(it.price)} steps<small>Buy</small></button>`;
+    action = `<button class="btn buy" data-act="buy" data-id="${it.id}">${fmt(it.price)} steps<small>Tap twice to buy</small></button>`;
   } else {
     action = `<button class="btn buy" disabled>${fmt(it.price)} steps<small>Need ${fmt(it.price - S.bank)} more</small></button>`;
   }
@@ -702,91 +735,143 @@ function renderVendors(){
 }
 
 /* --- nest --- */
-/* Built from the Nest asset pack (SPEC.md). Everything is laid out in the spec's points on a
-   390 pt wide stage and scaled to the screen with --u (1 pt). Rows grow past three as eggs
-   are added. Nothing here shows or names the dragon inside before it hatches. */
+/* Built from the Nest asset pack to handoff/nest-spec.md. Everything is laid out in the spec's px on
+   a 390 px wide stage and scaled to the screen with --u. Rows grow past three as eggs are added.
+   Nothing here shows or names the dragon inside before it hatches. */
 const NA = "art/nest/";
 const eggImg = (it, cls) => `<img class="${cls || "eggimg"}" src="${NA}${it.line}_egg.webp" alt="" draggable="false">`;
 const COLS = [93, 195, 297], ROW0 = 239, PITCH = 145, MIN_ROWS = 3;
 /* The gold ring shows around any egg within this many steps of hatching. */
 const RING_STEPS = 2000;
+/* Spec §7.1 tube base colours (the shelf light spill) and §6 portrait egg placement (left, top, size in % of the 112 px box). */
+const TUBE = {cinder:"#b3261a", inferno:"#cc5f17", brine:"#128399", stormling:"#3c35a6", moss:"#3e7a16", voidling:"#6a2c90", tempest:"#5d6470"};
+const PORTRAIT = {cinder:[-1.72,-10.78,103.45], inferno:[-1.72,-10.78,103.45], brine:[-1.53,-10.40,103.05], voidling:[-2.12,-11.53,104.25],
+  stormling:[-2.73,-12.70,105.47], moss:[-1.72,-10.78,103.45], tempest:[-1.72,-10.49,103.45]};
 let NSEL = null;
 const stepsLeft = e => Math.max(0, ITEM[e.item].hatch - eggProgress(e));
 const pctOf = e => Math.min(1, eggProgress(e) / ITEM[e.item].hatch);
+const nearHatch = e => stepsLeft(e) <= RING_STEPS && !eggReady(e);
+const edgeOf = p => p > 0 ? Math.max(7.4 + 4, 7.4 + 81.2 * p) : 0;
 function nestOrder(){ return S.eggs.slice().sort((a, b) => pctOf(b) - pctOf(a) || stepsLeft(a) - stepsLeft(b)); }
 const P = (x, y, w, h) => `left:calc(${x}*var(--u));top:calc(${y}*var(--u));width:calc(${w}*var(--u));height:calc(${h}*var(--u))`;
-function ringHTML(x, y){
+/* What the last render drew, per egg, so a re-render can start each tube where it was and let the
+   600 ms transition carry it to the new value, and so a ring that was already up doesn't fade in again. */
+const NPREV = {edge:{}, sp:{}, ring:new Set(), sel:undefined};
+function ringHTML(x, y, held){
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  return `<div class="hx-ring" style="${P(x, y, 150, 150)}" aria-hidden="true">${still
+  return `<div class="hx-ring${held ? " held" : ""}" style="${P(x, y, 150, 150)}" aria-hidden="true">${still
     ? `<img src="${NA}ring.webp" alt="">`
-    : `<div class="rs"></div>`}</div>`;
+    : `<div class="rs" style="--rd:${-(performance.now() % 4000).toFixed(0)}ms"></div>`}</div>`;
 }
 function tubeHTML(e, x, y){
-  if (!e) return `<div class="hx-tube" style="${P(x, y, 96, 28)}" aria-hidden="true"><img src="${NA}tube_track_back.webp" alt=""><img src="${NA}tube_track_front.webp" alt=""></div>`;
-  const p = pctOf(e), rd = p >= 1;
-  if (rd) return `<div class="hx-tube ready" style="${P(x, y, 96, 28)}" aria-hidden="true"><img src="${NA}tube_ready_full.webp" alt=""><img src="${NA}tube_ready_label.webp" alt=""></div>`;
-  const right = p > 0 ? Math.max(7.4 + 4, 7.4 + 81.2 * p) : 0;
-  const clip = `clip-path:inset(0 ${(100 - right / 96 * 100).toFixed(2)}% 0 0 round 0 calc(7.6*var(--u)) calc(7.6*var(--u)) 0)`;
-  return `<div class="hx-tube" style="${P(x, y, 96, 28)}" aria-hidden="true">
-      <img src="${NA}tube_track_back.webp" alt="">
-      ${p > 0 ? `<img src="${NA}fill_${ITEM[e.item].line}.webp" alt="" style="${clip}"><i class="sheen" style="${clip};animation-delay:${(-(e.at % 3200) / 1000).toFixed(2)}s"></i>` : ""}
-      <img src="${NA}tube_track_front.webp" alt=""></div>`;
+  const track = inner => `<div class="hx-tube"${inner[0]} style="${P(x, y, 96, 28)}${inner[1]}" aria-hidden="true"><img src="${NA}tube_track_back.webp" alt="">${inner[2]}<img src="${NA}tube_track_front.webp" alt=""></div>`;
+  if (!e) return track(["", "", ""]);
+  const p = pctOf(e), edge = edgeOf(p);
+  if (!p) return track(["", "", ""]);
+  const from = NPREV.edge[e.id] != null ? NPREV.edge[e.id] : edge;
+  const sd = -((performance.now() + e.at) % 3200).toFixed(0);
+  return track([` data-to="--edge:${edge.toFixed(2)}"`, `;--edge:${from.toFixed(2)};--sd:${sd}ms`,
+    `<img class="fill" src="${NA}fill_${ITEM[e.item].line}.webp" alt=""><i class="sheen"></i><i class="men"></i>`]);
+}
+function nestShell(){
+  let st = $("#nestBody .hx-in");
+  if (!st){ $("#nestBody").innerHTML = `<div class="hx"><div class="hx-in"><div class="hx-dyn"></div></div></div>`; st = $("#nestBody .hx-in"); }
+  return st;
 }
 function renderNest(){
-  const eggs = nestOrder();
+  const eggs = nestOrder(), stage = nestShell();
   if (!eggs.some(e => e.id === NSEL)) NSEL = eggs.length ? eggs[0].id : null;
   const ready = eggs.filter(eggReady).length;
   const rows = Math.max(MIN_ROWS, Math.ceil(eggs.length / 3)), D = (rows - MIN_ROWS) * PITCH;
-  let rings = "", body = "";
+  const rings = new Set(), edges = {}, sps = {};
+  let body = "";
   for (let r = 0; r < rows; r++){
     const ty = ROW0 + r * PITCH;
+    body += `<i class="hx-blight" style="${P(40, ty - 92, 310, 70)}"></i><i class="hx-blight scr" style="${P(40, ty - 92, 310, 70)}"></i>`;
     body += `<img class="hx-shelf" src="${NA}shelf.webp" alt="" style="${P(29, ty - 6, 332, 46)}">`;
     COLS.forEach((cx, c) => {
       const e = eggs[r * 3 + c], sx = cx - 50, sy = ty - 92;
-      if (e && stepsLeft(e) <= RING_STEPS) rings += ringHTML(sx - 25, sy - 50);
       if (!e){ body += `<img class="hx-slot empty" src="${NA}nest_empty.webp" alt="" style="${P(sx, sy, 100, 100)}">`; return; }
-      const it = ITEM[e.item], rd = eggReady(e);
-      body += `<button class="hx-slot${rd ? " ready" : ""}${e.id === NSEL ? " sel" : ""}" data-act="nsel" data-id="${e.id}" style="${P(sx, sy, 100, 100)};--p:${pctOf(e).toFixed(3)};animation-delay:${(-(e.at % 3100) / 1000).toFixed(2)}s"
-          aria-label="${esc(it.name)}, ${rd ? "ready to crack" : Math.floor(pctOf(e) * 100) + "% warm, " + fmt(stepsLeft(e)) + " steps to go"}" aria-pressed="${e.id === NSEL}">
+      const it = ITEM[e.item], p = pctOf(e), near = nearHatch(e), rd = eggReady(e);
+      /* An egg that jumps straight past the window hatches without ever showing the ring. */
+      if (near){ body += ringHTML(sx - 25, sy - 50, NPREV.ring.has(e.id)); rings.add(e.id); }
+      const sp0 = NPREV.sp[e.id] != null ? NPREV.sp[e.id] : p;
+      for (const k of ["", " scr"]) body += `<i class="hx-spill${k}" data-to="--sp:${p.toFixed(3)}" style="left:calc(${cx - 46}*var(--u));top:calc(${ty + 12}*var(--u));--sp:${sp0.toFixed(3)};--c:${TUBE[it.line]}"></i>`;
+      edges[e.id] = edgeOf(p); sps[e.id] = p;
+      body += `<button class="hx-slot${near ? " near" : ""}${e.id === NSEL ? " sel" : ""}" data-act="nsel" data-id="${e.id}" style="${P(sx, sy, 100, 100)};--p:${p.toFixed(3)};animation-delay:${(-(e.at % 3100) / 1000).toFixed(2)}s"
+          aria-label="${esc(it.name)}, ${rd ? "ready to crack" : Math.floor(p * 100) + "% warm, " + fmt(stepsLeft(e)) + " steps to go"}" aria-pressed="${e.id === NSEL}">
           <i class="glow"></i><img src="${NA}${it.line}_nest.webp" alt="" draggable="false"></button>`;
     });
     body += `<img class="hx-conn" src="${NA}tube_connector.webp" alt="" style="${P(COLS[0] + 42, ty - 4, 18, 28)}"><img class="hx-conn" src="${NA}tube_connector.webp" alt="" style="${P(COLS[1] + 42, ty - 4, 18, 28)}">`;
     COLS.forEach((cx, c) => { body += tubeHTML(eggs[r * 3 + c], cx - 48, ty - 4); });
   }
   const sel = eggs.find(x => x.id === NSEL);
+  const xf = NPREV.sel !== undefined && NPREV.sel !== NSEL ? " xf" : "";
   let banner, status, card;
   if (!sel){
     banner = "Your nest is empty. Eggs you buy warm up here as you walk.";
     status = "No eggs warming yet.";
-    card = `<div class="hx-portrait" style="${P(37.5, 639 + D, 112, 112)}"><img src="${NA}portrait_backing.webp" alt=""><img class="pe" src="${NA}nest_empty.webp" alt=""><img src="${NA}portrait_frame.webp" alt=""></div>
-      <div class="hx-cardtext" style="${P(164.5, 646 + D, 190, 104)}"><div class="caps">Nest · empty</div><div class="title">No eggs yet</div>
-        <button class="hx-btn" data-act="goto-stall">Visit the stall</button></div>`;
+    card = `<div class="hx-portrait${xf}" style="${P(37.5, 639 + D, 112, 112)}"><img src="${NA}portrait_backing.webp" alt=""><img class="pe" src="${NA}nest_empty.webp" alt="" style="left:-2.5%;top:-11.4%;width:105%;height:105%"><img src="${NA}portrait_frame.webp" alt=""></div>
+      <div class="hx-caps${xf}" style="${P(164.5, 651.64 + D, 190, 12.6)}">Nest · empty</div>
+      <p class="hx-title${xf}" style="${P(164, 665.13 + D, 190, 33.91)}">No eggs yet</p>
+      <div class="hx-cta${xf}" style="${P(164.5, 706.72 + D, 190, 37)}"><button class="hx-btn" data-act="goto-stall">Visit the stall</button></div>`;
   } else {
-    const it = ITEM[sel.item], p = pctOf(sel), rd = p >= 1;
+    const it = ITEM[sel.item], p = pctOf(sel), rd = p >= 1, [pl, pt, pw] = PORTRAIT[it.line];
     banner = rd ? `${esc(it.name)} is ready to crack! Tap Crack it below to hatch it.` : `${esc(it.name)} is in your nest. It cracks after ${fmt(stepsLeft(sel))} more steps.`;
     status = `${eggs.length} egg${eggs.length > 1 ? "s" : ""} warming${ready ? ` · <b>${ready} ready to crack</b>` : ""}. Every step you walk warms all of them at once.`;
     const flavor = p < .34 ? "It’s still and quiet." : p < .67 ? "It’s warm to the touch." : "Something is pressing at the shell from the inside.";
-    card = `<div class="hx-portrait${rd ? " ready" : ""}" style="${P(37.5, 639 + D, 112, 112)}"><img src="${NA}portrait_backing.webp" alt="">${eggImg(it, "pe")}<img src="${NA}portrait_frame.webp" alt=""></div>
-      <div class="hx-cardtext" style="${P(164.5, 646 + D, 190, 104)}">
-        <div class="caps">${it.rarity} egg · ${rd ? "ready" : "warming"}</div>
-        <div class="title">${esc(it.name)}</div>
-        ${rd ? `<button class="hx-btn" data-act="hatch" data-id="${sel.id}">Crack it</button>` : `<p class="body">${flavor}</p>`}
-      </div>`;
+    card = `<div class="hx-portrait${xf}" style="${P(37.5, 639 + D, 112, 112)}"><img src="${NA}portrait_backing.webp" alt=""><img class="pe" src="${NA}${it.line}_egg.webp" alt="" draggable="false" style="left:${pl}%;top:${pt}%;width:${pw}%;height:${pw}%"><img src="${NA}portrait_frame.webp" alt=""></div>
+      <div class="hx-caps${xf}" style="${P(164.5, 651.64 + D, 190, 12.6)}">${it.rarity} egg · ${rd ? "ready" : "warming"}</div>
+      <p class="hx-title${xf}" style="${P(164, 665.13 + D, 190, 33.91)}">${esc(it.name)}</p>
+      ${rd ? `<div class="hx-cta${xf}" style="${P(164.5, 706.72 + D, 190, 37)}"><button class="hx-btn" data-act="hatch" data-id="${sel.id}">Crack it</button></div>`
+           : `<p class="hx-body${xf}" style="${P(164.5, 706.72 + D, 190, 37)}">${flavor}</p>`}`;
   }
-  const embers = Array.from({length:12}, (_, i) => {
-    const left = i % 2 ? 2 + (i * 7) % 26 : 362 + (i * 5) % 26;
-    return `<img class="ember" src="${NA}ember_0${(i % 6) + 1}.webp" alt="" style="left:calc(${left}*var(--u));top:calc(${300 + (i * 97) % 420 + D}*var(--u));animation-duration:${(4 + (i * 13) % 4)}s;animation-delay:${(-i * 0.9).toFixed(1)}s">`;
-  }).join("");
-  $("#nestBody").innerHTML = `<div class="hx"><div class="hx-in" style="height:calc(${776 + D}*var(--u))">
-      <div class="embers" aria-hidden="true">${embers}</div>
-      <div class="hx-banner" style="${P(21, 24, 348, 78)}"><p>${banner}</p></div>
+  stage.style.height = `calc(${764 + D}*var(--u))`;
+  const dyn = stage.querySelector(".hx-dyn");
+  dyn.innerHTML = `<div class="hx-banner" style="${P(21, 24, 348, 78)}"></div>
+      <p class="hx-btext" style="${P(50.5, 41.31, 288.5, 42)}">${banner}</p>
       <div class="hx-cab-back" style="${P(20, 90, 350, 488 + D)}"></div>
-      ${rings}${body}
+      ${body}
       <div class="hx-cab-frame" style="${P(20, 90, 350, 488 + D)}"></div>
-      <p class="hx-status" style="${P(14, 574 + D, 362, 54)}"><span>${status}</span></p>
+      <p class="hx-status" style="${P(14, 581.31 + D, 362, 42)}">${status}</p>
       <div class="hx-card" style="${P(18, 628 + D, 354, 136)}"></div>
-      ${card}
-    </div></div>`;
+      ${card}`;
+  /* Commit the starting values, then set the targets so the registered properties transition. */
+  void dyn.offsetWidth;
+  dyn.querySelectorAll("[data-to]").forEach(el => { const [k, v] = el.dataset.to.split(":"); el.style.setProperty(k, v); });
+  NPREV.edge = edges; NPREV.sp = sps; NPREV.ring = rings; NPREV.sel = NSEL;
+}
+/* Embers (spec §10): 0.6–1.2 spawns a second while the Nest is open, at most 24 alive, each living
+   4–7 s, rising 12–30 px/s with a sine sway. Most rise along the edges; about one in seven drifts behind the cabinet. */
+let emT = 0;
+function spawnEmber(seed){
+  const stage = $("#nestBody .hx-in");
+  if (!stage || stage.querySelectorAll(".em").length >= 24) return;
+  const R = (a, b) => a + Math.random() * (b - a), u = stage.offsetWidth / 390;
+  if (!u) return;
+  const H = stage.offsetHeight / u;
+  const back = Math.random() < .15;
+  const x = back ? R(40, 350) : Math.random() < .5 ? R(0, 30) : R(360, 390), y = R(.4 * Math.min(H, 844), H);
+  const life = R(4, 7), rise = R(12, 30) * life, amp = R(6, 14), per = R(2, 4), sc = R(.5, 1.2);
+  const el = document.createElement("i");
+  el.className = "em"; el.style.zIndex = back ? 1 : 17;
+  el.style.left = `calc(${(x - 12).toFixed(1)}*var(--u))`; el.style.top = `calc(${(y - 12).toFixed(1)}*var(--u))`;
+  el.innerHTML = `<img src="${NA}ember_0${1 + Math.floor(Math.random() * 6)}.webp" alt="">`;
+  stage.appendChild(el);
+  const a = el.animate([{transform:"translateY(0)", opacity:0}, {opacity:1, offset:.4 / life}, {opacity:1, offset:(life - 1.5) / life}, {transform:`translateY(${(-rise * u).toFixed(1)}px)`, opacity:0}],
+    {duration:life * 1000, easing:"linear"});
+  el.firstChild.animate([{transform:`translateX(${(-amp * u).toFixed(1)}px) scale(${sc.toFixed(2)})`}, {transform:`translateX(${(amp * u).toFixed(1)}px) scale(${sc.toFixed(2)})`}],
+    {duration:per * 500, direction:"alternate", iterations:Infinity, easing:"ease-in-out", delay:-Math.random() * per * 1000});
+  if (seed) a.currentTime = Math.random() * life * 1000;
+  a.onfinish = () => el.remove();
+}
+function syncEmbers(){
+  const on = S.tab === "nest" && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (on && !emT){
+    for (let i = 0; i < 4; i++) spawnEmber(true);
+    const tick = () => { if (S.tab !== "nest"){ emT = 0; return; } spawnEmber(false); emT = setTimeout(tick, 1000 / (0.6 + Math.random() * 0.6)); };
+    emT = setTimeout(tick, 900);
+  } else if (!on && emT){ clearTimeout(emT); emT = 0; }
 }
 
 /* --- dragon --- */
@@ -879,7 +964,7 @@ function buy(id){
   if (!it || (it.kind !== "egg" && S.owned[id]) || S.bank < it.price || !sceneOpen(it.scene)) return;
   if (pending !== id){
     pending = id; clearTimeout(pendingT);
-    pendingT = setTimeout(() => { pending = null; render(); }, 3500);
+    pendingT = setTimeout(() => { pending = null; render(); }, 3000);
     render(); return;
   }
   pending = null; clearTimeout(pendingT);
@@ -977,13 +1062,15 @@ function openShare(){
 }
 
 let resetArmed = false, resetT;
+const RESET_IDLE = "Reset to first run<small>Wipes all progress \u00B7 tap twice</small>", RESET_ARMED = "Tap again to wipe everything<small>Cancels in 3 seconds</small>";
 document.addEventListener("click", ev => {
   const tab = ev.target.closest(".tab");
   if (tab){ setTab(tab.dataset.tab); return; }
   const b = ev.target.closest("[data-act]");
   if (!b) return;
   const a = b.dataset.act;
-  if (a === "add") addSteps(+b.dataset.n);
+  if (a.startsWith("dbg-")) debugAct(a, b);
+  else if (a === "add") addSteps(+b.dataset.n);
   else if (a === "buy") buy(b.dataset.id);
   else if (a === "dot") scrollToScene(+b.dataset.i, true);
   else if (a === "vf"){ VF[+b.dataset.i] = b.dataset.k; renderVendors(); }
@@ -1002,11 +1089,11 @@ document.addEventListener("click", ev => {
   }
   else if (a === "reset"){
     if (!resetArmed){
-      resetArmed = true; b.classList.add("armed"); b.textContent = "Tap again to wipe everything and start at 0";
-      clearTimeout(resetT); resetT = setTimeout(() => { resetArmed = false; b.classList.remove("armed"); b.textContent = "Reset to first run"; }, 3500);
+      resetArmed = true; b.classList.add("armed"); b.innerHTML = RESET_ARMED;
+      clearTimeout(resetT); resetT = setTimeout(() => { resetArmed = false; b.classList.remove("armed"); b.innerHTML = RESET_IDLE; }, 3000);
       return;
     }
-    resetArmed = false; b.classList.remove("armed"); b.textContent = "Reset to first run";
+    clearTimeout(resetT); resetArmed = false; b.classList.remove("armed"); b.innerHTML = RESET_IDLE;
     S = fresh(); shown = 0; save(); scrollToScene(0, false); setTab("bank"); toast("Back to a first run. Bank at 0.");
   }
 });
@@ -1023,6 +1110,28 @@ document.addEventListener("keydown", ev => {
   else if (!$("#hatchOv").hidden && $("#hafter")?.classList.contains("show")) closeHatch();
 });
 window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); });
+
+/* ================= debug panel ================= */
+/* For testing late-game states without thousands of taps. Only shown with ?debug=1 or #debug. */
+const DEBUG = /[?&]debug=1(&|$)/.test(location.search) || location.hash === "#debug";
+function debugPanel(){
+  const el = document.createElement("details");
+  el.className = "dbg";
+  el.innerHTML = `<summary>Debug</summary>
+    <div class="row"><span>Bank</span><input id="dbgBank" type="number" min="0" step="1000" inputmode="numeric"><button data-act="dbg-bank">Set</button></div>
+    <div class="row"><span>Walk</span><input id="dbgWalk" type="number" min="1" step="1000" value="50000" inputmode="numeric"><button data-act="dbg-walk">Add steps</button></div>
+    <div class="row"><span>Prize</span>${STAGES.map((st, i) => `<button data-act="dbg-stage" data-i="${i}">${st.name}</button>`).join("")}</div>
+    <div class="row"><span>Eggs</span><button data-act="dbg-left" data-n="2000">2,000 left</button><button data-act="dbg-left" data-n="1">1 left</button><button data-act="dbg-left" data-n="0">Hatch all</button></div>
+    <p>Time of day and streak controls come with those features. The game doesn\u2019t use either yet.</p>`;
+  $("#app").appendChild(el);
+  el.addEventListener("toggle", () => { if (el.open) $("#dbgBank").value = S.bank; });
+}
+function debugAct(a, b){
+  if (a === "dbg-bank"){ S.bank = Math.max(0, Math.round(+$("#dbgBank").value || 0)); save(); render(); }
+  else if (a === "dbg-walk"){ const n = Math.round(+$("#dbgWalk").value || 0); if (n > 0) addSteps(n); $("#dbgBank").value = S.bank; }
+  else if (a === "dbg-stage"){ const d = prizeDragon(); if (!d){ toast("No prize dragon yet."); return; } d.xp = STAGES[+b.dataset.i].at; save(); render(); }
+  else if (a === "dbg-left"){ const n = +b.dataset.n; S.eggs.forEach(e => { e.at = S.lifetime - ITEM[e.item].hatch + n; }); save(); render(); autoHatch(); }
+}
 
 /* ================= boot ================= */
 /* Saves from before the painted dragon lines: map old eggs and species onto the seven lines,
@@ -1054,6 +1163,7 @@ function start(data){
   shown = S.bank;
   $("#balance").textContent = fmt(S.bank);
   buildScenes();
+  if (DEBUG) debugPanel();
   setTab(S.tab || "bank");
   setTimeout(autoHatch, 600);
 }
