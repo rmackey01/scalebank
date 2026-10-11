@@ -370,7 +370,19 @@ button.bx:active{transform:scale(.96)}
 .dexsheet .plate{width:200px;margin:12px auto 10px}
 .dexsheet .plate .dart{width:200px;border-radius:12px}
 .dexsheet .dno2{font:700 11px/1 var(--body);letter-spacing:.16em;color:var(--gold)}
-.dexsheet.rf-mut .dno2{color:#cdb8ff}
+.dexsheet.rf-mut .plate,.dexsheet.rf-mut .plate .dart{width:136px}
+.dexsheet.rf-mut{--rf-mutin:inset 0 0 0 1px var(--mut-acc)}
+.dexsheet.rf-mut .dno2{color:var(--mut-acc-text,var(--mut-acc))}
+.dexsheet .stg-h.acc{border-bottom-color:var(--mut-acc)}
+.acc-aurora .stg-h.acc{border-bottom:1px solid transparent;border-image:var(--mut-acc-grad) 1}
+.acc-moonlit{--mut-acc:#a9c4e8}
+.acc-obsidian{--mut-acc:#e8783a}
+.acc-gilded{--mut-acc:#e9c46c}
+.acc-aurora{--mut-acc:#8fd6cf;--mut-acc-grad:linear-gradient(90deg,#5fd0c0,#a78bfa)}
+.mutb[class*="acc-"]{border-color:var(--mut-acc);color:var(--mut-acc);background:transparent}
+.dexsheet.rf-mut .note{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dexsheet .stg .dart{width:100%;border-radius:8px}
+.dexsheet .stg.top > .dart{outline:2px solid var(--gold);outline-offset:-2px}
 .dexsheet .dname{font-family:var(--display);font-weight:700;font-size:32px;line-height:1;color:#ece4d4;margin:4px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .dexsheet .tag{font:italic 600 16px/1.2 var(--display);color:var(--muted);margin-top:2px}
 .dexsheet .stats{display:grid;grid-template-columns:1fr 1.25fr 1fr;margin-top:12px;border-top:1px solid rgba(216,169,75,.3);border-bottom:1px solid rgba(216,169,75,.3)}
@@ -464,7 +476,7 @@ button.dexchip{cursor:pointer}
 .dart.ghost{background:radial-gradient(ellipse 70% 60% at 50% 50%,#e8dcc4,var(--edge) 80%)}
 .dart.grow-in{animation:growin 1.6s ease-out both}
 @keyframes growin{0%{filter:brightness(1.9) saturate(.6)}100%{filter:none}}
-/* Mutations are card effects around the video, never a recolor of the dragon. */
+/* Mutation card effects: fallback only, when the mutation's own art isn't in the manifest. */
 .dart.fx-moon{box-shadow:0 0 0 2px rgba(206,220,255,.9),0 0 28px rgba(150,180,255,.6)}
 .dart.fx-moon::after{box-shadow:inset 0 0 40px rgba(150,180,255,.45)}
 .dart.fx-gold{box-shadow:0 0 0 2px #16121c,0 0 0 4px var(--gold),0 0 24px rgba(216,169,75,.45)}
@@ -697,7 +709,7 @@ const SCENES = [
   {id:"roost", name:"Cliff Roost", keeper:"A stranger \u00B7 storm eggs and night trails", quip:"Sells what the storm leaves behind. Doesn\u2019t haggle.", art:artRoostVideo, keys:["storm","tsparks"]}
 ];
 const KEY = "scalebank.v1";
-const SAVE_VER = 2;
+const SAVE_VER = 3;
 const DEX_LINES = ITEMS.filter(i => i.kind === "egg").map(i => i.line);
 const MUT_KEYS = Object.keys(MUTATIONS);
 const DEX_KEYS = DEX_LINES.flatMap(l => [l, ...MUT_KEYS.map(m => l + ":" + m)]);
@@ -725,6 +737,51 @@ const MUT_NOTES = {
   gilded:"A sheen of gold runs over its scales whenever it catches the light.",
   aurora:"Faint northern lights ripple across its hide, never the same colour twice."
 };
+/* Mutation art. The manifest is the only source of truth: unlisted files are never requested. */
+const MSTAGE = ["1_hatchling","2_juvenile","3_adult","4_elder"];
+let MUT_ART = {};
+const HEX = /^#[0-9a-f]{6}$/i;
+function normEntries(list, known, pick){
+  const out = {};
+  (Array.isArray(list) ? list : []).forEach(x => {
+    const o = typeof x === "string" ? {key:x} : (x && typeof x === "object" ? x : null);
+    if (o && typeof o.key === "string" && known.includes(o.key) && !out[o.key]) out[o.key] = pick(o);
+  });
+  return out;
+}
+function normManifest(j){
+  const M = {};
+  if (!j || typeof j !== "object") return M;
+  DEX_LINES.forEach(l => MUT_KEYS.forEach(m => {
+    const e = j[l] && j[l][m]; if (!e || typeof e !== "object") return;
+    (M[l] = M[l] || {})[m] = {
+      stages:  normEntries(e.stages,  MSTAGE, o => ({edge: HEX.test(o.edge || "") ? o.edge : null})),
+      reveals: normEntries(e.reveals, REVEAL_KEY.filter(Boolean), o => ({
+        panelH: Number.isFinite(o.panelH) && o.panelH > 0 ? o.panelH : null,
+        change: typeof o.change === "string" && o.change.trim() ? o.change : null}))
+    };
+  }));
+  return M;
+}
+const mutStage  = (line, m, si)  => !!(m && MUT_ART[line] && MUT_ART[line][m] && MUT_ART[line][m].stages[MSTAGE[si]]);
+const mutReveal = (line, m, key) => !!(m && MUT_ART[line] && MUT_ART[line][m] && MUT_ART[line][m].reveals[key]);
+const mutEdge   = (line, m, si)  => (MUT_ART[line] && MUT_ART[line][m] && MUT_ART[line][m].stages[MSTAGE[si]] && MUT_ART[line][m].stages[MSTAGE[si]].edge) || EDGES[line + "-" + (si + 1)] || "#d8c8ac";
+const mutPanelH = (line, m, key) => (MUT_ART[line] && MUT_ART[line][m] && MUT_ART[line][m].reveals[key] && MUT_ART[line][m].reveals[key].panelH) || PANEL_H[line + "-" + key] || 600;
+const mutChange = (line, m, key) => {
+  const r = MUT_ART[line] && MUT_ART[line][m] && MUT_ART[line][m].reveals[key];
+  const c = r ? r.change : undefined;
+  return c != null ? c : (CHANGE_LINES[line + "-" + key] != null ? CHANGE_LINES[line + "-" + key] : "");
+};
+const mutSrc    = (line, m, si) => `art/mutations/${line}/${m}/${MSTAGE[si]}`;
+function loadMutArt(){
+  return fetch("art/mutations/manifest.json", {cache:"no-cache"})
+    .then(r => r.ok ? r.json() : {}).catch(() => ({}))
+    .then(j => {
+      MUT_ART = normManifest(j);
+      render();
+      if (dexFrom && !$("#dexOv").hidden) openDex(dexFrom);
+    });
+}
 
 /* ================= state ================= */
 function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1, dex:{}, ver:SAVE_VER}; }
@@ -845,11 +902,16 @@ function revealAvailable(line, key){
 
 let revealActive = null, revealFocusReturn = null;
 
+const rsrc = (d, key) => d.mut ? `art/reveals/${d.line}-${d.mut}-${key}` : revealSrc(d.line, key);
+function revealOk(d, key){
+  if (d.mut) return Promise.resolve(mutReveal(d.line, d.mut, key));
+  return revealAvailable(d.line, key);
+}
 function startGrowth(grow, msgs){
   const {d, was, now} = grow;
   const key = REVEAL_KEY[now];
   if (!key){ fallbackGrowth(d, now, msgs); return; }
-  revealAvailable(d.line, key).then(ok => {
+  revealOk(d, key).then(ok => {
     if (ok) openReveal(d, was, now, key);
     else fallbackGrowth(d, now, msgs);
   });
@@ -864,12 +926,11 @@ function openReveal(d, was, now, key){
   const ov = $("#revealOv");
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const seen = d.reveals && d.reveals[key];
-  const panelH = PANEL_H[`${d.line}-${key}`] || 600;
+  const panelH = d.mut ? mutPanelH(d.line, d.mut, key) : (PANEL_H[`${d.line}-${key}`] || 600);
   const cardTop = 1724 - panelH;
   const cardH = 36 + panelH;
   const extra = panelH - 600;
-  const changeKey = `${d.line}-${key}`;
-  const changeText = CHANGE_LINES[changeKey] || "";
+  const changeText = d.mut ? mutChange(d.line, d.mut, key) : (CHANGE_LINES[`${d.line}-${key}`] || "");
   const baseFontSize = (panelH === 636 || panelH === 672) ? 28 : 31;
   const baseLineHeight = baseFontSize === 28 ? 36 : 40;
   const maxLines = Math.round((panelH - 600) / baseLineHeight) + 1;
@@ -879,13 +940,16 @@ function openReveal(d, was, now, key){
 
   const arrowSVG = `<svg viewBox="0 0 170 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rvag" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFE6A0"/><stop offset=".5" stop-color="#F3C859"/><stop offset="1" stop-color="#C68A30"/></linearGradient></defs><path d="M2 4L42 32L2 60L12 32Z M57 4L97 32L57 60L67 32Z M112 4L152 32L112 60L122 32Z" fill="url(#rvag)"/></svg>`;
 
+  const clip = rsrc(d, key);
+  const wasStill = artSrc(d, was).src + ".webp";
+  const nowStill = artSrc(d, now).src + ".webp";
   let mediaHTML;
   if (reducedMotion){
-    mediaHTML = `<img class="rv-still" src="${revealSrc(d.line, key)}-poster.webp" alt="">`;
+    mediaHTML = `<img class="rv-still" src="${clip}-poster.webp" alt="">`;
   } else {
     mediaHTML = `<video id="rvVideo" muted playsinline autoplay preload="auto" disablepictureinpicture style="opacity:0">
-      <source src="${revealSrc(d.line, key)}.webm" type="video/webm">
-      <source src="${revealSrc(d.line, key)}.mp4" type="video/mp4">
+      <source src="${clip}.webm" type="video/webm">
+      <source src="${clip}.mp4" type="video/mp4">
     </video>`;
   }
 
@@ -896,8 +960,8 @@ function openReveal(d, was, now, key){
       <div class="rv-card-inner"></div>
       <div class="rv-card-border"></div>
       <div class="rv-portraits">
-        <div class="rv-portrait"><img src="art/nest/portrait_backing.webp" alt=""><img class="pe" src="${stageSrc(d.line, was)}.webp" alt=""><img src="art/nest/portrait_frame.webp" alt=""></div>
-        <div class="rv-portrait"><img src="art/nest/portrait_backing.webp" alt=""><img class="pe" src="${stageSrc(d.line, now)}.webp" alt=""><img src="art/nest/portrait_frame.webp" alt=""></div>
+        <div class="rv-portrait"><img src="art/nest/portrait_backing.webp" alt=""><img class="pe" src="${wasStill}" alt=""><img src="art/nest/portrait_frame.webp" alt=""></div>
+        <div class="rv-portrait"><img src="art/nest/portrait_backing.webp" alt=""><img class="pe" src="${nowStill}" alt=""><img src="art/nest/portrait_frame.webp" alt=""></div>
       </div>
       <div class="rv-arrow">${arrowSVG}</div>
       <div class="rv-labels"><span class="rv-label from">${STAGES[was].name}</span><span class="rv-label to">${STAGES[now].name}</span></div>
@@ -917,10 +981,13 @@ function openReveal(d, was, now, key){
     let loadTimeout = setTimeout(() => { closeRevealFallback(); }, 4000);
     const clearLoad = () => { clearTimeout(loadTimeout); loadTimeout = null; };
     video.addEventListener("loadeddata", clearLoad, {once:true});
-    video.addEventListener("error", () => { if (loadTimeout) closeRevealFallback(); }, {once:true});
+    /* A missing webm (or mp4) must not abort while the other format can still play. */
+    let sourcesLeft = video.querySelectorAll("source").length;
+    video.addEventListener("error", () => { if (sourcesLeft <= 0 && loadTimeout) closeRevealFallback(); }, {once:true});
     for (const src of video.querySelectorAll("source")){
       src.addEventListener("error", () => {
-        if (!video.currentSrc && loadTimeout) closeRevealFallback();
+        sourcesLeft -= 1;
+        if (sourcesLeft <= 0 && loadTimeout) closeRevealFallback();
       }, {once:true});
     }
     video.addEventListener("playing", () => { video.style.opacity = "1"; }, {once:true});
@@ -1010,7 +1077,7 @@ function onRevealTime(){
     ra.cardStarted = true;
     const card = $("#rvCard");
     if (card){
-      const panelH = PANEL_H[`${ra.d.line}-${ra.key}`] || 600;
+      const panelH = ra.panelH || 600;
       const k = parseFloat(card.style.getPropertyValue("--k")) || 1;
       const fullD = (2280 - (1742 - panelH/2)) * k;
       const late = Math.max(0, t - T(10.25));
@@ -1113,9 +1180,9 @@ function replayReveal(d){
   if (si < 1) return;
   const key = REVEAL_KEY[si];
   if (!key) return;
-  revealAvailable(d.line, key).then(ok => {
+  revealOk(d, key).then(ok => {
     if (ok) openReveal(d, si - 1, si, key);
-    else toast("Reveal video not available.");
+    else if (!d.mut) toast("Reveal video not available.");
   });
 }
 
@@ -1162,18 +1229,25 @@ function trailSVG(type, id, vb){
   return `<svg class="trail" viewBox="${vb || "0 0 768 1152"}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>${defs}</defs>${body}</svg>`;
 }
 function stageSrc(line, si){ return `art/dragons/${line}-${si + 1}`; }
-/* o.live plays the loop (prize card, hatch, share card); everywhere else shows the poster frame. */
+function artSrc(d, si){
+  return mutStage(d.line, d.mut, si) ? {src: mutSrc(d.line, d.mut, si), own: true}
+                                     : {src: stageSrc(d.line, si), own: false};
+}
+/* o.live plays the loop (prize card, hatch, share card); everywhere else shows the still. */
 function dragonArt(d, o){
   o = o || {};
-  const si = o.stage != null ? o.stage : stageIdx(d), src = stageSrc(d.line, si);
+  const si = o.stage != null ? o.stage : stageIdx(d);
+  const a = artSrc(d, si), src = a.src;
   const live = o.live && !matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const fx = !o.ghost && d.mut ? MUTATIONS[d.mut].fx : "";
+  const fx = !o.ghost && d.mut && !a.own ? MUTATIONS[d.mut].fx : "";
+  const edge = a.own ? mutEdge(d.line, d.mut, si) : (EDGES[d.line + "-" + (si + 1)] || "#d8c8ac");
+  const poster = (a.own ? src + "-poster" : src) + ".webp";
   const trail = !o.ghost && d.trail && ITEM[d.trail] ? trailSVG(ITEM[d.trail].fx || "lantern", "t" + (uid++)) : "";
   const label = o.ghost ? "Empty prize slot" : esc(`${d.name || DRAGONS[d.line].name}, ${STAGES[si].name.toLowerCase()}`);
   const media = live
-    ? `<video poster="${src}.webp" autoplay muted loop playsinline preload="auto" aria-hidden="true"><source src="${src}.webm" type="video/webm"><source src="${src}.mp4" type="video/mp4"></video>`
+    ? `<video poster="${poster}" autoplay muted loop playsinline preload="auto" aria-hidden="true"><source src="${src}.webm" type="video/webm"><source src="${src}.mp4" type="video/mp4"></video>`
     : o.ghost ? "" : `<img src="${src}.webp" alt="" loading="lazy" draggable="false">`;
-  return `<div class="dart${live || trail ? " anim" : ""}${fx ? " fx-" + fx : ""}${o.ghost ? " ghost" : ""}${o.grow ? " grow-in" : ""}" style="--edge:${EDGES[d.line + "-" + (si + 1)] || "#d8c8ac"}" role="img" aria-label="${label}">${media}${trail}${fx === "shine" ? `<b class="shine"></b>` : ""}</div>`;
+  return `<div class="dart${live || trail ? " anim" : ""}${fx ? " fx-" + fx : ""}${o.ghost ? " ghost" : ""}${o.grow ? " grow-in" : ""}" style="--edge:${edge}" role="img" aria-label="${label}">${media}${trail}${fx === "shine" ? `<b class="shine"></b>` : ""}</div>`;
 }
 
 /* ================= art: eggs ================= */
@@ -1561,7 +1635,7 @@ function renderDragon(){
   const replayBtn = $("#dragonBody .replay-reveal");
   if (replayBtn && p){
     const si = stageIdx(p), key = si >= 1 ? REVEAL_KEY[si] : null;
-    if (key) revealAvailable(p.line, key).then(ok => { if (ok) replayBtn.hidden = false; });
+    if (key) revealOk(p, key).then(ok => { if (ok && replayBtn.isConnected) replayBtn.hidden = false; });
   }
 }
 
@@ -1645,7 +1719,7 @@ function openDex(k){
   const note = DEX_NOTES[line] || {tag:"", note:""};
   const first = e.first ? new Date(e.first).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"}) : "Before the bestiary";
   const pips = STAGES.map((_, i) => `<i class="${i <= e.top ? "on" : ""}"></i>`).join("");
-  const stages = m ? "" : `<h3 class="stg-h">Growth</h3><div class="stg-row">${STAGES.map((st, i) => {
+  const baseStages = `<h3 class="stg-h">Growth</h3><div class="stg-row">${STAGES.map((st, i) => {
     const reached = i <= e.top, top = i === e.top;
     const label = `${st.name}, ${reached ? "reached" : "not reached yet"}`;
     const cap = `<figcaption>${esc(st.name)}</figcaption>`;
@@ -1655,6 +1729,21 @@ function openDex(k){
       : `<span class="stg-q">???</span>`;
     return `<figure class="stg lock" aria-label="${esc(label)}"><div class="stg-ph">${ph}</div>${cap}</figure>`;
   }).join("")}</div>`;
+  const stages = m ? `<h3 class="stg-h acc">Growth</h3><div class="stg-row">${STAGES.map((st, i) => {
+    const reached = i <= e.top, top = i === e.top, listed = mutStage(line, m, i);
+    const label = reached ? `${st.name}, reached` : `Stage ${i + 1}, not reached yet`;
+    const cap = `<figcaption>${reached ? esc(st.name) : "???"}</figcaption>`;
+    if (reached && listed) return `<figure class="stg${top ? " top" : ""}" aria-label="${esc(label)}"><img src="${mutSrc(line, m, i)}.webp" alt="" loading="lazy" draggable="false">${cap}</figure>`;
+    if (reached){
+      const fx = MUTATIONS[m].fx, edge = EDGES[line + "-" + (i + 1)] || "#d8c8ac";
+      return `<figure class="stg${top ? " top" : ""}" aria-label="${esc(label)}"><div class="dart fx-${fx}" style="--edge:${edge}"><img src="${stageSrc(line, i)}.webp" alt="" loading="lazy" draggable="false">${fx === "shine" ? `<b class="shine"></b>` : ""}</div>${cap}</figure>`;
+    }
+    if (listed) return `<figure class="stg lock" aria-label="${esc(label)}"><img src="${mutSrc(line, m, i)}-sil.webp" alt="" loading="lazy" draggable="false">${cap}</figure>`;
+    const ph = i === 0
+      ? `<img src="art/bestiary/silhouettes/${line}-1-silhouette.webp" alt="" loading="lazy" draggable="false">`
+      : `<span class="stg-q">???</span>`;
+    return `<figure class="stg lock" aria-label="${esc(label)}"><div class="stg-ph">${ph}</div>${cap}</figure>`;
+  }).join("")}</div>` : baseStages;
   const stats = m
     ? `<div><h4>Rarity</h4><em class="r ${rcls(r)}">${r}</em></div>
        <div><h4>Egg</h4><b>${esc(it.name)}</b><span class="sc">${esc(SCENES[it.scene].name)}</span></div>
@@ -1669,23 +1758,22 @@ function openDex(k){
       : `<span class="dexchip">${esc(name)}</span>`;
   }).join("");
   const bodyNote = m ? MUT_NOTES[m] : note.note;
-  const odds = m ? `<div class="facts"><span>Odds per hatch <b>${pct(RARITY[r].mut / MUT_KEYS.length)}</b></span></div>` : "";
+  const oddsBit = m ? `<span>Odds per hatch <b>${pct(RARITY[r].mut / MUT_KEYS.length)}</b></span>` : "";
   dexFrom = k;
   const ov = $("#dexOv");
   ov.innerHTML = `<div class="dex-frame">
       <div class="bst-pins" aria-hidden="true"><i class="bst-br tl"></i><i class="bst-br tr"></i><i class="bst-br bl"></i><i class="bst-br brb"></i></div>
       <div class="card-wrap dex-card" role="dialog" aria-modal="true" aria-labelledby="dexName">
-      <div class="${rfcls(d)} dexsheet${m ? "" : " dex-dragon"}"${m ? ` style="${rfd(0)}"` : ""}>
+      <div class="${rfcls(d)} dexsheet${m ? " acc-" + m : " dex-dragon"}"${m ? ` style="${rfd(0)}"` : ""}>
         <div class="brand"><span>Bestiary</span><span>${dexFound()} of ${DEX_KEYS.length}</span></div>
         <div class="plate">${dragonArt(d, {live:true, stage:e.top})}</div>
         <div class="dno2">NO. ${m ? dexNo(line, m) : String(DEX_LINES.indexOf(line) + 1).padStart(2, "0")}</div>
         <p class="dname" id="dexName">${esc(d.name)}</p>
         <div class="tag">${esc(note.tag)}</div>
-        ${m ? `<div class="mutb">${MUTATIONS[m].name} mutation</div>` : ""}
+        ${m ? `<div class="mutb acc-${m}">${MUTATIONS[m].name} mutation</div>` : ""}
         <div class="stats">${stats}</div>
         ${stages}
-        <div class="facts"><span>First hatched <b>${first}</b></span><span>Owned <b>×${fmt(e.n)}</b></span></div>
-        ${odds}
+        <div class="facts"><span>First hatched <b>${first}</b></span><span>Owned <b>×${fmt(e.n)}</b></span>${oddsBit}</div>
         <p class="note">${esc(bodyNote)}</p>
         <div class="dexchips">${chips}</div>
       </div>
@@ -1697,7 +1785,7 @@ function openDex(k){
   const best = S.dragons.filter(x => dexKeys(x).includes(k)).sort((a, b) => (b.xp || 0) - (a.xp || 0))[0];
   const si = best ? stageIdx(best) : 0;
   if (best && si >= 1 && REVEAL_KEY[si]){
-    revealAvailable(best.line, REVEAL_KEY[si]).then(ok => {
+    revealOk(best, REVEAL_KEY[si]).then(ok => {
       if (!ok || $("#dexOv").hidden || dexFrom !== k) return;
       const actions = $("#dexActions");
       if (!actions || actions.querySelector("[data-act=dex-replay]")) return;
@@ -1725,6 +1813,7 @@ function addSteps(n){
     if (now > was) grow = {d: p, was, now};
   }
   save(); render();
+  if (grow && dexFrom && !$("#dexOv").hidden && dexKeys(grow.d).includes(dexFrom)) openDex(dexFrom);
   if (grow) startGrowth(grow, msgs);
   else { if (msgs.length) toast(msgs.join(" ")); autoHatch(); }
 }
@@ -1953,7 +2042,7 @@ function debugPanel(){
 function debugAct(a, b){
   if (a === "dbg-bank"){ S.bank = Math.max(0, Math.round(+$("#dbgBank").value || 0)); save(); render(); }
   else if (a === "dbg-walk"){ const n = Math.round(+$("#dbgWalk").value || 0); if (n > 0) addSteps(n); $("#dbgBank").value = S.bank; }
-  else if (a === "dbg-stage"){ const d = prizeDragon(); if (!d){ toast("No prize dragon yet."); return; } d.xp = STAGES[+b.dataset.i].at; save(); render(); }
+  else if (a === "dbg-stage"){ const d = prizeDragon(); if (!d){ toast("No prize dragon yet."); return; } d.xp = STAGES[+b.dataset.i].at; save(); render(); if (dexFrom && !$("#dexOv").hidden && dexKeys(d).includes(dexFrom)) openDex(dexFrom); }
   else if (a === "dbg-left"){ const n = +b.dataset.n; S.eggs.forEach(e => { e.at = S.lifetime - ITEM[e.item].hatch + n; }); save(); render(); autoHatch(); }
   else if (a === "dbg-mut"){ DBG_MUT = b.dataset.k === "none" ? null : b.dataset.k; toast(DBG_MUT ? `Next hatch: ${MUTATIONS[DBG_MUT].name}` : "Next hatch: normal odds"); }
 }
@@ -1988,10 +2077,23 @@ function migrate(){
   Object.keys(S.bought).forEach(k => { if (!ITEM[k]) delete S.bought[k]; });
   if ((S.ver || 1) < 2){ migrateDex(); S.ver = 2; }
 }
+function migrateV3(){
+  S.dex = asMap(S.dex);
+  for (const k of Object.keys(S.dex)){
+    const e = S.dex[k];
+    if (!e || typeof e !== "object") continue;
+    e.top = Math.min(3, Math.max(0, e.top | 0));
+  }
+  S.dragons.forEach(d => { if (!d.mut || !MUTATIONS[d.mut]) return;
+    const k = d.line + ":" + d.mut, e = S.dex[k] || (S.dex[k] = {first:null, n:0, top:0});
+    if (!e.n) e.n = S.dragons.filter(x => dexKeys(x).includes(k)).length;
+    e.top = Math.max(e.top | 0, stageIdx(d)); });
+}
 function start(data){
   S = (data && data.state) ? hydrate(data.state) : (load() || fresh());
   if (!S.opened) S.opened = {};
   migrate();
+  if ((S.ver || 1) < 3){ migrateV3(); S.ver = 3; save(); }
   ITEMS.forEach(it => { if (S.owned[it.id]) for (let k = 1; k <= it.scene; k++) S.opened[k] = true; });
   applyDebugParams();
   shown = S.bank;
@@ -1999,6 +2101,7 @@ function start(data){
   buildScenes();
   if (DEBUG) debugPanel();
   setTab(S.tab || "bank");
+  loadMutArt();
   setTimeout(autoHatch, 600);
 }
 try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({state: S})); } catch(e){}
