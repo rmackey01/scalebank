@@ -298,7 +298,8 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .rf-wrap.rf-mut{--rf-fill:linear-gradient(180deg,#26283a,#0c1015)}
 
 /* ---------- bestiary (handoff/feature-bestiary.md §6.0, mockups.html) ---------- */
-#bestiary.bst-journal,#dexOv.bst-journal{background:radial-gradient(120% 70% at 50% 0%,#211b15 0%,transparent 60%),radial-gradient(90% 60% at 50% 110%,#0c0a08 0%,transparent 70%),#14110e;box-shadow:inset 0 0 0 1px rgba(216,169,75,.55),inset 0 0 0 5px #14110e,inset 0 0 0 6px rgba(216,169,75,.28)}
+#bestiary.bst-journal,#dexOv.bst-journal{background:radial-gradient(120% 70% at 50% 0%,#211b15 0%,transparent 60%),radial-gradient(90% 60% at 50% 110%,#0c0a08 0%,transparent 70%),#14110e}
+#bestiary.bst-journal{box-shadow:inset 0 0 0 1px rgba(216,169,75,.55),inset 0 0 0 5px #14110e,inset 0 0 0 6px rgba(216,169,75,.28)}
 #bestiary{position:relative;overflow:hidden;display:flex;flex-direction:column;color:#ece4d4}
 .bst-scroll{flex:1;min-height:0;overflow-y:auto}
 .bst-frame{position:relative;min-height:100%}
@@ -345,8 +346,13 @@ button.bx:active{transform:scale(.96)}
 #bestiary button.bx.rf{--rf-fill:linear-gradient(#1a1612,#1a1612)}
 #bestiary button.bx.rf-mut{--rf-fill:linear-gradient(180deg,#26283a,#1a1612)}
 #bestiary .bx.rf-none{--rf-fill:linear-gradient(#1a1612,#1a1612)}
-#dexOv{align-items:flex-start;overflow-y:auto;backdrop-filter:none}
-.dex-card{position:relative;margin-block:auto;width:100%;max-width:360px}
+#dexOv{align-items:flex-start;overflow-y:auto;padding:4px;backdrop-filter:none}
+.dex-frame{position:relative;box-sizing:border-box;width:100%;margin-block:auto;padding:14px;display:flex;flex-direction:column;align-items:center;box-shadow:inset 0 0 0 1px rgba(216,169,75,.55),inset 0 0 0 5px #14110e,inset 0 0 0 6px rgba(216,169,75,.28)}
+.dex-frame .bst-br.tl{top:-3px;left:-3px}
+.dex-frame .bst-br.tr{top:-3px;right:-3px}
+.dex-frame .bst-br.bl{bottom:-3px;left:-3px}
+.dex-frame .bst-br.brb{bottom:-3px;right:-3px}
+.dex-card{width:100%;max-width:360px}
 .dexsheet.dex-dragon .stats{grid-template-columns:1fr 1fr}
 .dexsheet.dex-dragon .plate,.dexsheet.dex-dragon .plate .dart{width:150px}
 .dexsheet{--rf-r:22px;--rf-fill:linear-gradient(180deg,#1f1913,#120f0c);padding:16px 16px 14px;text-align:center}
@@ -1657,8 +1663,9 @@ function openDex(k){
   const odds = m ? `<div class="facts"><span>Odds per hatch <b>${pct(RARITY[r].mut / MUT_KEYS.length)}</b></span></div>` : "";
   dexFrom = k;
   const ov = $("#dexOv");
-  ov.innerHTML = `<div class="card-wrap dex-card" role="dialog" aria-modal="true" aria-labelledby="dexName">
+  ov.innerHTML = `<div class="dex-frame">
       <div class="bst-pins" aria-hidden="true"><i class="bst-br tl"></i><i class="bst-br tr"></i><i class="bst-br bl"></i><i class="bst-br brb"></i></div>
+      <div class="card-wrap dex-card" role="dialog" aria-modal="true" aria-labelledby="dexName">
       <div class="${rfcls(d)} dexsheet${m ? "" : " dex-dragon"}"${m ? ` style="${rfd(0)}"` : ""}>
         <div class="brand"><span>Bestiary</span><span>${dexFound()} of ${DEX_KEYS.length}</span></div>
         <div class="plate">${dragonArt(d, {live:true, stage:e.top})}</div>
@@ -1674,10 +1681,10 @@ function openDex(k){
         <div class="dexchips">${chips}</div>
       </div>
       <div class="card-actions" id="dexActions"><button class="btn ghost" data-act="close-dex">Close</button></div>
-    </div>`;
+    </div></div>`;
   ov.hidden = false;
+  ov.querySelector("[data-act=close-dex]").focus({preventScroll:true});
   ov.scrollTop = 0;
-  ov.querySelector("[data-act=close-dex]").focus();
   const best = S.dragons.filter(x => dexKeys(x).includes(k)).sort((a, b) => (b.xp || 0) - (a.xp || 0))[0];
   const si = best ? stageIdx(best) : 0;
   if (best && si >= 1 && REVEAL_KEY[si]){
