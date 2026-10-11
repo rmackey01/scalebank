@@ -245,9 +245,6 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .hd .dart{width:72px;border-radius:8px}
 .hd > span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hd > span.hd-rarity{display:inline-flex;align-items:baseline;justify-content:center;gap:4px;max-width:100%;white-space:nowrap;overflow:visible;text-overflow:clip}
-.hd > span.hd-rarity:has(.walk-tag){gap:3px}
-.hd > span.hd-rarity:has(.walk-tag) em{font-size:9px;letter-spacing:0}
-.hd > span.hd-rarity:has(.walk-tag) .walk-tag{font-size:8px;letter-spacing:0}
 .hd-rarity .walk-tag{margin-left:0;flex:none;max-width:none;overflow:visible}
 .hd[aria-pressed="true"]{color:var(--gold-hi)}
 .hd small{font-weight:500;color:var(--muted);font-size:11px}
@@ -284,7 +281,8 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
   box-shadow:0 0 0 2px rgba(255,244,220,.85),0 0 18px 4px rgba(255,236,200,.35);animation:prizeBreath 2.4s ease-in-out infinite}
 @keyframes prizeBreath{0%,100%{opacity:.6}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.rf[aria-pressed="true"]::after{animation:none;opacity:1}}
-.walk-tag{margin-left:4px;font:700 9px/13px var(--body);letter-spacing:.1em;text-transform:uppercase;color:#fff4dc}
+.walk-tag{margin-left:4px;display:inline-flex;color:#fff4dc;line-height:0}
+.walk-tag svg{width:12px;height:12px;display:block}
 .rf:focus-visible{outline-offset:6px}
 @supports (mask-composite:exclude) or (-webkit-mask-composite:xor){
   .rf-mut::before{content:"";position:absolute;inset:calc(-1 * var(--rf-w));padding:var(--rf-w);border-radius:inherit;pointer-events:none;
@@ -345,6 +343,7 @@ button.bx:active{transform:scale(.96)}
 .bx.unk .dart > img{opacity:.55;-webkit-mask:none;mask:none;object-position:50% 64%}
 #bestiary button.bx.rf{--rf-fill:linear-gradient(#1a1612,#1a1612)}
 #bestiary button.bx.rf-mut{--rf-fill:linear-gradient(180deg,#26283a,#1a1612)}
+#bestiary .bx.rf-none{--rf-fill:linear-gradient(#1a1612,#1a1612)}
 #dexOv{align-items:stretch;justify-content:flex-start;flex-direction:column;overflow:hidden;padding:0;backdrop-filter:none}
 #dexOv .dex-scroll{flex:1;min-height:0;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px}
 .dex-card{margin-block:auto;width:100%;max-width:360px}
@@ -1527,7 +1526,7 @@ function renderDragon(){
     h += `<div class="section"><h2>Hoard <small>${S.dragons.length} dragons${muts ? ` \u00B7 ${muts} mutated` : ""}</small></h2>
       <p class="hoard-note">Tap one to put it in the prize slot. Only the prize dragon grows.</p>
       <div class="hoard">${S.dragons.map((d, i) =>
-      `<button class="hd ${rfcls(d)}"${d.mut ? ` style="${rfd(i)}"` : ""} data-act="prize" data-id="${d.id}" aria-pressed="${d.id === S.prize}">${dragonArt(d, {still:true})}<span>${esc(d.name)}</span><small>${STAGES[stageIdx(d)].name}${d.mut ? ` \u00B7 ${MUTATIONS[d.mut].name}` : ""}</small><span class="hd-rarity"><em class="r ${rcls(rarityOf(d))}">${rarityOf(d)}</em>${d.id === S.prize ? `<span class="walk-tag">Walking</span>` : ""}</span></button>`).join("")}</div></div>`;
+      `<button class="hd ${rfcls(d)}"${d.mut ? ` style="${rfd(i)}"` : ""} data-act="prize" data-id="${d.id}" aria-pressed="${d.id === S.prize}">${dragonArt(d, {still:true})}<span>${esc(d.name)}</span><small>${STAGES[stageIdx(d)].name}${d.mut ? ` \u00B7 ${MUTATIONS[d.mut].name}` : ""}</small><span class="hd-rarity"><em class="r ${rcls(rarityOf(d))}">${rarityOf(d)}</em>${d.id === S.prize ? `<span class="walk-tag" role="img" aria-label="Walking"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><ellipse cx="9.5" cy="16.2" rx="4.2" ry="5.4"/><circle cx="5.4" cy="8.4" r="1.55"/><circle cx="8.6" cy="6.1" r="1.7"/><circle cx="12" cy="6.4" r="1.55"/><circle cx="14.8" cy="8.6" r="1.35"/></svg></span>` : ""}</span></button>`).join("")}</div></div>`;
   }
   h += `<div style="height:24px"></div>`;
   $("#dragonBody").innerHTML = h;
