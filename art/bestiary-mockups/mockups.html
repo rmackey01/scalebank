@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>Scale Bank Bestiary mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&family=Lato:wght@400;700;900&display=block" rel="stylesheet">
+<style>
+/* ===== Tokens ===== */
+:root{--leather:#14110e;--leather2:#1c1712;--gold:#d8a94b;--gold-hi:#f4d78f;--muted:#9c978b;--ink:#ece4d4;
+  --parch:#e9dcc0;--c-common:#c9bfae;--c-uncommon:#93cf86;--c-rare:#b9b6f0;--c-epic:#d6a2ff;--c-legendary:#ffd27a;--c-mut:#cdb8ff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;background:var(--leather);color:var(--ink);font:400 13px/1.35 Lato,sans-serif;-webkit-font-smoothing:antialiased}
+.view{display:none;width:390px;min-height:844px;position:relative;overflow:hidden}
+body[data-v="tiles"] #tiles,body[data-v="grid"] #grid,body[data-v="inferno"] #inferno,body[data-v="moon"] #moon{display:block}
+body[data-v="all"] .view{display:block;margin-bottom:24px}
+.serif{font-family:"Cormorant Garamond",serif}
+
+/* ===== Field-journal chrome: leather + thin gold double rule + corner brackets ===== */
+.journal{min-height:844px;padding:14px;background:
+  radial-gradient(120% 70% at 50% 0%,#211b15 0%,transparent 60%),
+  radial-gradient(90% 60% at 50% 110%,#0c0a08 0%,transparent 70%),var(--leather)}
+.page{position:relative;min-height:816px;padding:18px 14px 20px;
+  border:1px solid rgba(216,169,75,.55);outline:1px solid rgba(216,169,75,.28);outline-offset:-5px}
+.page>.br{position:absolute;width:16px;height:16px;border:2px solid var(--gold)}
+.br.tl{top:-3px;left:-3px;border-right:0;border-bottom:0}.br.tr{top:-3px;right:-3px;border-left:0;border-bottom:0}
+.br.bl{bottom:-3px;left:-3px;border-right:0;border-top:0}.br.brr{bottom:-3px;right:-3px;border-left:0;border-top:0}
+
+/* header */
+.bhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bhead h1{font:700 30px/1 "Cormorant Garamond",serif;color:var(--gold-hi);letter-spacing:.02em}
+.pill{font:700 11px/1 Lato;letter-spacing:.08em;color:var(--gold-hi);border:1px solid rgba(216,169,75,.6);border-radius:99px;padding:6px 10px;background:rgba(216,169,75,.08);white-space:nowrap}
+.sub{font:italic 500 15px/1.3 "Cormorant Garamond",serif;color:var(--muted);margin:4px 0 12px}
+.ghead{display:flex;justify-content:space-between;align-items:baseline;font:700 18px/1 "Cormorant Garamond",serif;color:var(--ink);
+  margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid rgba(216,169,75,.25)}
+.ghead span{font:700 10px/1 Lato;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.ghead.s{font-size:16px;margin-top:12px}
+
+/* ===== Rarity frames (from feature-rarity-frames.md) ===== */
+.rf{--rf-w:1px;--rf-r:12px;--rf-fill:linear-gradient(#1a1612,#14110e);--rf-border:linear-gradient(#3a3a3a,#3a3a3a);
+  --rf-in:0 0 #0000;--rf-out:0 0 #0000;--rf-mutin:0 0 #0000;--rf-prize:0 0 #0000;
+  border:var(--rf-w) solid transparent;border-radius:var(--rf-r);position:relative;
+  background:var(--rf-fill) padding-box,var(--rf-border) border-box;box-shadow:var(--rf-prize),var(--rf-out),var(--rf-mutin),var(--rf-in)}
+.rf-none{--rf-border:linear-gradient(#4a4844,#3a3936)} /* neutral grey for undiscovered */
+.rf-common{--rf-border:linear-gradient(160deg,#b39062,#6e583c)}
+.rf-uncommon{--rf-w:2px;--rf-border:linear-gradient(160deg,#c9edb9,#93cf86 40%,#3e7a16);--rf-in:inset 0 0 10px rgba(147,207,134,.12)}
+.rf-rare{--rf-w:2px;--rf-border:linear-gradient(160deg,#dcdaff,#b9b6f0 40%,#3c35a6);--rf-in:inset 0 0 12px rgba(185,182,240,.16)}
+.rf-epic{--rf-w:2px;--rf-border:linear-gradient(160deg,#f0d6ff,#d6a2ff 40%,#6a2c90);--rf-in:inset 0 0 14px rgba(214,162,255,.2);--rf-out:0 0 10px rgba(166,79,214,.35)}
+.rf-legendary{--rf-w:3px;--rf-border:linear-gradient(160deg,#ffe9a8,#e8b451 22%,#9a5e18 45%,#6e400f 60%,#c68a30 80%,#ffd98a);--rf-in:inset 0 0 18px rgba(255,200,100,.16);--rf-out:0 0 14px rgba(255,200,100,.35)}
+.rf-mut{--rf-fill:linear-gradient(180deg,#26233a,#14110e);--rf-mutin:inset 0 0 0 1px rgba(205,184,255,.55)}
+.rf-common.rf-mut{--rf-w:2px}
+/* Prize = the dragon getting steps. NOT a rarity: keeps its real frame + label, adds warm-white outer glow */
+.prize{--rf-prize:0 0 0 1px rgba(255,246,228,.55),0 0 14px 2px rgba(255,240,214,.55),0 0 30px rgba(255,236,200,.25)}
+.walk{position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:3;font:900 8.5px/1 Lato;letter-spacing:.14em;
+  color:#2a2118;background:linear-gradient(#fffaf0,#efe4cf);padding:4px 7px 3px;border-radius:99px;box-shadow:0 0 8px rgba(255,240,214,.7);white-space:nowrap}
+
+/* ===== Tiles ===== */
+.bst-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bst-grid.mut{grid-template-columns:repeat(4,1fr);gap:8px}
+.bx{padding:5px 5px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;min-width:0}
+.dart{position:relative;width:100%;aspect-ratio:1/1;border-radius:8px;overflow:visible;background:var(--parch)}
+.dart>.clip{position:absolute;inset:0;border-radius:inherit;overflow:hidden}
+.dart img{width:100%;height:100%;object-fit:cover;object-position:50% 58%;display:block;
+  -webkit-mask:radial-gradient(75% 75% at 50% 50%,#000 60%,transparent 100%);mask:radial-gradient(75% 75% at 50% 50%,#000 60%,transparent 100%)}
+.dno{position:absolute;top:4px;left:5px;z-index:2;font:700 9px/1 Lato;letter-spacing:.06em;color:#4a3a26;background:rgba(244,232,206,.85);padding:2px 4px;border-radius:4px}
+.bn{font:700 15px/1.1 "Cormorant Garamond",serif;color:var(--ink);margin-top:4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.r{font:900 9px/1 Lato;letter-spacing:.14em;text-transform:uppercase;font-style:normal}
+.r.common{color:var(--c-common)}.r.uncommon{color:var(--c-uncommon)}.r.rare{color:var(--c-rare)}.r.epic{color:var(--c-epic)}
+.r.legendary{color:var(--c-legendary);text-shadow:0 0 6px rgba(255,210,122,.55)}
+.r.mutl{color:var(--c-mut)}
+.bx small{font-size:10px;color:var(--muted)}
+.bst-grid.mut .bn{font-size:12.5px}.bst-grid.mut .dno{font-size:7.5px}
+/* undiscovered: silhouettes/<line>-1-silhouette.webp at .55 over a parchment plate dimmed ~25% */
+.unk .dart{background:#aea48f}
+.unk .dart img{object-position:50% 64%;opacity:.55;-webkit-mask:none;mask:none} /* pre-darkened #0b0a09 cut-out: no filter needed */
+.unk .dart .clip{background:radial-gradient(80% 80% at 50% 45%,#b4a88f,#8f8572)}
+.unk .bn{color:var(--muted)}
+.unk .dno{background:rgba(174,164,143,.9);color:#3a3226}
+/* mutation fx on art (index.html lines 296–303, recoloured per approved design) */
+.fx-moon{box-shadow:0 0 0 2px rgba(206,220,255,.9),0 0 22px rgba(150,180,255,.6)}
+.fx-moon .clip::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 40px rgba(150,180,255,.5);background:linear-gradient(180deg,rgba(120,140,220,.18),rgba(40,50,110,.25));mix-blend-mode:multiply;border-radius:inherit}
+.fx-moon .clip::before{content:"";position:absolute;inset:0;z-index:1;box-shadow:inset 0 0 40px rgba(150,180,255,.45);border-radius:inherit}
+
+/* ===== Tiles board ===== */
+.board{display:grid;grid-template-columns:1fr 1fr;gap:26px 22px;margin-top:20px}
+.board .cell{display:flex;flex-direction:column;gap:10px}
+.board .bx{width:100%}
+.lab{font:700 10px/1.35 Lato;letter-spacing:.06em;color:var(--gold-hi);text-transform:uppercase}
+.lab i{display:block;font:italic 500 12.5px/1.25 "Cormorant Garamond",serif;letter-spacing:0;text-transform:none;color:var(--muted)}
+
+/* ===== Detail sheet ===== */
+.dexsheet{--rf-r:20px;padding:16px 16px 14px;text-align:center}
+.dexsheet:not(.rf-mut){--rf-fill:linear-gradient(180deg,#1f1913,#120f0c)}
+.dexsheet.rf-mut{--rf-fill:linear-gradient(180deg,#27233c,#120f0c)}
+.brand{font:700 10px/1 Lato;letter-spacing:.24em;color:var(--muted);text-transform:uppercase;display:flex;justify-content:space-between}
+.plate{position:relative;width:206px;height:290px;margin:12px auto 10px;border-radius:12px;background:var(--parch)}
+.plate .clip{position:absolute;inset:0;border-radius:inherit;overflow:hidden}
+.plate img{width:100%;height:100%;object-fit:cover;display:block}
+.plate.fx-moon{box-shadow:0 0 0 2px rgba(206,220,255,.9),0 0 30px rgba(150,180,255,.6)}
+.dno2{font:700 11px/1 Lato;letter-spacing:.16em;color:var(--gold)}
+.dname{font:700 32px/1 "Cormorant Garamond",serif;color:var(--ink);margin-top:4px}
+.tag{font:italic 600 16px/1.2 "Cormorant Garamond",serif;color:var(--muted);margin-top:2px}
+.mutb{display:inline-block;margin-top:7px;font:900 9px/1 Lato;letter-spacing:.16em;color:var(--c-mut);text-transform:uppercase;border:1px solid rgba(205,184,255,.55);border-radius:99px;padding:4px 9px;background:rgba(205,184,255,.08)}
+.stats{display:grid;grid-template-columns:1fr 1.25fr 1fr;margin-top:12px;border-top:1px solid rgba(216,169,75,.3);border-bottom:1px solid rgba(216,169,75,.3)}
+.rf-mut .stats{border-color:rgba(205,184,255,.35)}
+.stats>div{padding:8px 4px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center}
+.stats>div+div{border-left:1px solid rgba(216,169,75,.18)}
+.stats h4{font:700 8.5px/1 Lato;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.stats b{font:700 12px/1.15 Lato;color:var(--ink)}.stats .sc{font-size:10px;color:var(--muted)}
+.stats .r{font-size:10.5px}
+.pips{display:flex;gap:4px}.pips i{width:9px;height:9px;border-radius:50%;border:1px solid var(--gold);display:block}
+.pips i.on{background:var(--gold);box-shadow:0 0 5px rgba(216,169,75,.6)}
+.facts{display:flex;justify-content:center;gap:16px;margin-top:8px;font-size:11px;color:var(--muted)}
+.facts b{color:var(--ink);font-weight:700}
+.note{font:italic 500 16px/1.32 "Cormorant Garamond",serif;color:#d9cfbd;margin:10px 6px 0}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.chip{border-radius:99px;padding:6px 0;font:700 9.5px/1 Lato;letter-spacing:.05em;border:1px dashed #4a4844;color:#6d6a63}
+.chip.on{border:1px solid rgba(205,184,255,.6);color:var(--c-mut);background:rgba(205,184,255,.09)}
+.chip.cur{box-shadow:0 0 0 1px var(--c-mut),0 0 8px rgba(205,184,255,.4)}
+.close{display:block;margin:12px auto 0;width:140px;padding:10px;border-radius:99px;border:1px solid rgba(216,169,75,.6);color:var(--gold-hi);background:transparent;font:700 12px Lato;letter-spacing:.08em}
+</style></head>
+<body data-v="all">
+
+<!-- ================= 1. TILES ================= -->
+<section class="view" id="tiles"><div class="journal"><div class="page">
+  <i class="br tl"></i><i class="br tr"></i><i class="br bl"></i><i class="br brr"></i>
+  <div class="bhead"><h1>Tile states</h1><span class="pill">BESTIARY · CSS REF</span></div>
+  <p class="sub">The four tile states, shown larger than in the grid so they're easy to read.</p>
+  <div class="board">
+    <div class="cell"><div class="lab">Found · Rare<i>Real art, Rare frame, rarity in #b9b6f0, count + highest stage.</i></div>
+      <div class="bx rf rf-rare"><div class="dart"><span class="dno">No. 04</span><div class="clip"><img src="assets/inferno-3.jpg" alt=""></div></div>
+        <span class="bn">Inferno</span><em class="r rare">Rare</em><small>×2 · Adult</small></div></div>
+    <div class="cell"><div class="lab">Undiscovered<i>Hatchling silhouette on dimmed parchment, number only, neutral grey frame.</i></div>
+      <div class="bx rf rf-none unk"><div class="dart"><span class="dno">No. 06</span><div class="clip"><img src="silhouettes/voidling-1-silhouette.webp" alt=""></div></div>
+        <span class="bn">???</span><small>Undiscovered</small></div></div>
+    <div class="cell"><div class="lab">Prize (walking)<i>Keeps its Common frame + label. Warm-white glow and WALKING tag only.</i></div>
+      <div class="bx rf rf-common prize"><span class="walk">WALKING</span><div class="dart"><span class="dno">No. 01</span><div class="clip"><img src="assets/cinder-2.jpg" alt=""></div></div>
+        <span class="bn">Cinder</span><em class="r common">Common</em><small>×3 · Juvenile</small></div></div>
+    <div class="cell"><div class="lab">Mutation variant<i>Moonlit fx on art, lavender hairline + tinted fill, tier frame kept.</i></div>
+      <div class="bx rf rf-common rf-mut"><div class="dart fx-moon"><span class="dno">No. 01-M</span><div class="clip"><img src="assets/cinder-1.jpg" alt=""></div></div>
+        <span class="bn">Moonlit Cinder</span><em class="r mutl">Moonlit</em><small>×1 · Hatchling</small></div></div>
+  </div>
+</div></div></section>
+
+<!-- ================= 2. GRID ================= -->
+<section class="view" id="grid"><div class="journal"><div class="page">
+  <i class="br tl"></i><i class="br tr"></i><i class="br bl"></i><i class="br brr"></i>
+  <div class="bhead"><h1>Bestiary</h1><span class="pill">4 OF 35</span></div>
+  <p class="sub">Every dragon you hatch gets a page here.</p>
+  <h2 class="ghead">Dragons <span>3 of 7</span></h2>
+  <div class="bst-grid">
+    <div class="bx rf rf-common prize"><span class="walk">WALKING</span><div class="dart"><span class="dno">No. 01</span><div class="clip"><img src="assets/cinder-2.jpg" alt=""></div></div><span class="bn">Cinder</span><em class="r common">Common</em><small>×3 · Juvenile</small></div>
+    <div class="bx rf rf-common"><div class="dart"><span class="dno">No. 02</span><div class="clip"><img src="assets/brine-3.jpg" alt=""></div></div><span class="bn">Brine</span><em class="r common">Common</em><small>×2 · Adult</small></div>
+    <div class="bx rf rf-none unk"><div class="dart"><span class="dno">No. 03</span><div class="clip"><img src="silhouettes/moss-1-silhouette.webp" alt=""></div></div><span class="bn">???</span><small>Undiscovered</small></div>
+    <div class="bx rf rf-rare"><div class="dart"><span class="dno">No. 04</span><div class="clip"><img src="assets/inferno-3.jpg" alt=""></div></div><span class="bn">Inferno</span><em class="r rare">Rare</em><small>×2 · Adult</small></div>
+    <div class="bx rf rf-none unk"><div class="dart"><span class="dno">No. 05</span><div class="clip"><img src="silhouettes/stormling-1-silhouette.webp" alt=""></div></div><span class="bn">???</span><small>Undiscovered</small></div>
+    <div class="bx rf rf-none unk"><div class="dart"><span class="dno">No. 06</span><div class="clip"><img src="silhouettes/voidling-1-silhouette.webp" alt=""></div></div><span class="bn">???</span><small>Undiscovered</small></div>
+    <div class="bx rf rf-none unk"><div class="dart"><span class="dno">No. 07</span><div class="clip"><img src="silhouettes/tempest-1-silhouette.webp" alt=""></div></div><span class="bn">???</span><small>Undiscovered</small></div>
+  </div>
+  <h2 class="ghead">Mutations <span>1 of 28</span></h2>
+  <h3 class="ghead s">Cinder <span>1 / 4</span></h3>
+  <div class="bst-grid mut">
+    <div class="bx rf rf-common rf-mut"><div class="dart fx-moon"><span class="dno">01-M</span><div class="clip"><img src="assets/cinder-1.jpg" alt=""></div></div><span class="bn">Moonlit Cinder</span></div>
+    <div class="bx rf rf-none unk"><div class="dart"><span class="dno">01-O</span><div class="clip"><img src="silhouettes/cinder-1-silhouette.webp" alt=""></div></div><span class="bn">???</span></div>
+    <div class="bx rf rf-none unk"><div class="dart"><span class="dno">01-G</span><div class="clip"><img src="silhouettes/cinder-1-silhouette.webp" alt=""></div></div><span class="bn">???</span></div>
+    <div class="bx rf rf-none unk"><div class="dart"><span class="dno">01-A</span><div class="clip"><img src="silhouettes/cinder-1-silhouette.webp" alt=""></div></div><span class="bn">???</span></div>
+  </div>
+</div></div></section>
+
+<!-- ================= 3. DETAIL: INFERNO ================= -->
+<section class="view" id="inferno"><div class="journal"><div class="page">
+  <i class="br tl"></i><i class="br tr"></i><i class="br bl"></i><i class="br brr"></i>
+  <div class="rf rf-rare dexsheet">
+    <div class="brand"><span>Bestiary</span><span>4 of 35</span></div>
+    <div class="plate"><div class="clip"><img src="assets/inferno-3.jpg" alt="Inferno, adult"></div></div>
+    <div class="dno2">NO. 04</div>
+    <div class="dname">Inferno</div>
+    <div class="tag">Forge bulwark</div>
+    <div class="stats">
+      <div><h4>Rarity</h4><em class="r rare">Rare</em></div>
+      <div><h4>Egg</h4><b>Forge Egg</b><span class="sc">Moon Kiln</span></div>
+      <div><h4>Highest stage</h4><div class="pips"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><span class="sc">Adult</span></div>
+    </div>
+    <div class="facts"><span>First hatched <b>Oct 4, 2026</b></span><span>Owned <b>×2</b></span></div>
+    <p class="note">Stubborn, proud and fiercely loyal. The magma seams between its plates brighten with every breath, and a single thump of the club tail settles most arguments.</p>
+    <div class="chips"><span class="chip">Moonlit</span><span class="chip">Obsidian</span><span class="chip">Gilded</span><span class="chip">Aurora</span></div>
+  </div>
+  <button class="close">Close</button>
+</div></div></section>
+
+<!-- ================= 4. DETAIL: MOONLIT CINDER ================= -->
+<section class="view" id="moon"><div class="journal"><div class="page">
+  <i class="br tl"></i><i class="br tr"></i><i class="br bl"></i><i class="br brr"></i>
+  <div class="rf rf-common rf-mut dexsheet">
+    <div class="brand"><span>Bestiary</span><span>4 of 35</span></div>
+    <div class="plate fx-moon"><div class="clip"><img src="assets/cinder-1.jpg" alt="Moonlit Cinder, hatchling"></div></div>
+    <div class="dno2" style="color:var(--c-mut)">NO. 01-M</div>
+    <div class="dname">Moonlit Cinder</div>
+    <div class="tag">Ash skink</div>
+    <span class="mutb">Moonlit mutation</span>
+    <div class="stats">
+      <div><h4>Rarity</h4><em class="r common">Common</em></div>
+      <div><h4>Egg</h4><b>Ember Egg</b><span class="sc">Lantern Stall</span></div>
+      <div><h4>Highest stage</h4><div class="pips"><i class="on"></i><i></i><i></i><i></i></div><span class="sc">Hatchling</span></div>
+    </div>
+    <div class="facts"><span>First hatched <b>Oct 9, 2026</b></span><span>Owned <b>×1</b></span></div>
+    <p class="note">Hatched under a full moon; a cold silver light clings to it after dark.</p>
+    <div class="chips"><span class="chip on cur">Moonlit</span><span class="chip">Obsidian</span><span class="chip">Gilded</span><span class="chip">Aurora</span></div>
+  </div>
+  <button class="close">Close</button>
+</div></div></section>
+
+<script>
+const v=new URLSearchParams(location.search).get("v");if(v)document.body.dataset.v=v;
+document.fonts.ready.then(()=>{const ok=["700 20px 'Cormorant Garamond'","italic 500 20px 'Cormorant Garamond'","400 20px Lato","900 20px Lato"].map(f=>document.fonts.check(f));
+document.title="FONTS:"+ok.join(",");});
+</script>
+</body></html>
