@@ -130,7 +130,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .kind.r-rare,.r.r-rare{color:#b9b6f0}
 .kind.r-epic,.r.r-epic{color:#d6a2ff}
 .kind.r-legendary,.r.r-legendary{color:#ffd27a;text-shadow:0 0 10px rgba(255,200,100,.45)}
-.r.r-common{color:var(--gold)} .r.r-uncommon{color:#93cf86}
+.r.r-common{color:#c9bfae} .r.r-uncommon{color:#93cf86}
 .odds{display:flex;flex-wrap:wrap;gap:4px 6px;margin:-2px 0 9px}
 .odds span{font-size:11px;color:var(--muted);background:var(--ink);border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-variant-numeric:tabular-nums}
 .odds b{color:var(--fg);font-weight:600}
@@ -241,14 +241,12 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .hx-btn{white-space:nowrap;padding:calc(7*var(--u)) calc(16*var(--u));border-radius:calc(10*var(--u));border:1px solid #f3c859;background:linear-gradient(180deg,#ffe9a8,#e8b451 45%,#9a5e18);color:#2a1606;font-family:"Lato",var(--body);font-weight:900;font-size:calc(14*var(--u));box-shadow:inset 0 1px 0 rgba(255,250,220,.7),0 calc(2*var(--u)) 0 #5c3d0c}
 .hx-btn:active{transform:translateY(1px)}
 .hoard{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
-.hd{background:var(--stone);border:1px solid var(--line);border-radius:14px;padding:6px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;font-weight:600;min-width:0}
+.hd{padding:6px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;font-weight:600;min-width:0}
 .hd .dart{width:72px;border-radius:8px}
 .hd span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hd[aria-pressed="true"]{border-color:var(--gold);color:var(--gold-hi)}
+.hd[aria-pressed="true"]{color:var(--gold-hi)}
 .hd small{font-weight:500;color:var(--muted);font-size:11px}
 .hd em{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-.hd.r-epic{border-color:rgba(214,162,255,.35)} .hd.r-legendary{border-color:rgba(255,210,122,.45);box-shadow:inset 0 0 18px rgba(255,200,100,.08)}
-.hd.has-mut{background:linear-gradient(180deg,rgba(190,160,255,.10),var(--stone))}
 .hoard-note{margin:-4px 0 10px;font-size:13px;color:var(--muted)}
 .mutb{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#e6dcff;border:1px solid rgba(190,160,255,.5);background:rgba(150,120,230,.12);padding:3px 10px;border-radius:999px}
 .growth{margin:12px auto 0;max-width:290px;text-align:left}
@@ -258,6 +256,43 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .grew-note{font-family:var(--display);font-weight:600;color:var(--gold-hi);font-size:18px;margin:-4px 0 2px;animation:grewnote 2.4s ease-out both}
 @keyframes grewnote{0%,30%{opacity:0;transform:translateY(6px)}50%,100%{opacity:1;transform:none}}
 .replay-reveal{margin-top:10px;background:transparent;border:1px solid var(--gold-lo);color:var(--gold);padding:6px 12px;border-radius:8px;font-size:13px;font-weight:600}
+
+/* ---------- rarity frames (handoff/feature-rarity-frames.md) ---------- */
+.rf{--rf-w:1px;--rf-r:14px;
+  --rf-fill:linear-gradient(#151b22,#151b22);
+  --rf-border:linear-gradient(#2c3540,#2c3540);
+  --rf-in:0 0 #0000;--rf-out:0 0 #0000;--rf-mutin:0 0 #0000;--rf-sel:0 0 #0000;
+  position:relative;
+  border:var(--rf-w) solid transparent;border-radius:var(--rf-r);
+  background:var(--rf-fill) padding-box,var(--rf-border) border-box;
+  box-shadow:var(--rf-sel),var(--rf-out),var(--rf-mutin),var(--rf-in)}
+.rf-common{--rf-w:1px;--rf-border:linear-gradient(160deg,#b39062 0%,#6e583c 100%)}
+.rf-uncommon{--rf-w:2px;--rf-border:linear-gradient(160deg,#c9edb9 0%,#93cf86 40%,#3e7a16 100%);--rf-in:inset 0 0 10px rgba(147,207,134,.12)}
+.rf-rare{--rf-w:2px;--rf-border:linear-gradient(160deg,#dcdaff 0%,#b9b6f0 40%,#3c35a6 100%);--rf-in:inset 0 0 12px rgba(185,182,240,.16)}
+.rf-epic{--rf-w:2px;--rf-border:linear-gradient(160deg,#f0d6ff 0%,#d6a2ff 40%,#6a2c90 100%);--rf-in:inset 0 0 14px rgba(214,162,255,.20);--rf-out:0 0 10px rgba(166,79,214,.35)}
+.rf-legendary{--rf-w:3px;--rf-border:linear-gradient(160deg,#ffe9a8 0%,#e8b451 22%,#9a5e18 45%,#6e400f 60%,#c68a30 80%,#ffd98a 100%);--rf-in:inset 0 0 18px rgba(255,200,100,.16);--rf-out:0 0 14px rgba(255,200,100,.35)}
+.rf-mut{--rf-fill:linear-gradient(180deg,#26283a,#151b22);--rf-mutin:inset 0 0 0 1px rgba(190,160,255,.5)}
+.rf-common.rf-mut{--rf-w:2px}
+.rf-none{--rf-border:linear-gradient(#4a4844,#3a3936)}
+.rf[aria-pressed="true"]{position:relative}
+.rf[aria-pressed="true"]::after{content:"";position:absolute;inset:calc(-1 * var(--rf-w));border-radius:inherit;pointer-events:none;
+  box-shadow:0 0 0 2px rgba(255,244,220,.85),0 0 18px 4px rgba(255,236,200,.35);animation:prizeBreath 2.4s ease-in-out infinite}
+@keyframes prizeBreath{0%,100%{opacity:.6}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.rf[aria-pressed="true"]::after{animation:none;opacity:1}}
+.walk-tag{margin-left:4px;font:700 9px/13px var(--body);letter-spacing:.1em;text-transform:uppercase;color:#fff4dc}
+.rf:focus-visible{outline-offset:6px}
+@supports (mask-composite:exclude) or (-webkit-mask-composite:xor){
+  .rf-mut::before{content:"";position:absolute;inset:calc(-1 * var(--rf-w));padding:var(--rf-w);border-radius:inherit;pointer-events:none;
+    background:linear-gradient(115deg,transparent 42%,rgba(230,220,255,.95) 50%,transparent 58%) 50% 0/300% 100% no-repeat;
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+            mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+    animation:rfshim 4.8s cubic-bezier(.37,0,.63,1) infinite;animation-delay:var(--rfd,0s)}
+}
+@keyframes rfshim{0%{background-position:100% 0}40%,100%{background-position:0% 0}}
+@media (prefers-reduced-motion:reduce){.rf-mut::before{animation:none;background-position:50% 0;opacity:.7}}
+.rf-wrap{--rf-r:14px;--rf-fill:linear-gradient(#0c1015,#0c1015);padding:6px;line-height:0}
+.rf-wrap > .dart{border-radius:8px}
+.rf-wrap.rf-mut{--rf-fill:linear-gradient(180deg,#26283a,#0c1015)}
 .growth .bar{height:8px;background:var(--stone-2);border-radius:4px;margin-top:8px;overflow:hidden}
 .growth .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-lo),var(--gold));border-radius:4px}
 .growth .prog{font-size:13px;color:var(--muted);margin-top:6px}
@@ -270,7 +305,8 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .hstage .halves img,.hstage .halves .crack{position:absolute;width:220px;height:220px;left:0;top:28px}
 .hstage .h-top{clip-path:polygon(0 0,100% 0,100% 57%,73% 57%,66% 52%,58% 60%,50% 52%,42% 60%,34% 52%,27% 57%,0 57%)}
 .hstage .h-bot{clip-path:polygon(0 57%,27% 57%,34% 52%,42% 60%,50% 52%,58% 60%,66% 52%,73% 57%,100% 57%,100% 100%,0 100%)}
-.hstage .born .dart{width:160px;opacity:0;transform:scale(.3) translateY(30px)}
+.hstage .born .rf-wrap{opacity:0;transform:scale(.3) translateY(30px)}
+.hstage .born .dart{width:160px}
 .flash{position:absolute;inset:-40px;border-radius:50%;background:radial-gradient(circle,rgba(255,226,160,.95),rgba(255,180,90,.3) 40%,transparent 68%);opacity:0;pointer-events:none}
 .hstage.wobble .halves{animation:wobble .45s ease-in-out 2;transform-origin:50% 85%}
 .crackline{stroke-dasharray:140;stroke-dashoffset:140}
@@ -279,7 +315,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .hstage.burst .h-bot{transition:transform .6s ease-in,opacity .5s .15s;transform:translate(16px,50px) rotate(10deg);opacity:0}
 .hstage.burst .flash{animation:flash .7s ease-out forwards}
 .hstage.burst .crack{transition:opacity .2s;opacity:0}
-.hstage.burst .born .dart{transition:transform .55s cubic-bezier(.3,1.6,.5,1) .15s,opacity .2s .15s;opacity:1;transform:none}
+.hstage.burst .born .rf-wrap{transition:transform .55s cubic-bezier(.3,1.6,.5,1) .15s,opacity .2s .15s;opacity:1;transform:none}
 .hstage.mutated .flash{background:radial-gradient(circle,rgba(230,215,255,.98),rgba(170,140,255,.4) 40%,transparent 68%)}
 @keyframes flash{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
 @keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
@@ -561,6 +597,8 @@ function prizeDragon(){ return S.dragons.find(d => d.id === S.prize) || null; }
 function stageIdx(d){ let i = 0; STAGES.forEach((st, k) => { if ((d.xp || 0) >= st.at) i = k; }); return i; }
 function rarityOf(d){ return ITEM[d.item].rarity; }
 const rcls = r => "r-" + r.toLowerCase();
+const rfcls = d => "rf rf-" + rarityOf(d).toLowerCase() + (d.mut ? " rf-mut" : "");
+const rfd = i => `--rfd:-${((i * 1.3) % 4.8).toFixed(2)}s`;
 const pct = p => { const v = p * 100; return (v < 1 ? v.toFixed(1) : Math.round(v)) + "%"; };
 function oddsOf(it){
   const m = RARITY[it.rarity].mut;
@@ -1335,8 +1373,8 @@ function renderDragon(){
     const muts = S.dragons.filter(d => d.mut).length;
     h += `<div class="section"><h2>Hoard <small>${S.dragons.length} dragons${muts ? ` \u00B7 ${muts} mutated` : ""}</small></h2>
       <p class="hoard-note">Tap one to put it in the prize slot. Only the prize dragon grows.</p>
-      <div class="hoard">${S.dragons.map(d =>
-      `<button class="hd ${rcls(rarityOf(d))}${d.mut ? " has-mut" : ""}" data-act="prize" data-id="${d.id}" aria-pressed="${d.id === S.prize}">${dragonArt(d, {still:true})}<span>${esc(d.name)}</span><small>${STAGES[stageIdx(d)].name}${d.mut ? ` \u00B7 ${MUTATIONS[d.mut].name}` : ""}</small><em class="r ${rcls(rarityOf(d))}">${d.id === S.prize ? "Prize" : rarityOf(d)}</em></button>`).join("")}</div></div>`;
+      <div class="hoard">${S.dragons.map((d, i) =>
+      `<button class="hd ${rfcls(d)}"${d.mut ? ` style="${rfd(i)}"` : ""} data-act="prize" data-id="${d.id}" aria-pressed="${d.id === S.prize}">${dragonArt(d, {still:true})}<span>${esc(d.name)}</span><small>${STAGES[stageIdx(d)].name}${d.mut ? ` \u00B7 ${MUTATIONS[d.mut].name}` : ""}</small><em class="r ${rcls(rarityOf(d))}">${rarityOf(d)}</em>${d.id === S.prize ? `<span class="walk-tag">Walking</span>` : ""}</button>`).join("")}</div></div>`;
   }
   h += `<div style="height:24px"></div>`;
   $("#dragonBody").innerHTML = h;
@@ -1400,7 +1438,9 @@ function buy(id){
   if (opened > 0) setTimeout(() => toast(`The ${SCENES[opened].name} is open. Tap it above or swipe over.`), 1600);
   save(); render();
 }
+let DBG_MUT = null;
 function rollMutation(it){
+  if (DBG_MUT){ const k = DBG_MUT; DBG_MUT = null; return k; }
   if (Math.random() >= RARITY[it.rarity].mut) return null;
   const keys = Object.keys(MUTATIONS);
   return keys[Math.floor(Math.random() * keys.length)];
@@ -1436,7 +1476,7 @@ function hatch(eggId){
   ov.innerHTML = `<div class="hatch" role="dialog" aria-modal="true" aria-label="Egg hatching">
       <div class="hlead"><span class="eyebrow">You walked it warm</span><h3>Your ${esc(it.name)} is hatching!</h3></div>
       <div class="hstage${mut ? " mutated" : ""}" id="hstage"><div class="flash"></div>
-        <div class="born">${dragonArt(d, {live:true})}</div>
+        <div class="born"><div class="${rfcls(d)} rf-wrap">${dragonArt(d, {live:true})}</div></div>
         <div class="halves">${eggImg(it, "h-top")}${eggImg(it, "h-bot")}<svg class="crack" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline class="crackline" points="27,57 34,52 42,60 50,52 58,60 66,52 73,57" fill="none" stroke="#fff3cf" stroke-width="1.4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg></div>
       </div>
       <div class="after" id="hafter">
@@ -1584,6 +1624,7 @@ function debugPanel(){
     <div class="row"><span>Walk</span><input id="dbgWalk" type="number" min="1" step="1000" value="50000" inputmode="numeric"><button data-act="dbg-walk">Add steps</button></div>
     <div class="row"><span>Prize</span>${STAGES.map((st, i) => `<button data-act="dbg-stage" data-i="${i}">${st.name}</button>`).join("")}</div>
     <div class="row"><span>Eggs</span><button data-act="dbg-left" data-n="2000">2,000 left</button><button data-act="dbg-left" data-n="1">1 left</button><button data-act="dbg-left" data-n="0">Hatch all</button></div>
+    <div class="row"><span>Mutate</span><button data-act="dbg-mut" data-k="none">Off</button>${Object.keys(MUTATIONS).map(k => `<button data-act="dbg-mut" data-k="${k}">${MUTATIONS[k].name}</button>`).join("")}</div>
     <p>Time of day and streak controls come with those features. The game doesn\u2019t use either yet.</p>`;
   $("#app").appendChild(el);
   el.addEventListener("toggle", () => { if (el.open) $("#dbgBank").value = S.bank; });
@@ -1593,6 +1634,7 @@ function debugAct(a, b){
   else if (a === "dbg-walk"){ const n = Math.round(+$("#dbgWalk").value || 0); if (n > 0) addSteps(n); $("#dbgBank").value = S.bank; }
   else if (a === "dbg-stage"){ const d = prizeDragon(); if (!d){ toast("No prize dragon yet."); return; } d.xp = STAGES[+b.dataset.i].at; save(); render(); }
   else if (a === "dbg-left"){ const n = +b.dataset.n; S.eggs.forEach(e => { e.at = S.lifetime - ITEM[e.item].hatch + n; }); save(); render(); autoHatch(); }
+  else if (a === "dbg-mut"){ DBG_MUT = b.dataset.k === "none" ? null : b.dataset.k; toast(DBG_MUT ? `Next hatch: ${MUTATIONS[DBG_MUT].name}` : "Next hatch: normal odds"); }
 }
 
 /* ================= boot ================= */
