@@ -368,6 +368,16 @@ button.bx:active{transform:scale(.96)}
 .dexsheet .pips{display:flex;gap:4px}
 .dexsheet .pips i{width:9px;height:9px;border-radius:50%;border:1px solid var(--gold);display:block}
 .dexsheet .pips i.on{background:var(--gold);box-shadow:0 0 5px rgba(216,169,75,.6)}
+.dexsheet .stg-h{margin:12px 0 6px;padding-bottom:5px;border-bottom:1px solid rgba(216,169,75,.3);font:700 8.5px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);text-align:left}
+.dexsheet .stg-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0}
+.dexsheet .stg{margin:0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.dexsheet .stg > img,.dexsheet .stg-ph{width:100%;aspect-ratio:784/1168;border-radius:8px;object-fit:cover;background:#1a1612;border:1px solid rgba(216,169,75,.35);display:block}
+.dexsheet .stg.top > img,.dexsheet .stg.top .stg-ph{border:2px solid var(--gold);box-shadow:0 0 8px rgba(216,169,75,.35)}
+.dexsheet .stg figcaption{max-width:100%;font:700 8.5px/1.15 var(--body);letter-spacing:.04em;text-transform:uppercase;color:#ece4d4;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dexsheet .stg.lock figcaption{color:var(--muted)}
+.dexsheet .stg-ph{display:grid;place-items:center;overflow:hidden;color:#6d6a63}
+.dexsheet .stg-ph img{width:100%;height:100%;object-fit:cover;opacity:.45;border:0;border-radius:0}
+.dexsheet .stg-q{font:700 13px/1 var(--body);letter-spacing:.08em}
 .dexsheet .facts{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--muted)}
 .dexsheet .facts b{color:#ece4d4;font-weight:700}
 .dexsheet .note{font:italic 500 16px/1.32 var(--display);color:#d9cfbd;margin:10px 6px 0}
@@ -1615,6 +1625,19 @@ function openDex(k){
   const note = DEX_NOTES[line] || {tag:"", note:""};
   const first = e.first ? new Date(e.first).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"}) : "Before the bestiary";
   const pips = STAGES.map((_, i) => `<i class="${i <= e.top ? "on" : ""}"></i>`).join("");
+  const stages = m ? "" : `<h3 class="stg-h">Growth</h3><div class="stg-row">${STAGES.map((st, i) => {
+    const reached = i <= e.top, top = i === e.top;
+    const label = `${st.name}, ${reached ? "reached" : "not reached yet"}`;
+    const cap = `<figcaption>${esc(st.name)}</figcaption>`;
+    if (reached) return `<figure class="stg${top ? " top" : ""}" aria-label="${esc(label)}"><img src="${stageSrc(line, i)}.webp" alt="" loading="lazy" draggable="false">${cap}</figure>`;
+    const ph = i === 0
+      ? `<img src="art/bestiary/silhouettes/${line}-1-silhouette.webp" alt="" loading="lazy" draggable="false">`
+      : `<span class="stg-q">???</span>`;
+    return `<figure class="stg lock" aria-label="${esc(label)}"><div class="stg-ph">${ph}</div>${cap}</figure>`;
+  }).join("")}</div>`;
+  const stageCell = m
+    ? `<div class="pips">${pips}</div><span class="sc">${STAGES[e.top].name}</span>`
+    : `<b>${esc(STAGES[e.top].name)}</b>`;
   const chips = MUT_KEYS.map(mk => {
     const kk = line + ":" + mk, on = !!S.dex[kk], cur = kk === k;
     const name = MUTATIONS[mk].name;
@@ -1638,8 +1661,9 @@ function openDex(k){
         <div class="stats">
           <div><h4>Rarity</h4><em class="r ${rcls(r)}">${r}</em></div>
           <div><h4>Egg</h4><b>${esc(it.name)}</b><span class="sc">${esc(SCENES[it.scene].name)}</span></div>
-          <div><h4>Highest stage</h4><div class="pips">${pips}</div><span class="sc">${STAGES[e.top].name}</span></div>
+          <div><h4>Highest stage</h4>${stageCell}</div>
         </div>
+        ${stages}
         <div class="facts"><span>First hatched <b>${first}</b></span><span>Owned <b>×${fmt(e.n)}</b></span></div>
         ${odds}
         <p class="note">${esc(bodyNote)}</p>
