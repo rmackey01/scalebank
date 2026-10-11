@@ -243,7 +243,12 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .hoard{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
 .hd{padding:6px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;font-weight:600;min-width:0}
 .hd .dart{width:72px;border-radius:8px}
-.hd span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd > span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd > span.hd-rarity{display:inline-flex;align-items:baseline;justify-content:center;gap:4px;max-width:100%;white-space:nowrap;overflow:visible;text-overflow:clip}
+.hd > span.hd-rarity:has(.walk-tag){gap:3px}
+.hd > span.hd-rarity:has(.walk-tag) em{font-size:9px;letter-spacing:0}
+.hd > span.hd-rarity:has(.walk-tag) .walk-tag{font-size:8px;letter-spacing:0}
+.hd-rarity .walk-tag{margin-left:0;flex:none;max-width:none;overflow:visible}
 .hd[aria-pressed="true"]{color:var(--gold-hi)}
 .hd small{font-weight:500;color:var(--muted);font-size:11px}
 .hd em{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
@@ -693,10 +698,17 @@ const MUT_NOTES = {
 
 /* ================= state ================= */
 function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1, dex:{}, ver:SAVE_VER}; }
+function asList(v){ return Array.isArray(v) ? v : []; }
+function asMap(v){ return v && typeof v === "object" && !Array.isArray(v) ? v : {}; }
 function hydrate(obj){
   const st = Object.assign(fresh(), obj || {});
   if (!obj || !obj.ver) st.ver = 1;
-  if (!st.dex || typeof st.dex !== "object") st.dex = {};
+  st.dex = asMap(st.dex);
+  st.owned = asMap(st.owned);
+  st.bought = asMap(st.bought);
+  st.opened = asMap(st.opened);
+  st.eggs = asList(st.eggs);
+  st.dragons = asList(st.dragons);
   return st;
 }
 function load(){
@@ -1505,7 +1517,7 @@ function renderDragon(){
     h += `<div class="section"><h2>Hoard <small>${S.dragons.length} dragons${muts ? ` \u00B7 ${muts} mutated` : ""}</small></h2>
       <p class="hoard-note">Tap one to put it in the prize slot. Only the prize dragon grows.</p>
       <div class="hoard">${S.dragons.map((d, i) =>
-      `<button class="hd ${rfcls(d)}"${d.mut ? ` style="${rfd(i)}"` : ""} data-act="prize" data-id="${d.id}" aria-pressed="${d.id === S.prize}">${dragonArt(d, {still:true})}<span>${esc(d.name)}</span><small>${STAGES[stageIdx(d)].name}${d.mut ? ` \u00B7 ${MUTATIONS[d.mut].name}` : ""}</small><em class="r ${rcls(rarityOf(d))}">${rarityOf(d)}</em>${d.id === S.prize ? `<span class="walk-tag">Walking</span>` : ""}</button>`).join("")}</div></div>`;
+      `<button class="hd ${rfcls(d)}"${d.mut ? ` style="${rfd(i)}"` : ""} data-act="prize" data-id="${d.id}" aria-pressed="${d.id === S.prize}">${dragonArt(d, {still:true})}<span>${esc(d.name)}</span><small>${STAGES[stageIdx(d)].name}${d.mut ? ` \u00B7 ${MUTATIONS[d.mut].name}` : ""}</small><span class="hd-rarity"><em class="r ${rcls(rarityOf(d))}">${rarityOf(d)}</em>${d.id === S.prize ? `<span class="walk-tag">Walking</span>` : ""}</span></button>`).join("")}</div></div>`;
   }
   h += `<div style="height:24px"></div>`;
   $("#dragonBody").innerHTML = h;
@@ -1908,6 +1920,12 @@ function debugAct(a, b){
 const OLD_EGG = {ember:"ember", tide:"tide", forest:"forest", frost:"tide", inferno:"inferno", storm:"storm", void:"void", tempest:"tempest"};
 const OLD_SPECIES = ["Cinder","Soot","Brine","Kelp","Moss","Fernback","Frostling","Rimeback","Inferno","Cinderking","Stormling","Pearl Stormling","Voidling","Starveil","Tempest","Stormcrown"];
 function migrate(){
+  S.eggs = asList(S.eggs);
+  S.dragons = asList(S.dragons);
+  S.owned = asMap(S.owned);
+  S.bought = asMap(S.bought);
+  S.opened = asMap(S.opened);
+  if (!S.dex || typeof S.dex !== "object" || Array.isArray(S.dex)) S.dex = {};
   S.dragons.forEach(d => {
     if (!ITEM[d.item] || ITEM[d.item].kind !== "egg") d.item = OLD_EGG[d.item] || "ember";
     if (!d.line || !DRAGONS[d.line]){
