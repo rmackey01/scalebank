@@ -2,7 +2,7 @@
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lato:wght@400;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&family=Lato:wght@400;700;900&display=swap">
 <style>
 /* Layout: one-column phone app, three screens over a fixed bottom tab bar; vendors swipe sideways with scroll-snap. */
 :root{
@@ -293,6 +293,80 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .rf-wrap{--rf-r:14px;--rf-fill:linear-gradient(#0c1015,#0c1015);padding:6px;line-height:0}
 .rf-wrap > .dart{border-radius:8px}
 .rf-wrap.rf-mut{--rf-fill:linear-gradient(180deg,#26283a,#0c1015)}
+
+/* ---------- bestiary (handoff/feature-bestiary.md §6.0, mockups.html) ---------- */
+#bestiary{position:relative;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(120% 70% at 50% 0%,#211b15 0%,transparent 60%),radial-gradient(90% 60% at 50% 110%,#0c0a08 0%,transparent 70%),#14110e;color:#ece4d4;box-shadow:inset 0 0 0 1px rgba(216,169,75,.55),inset 0 0 0 5px #14110e,inset 0 0 0 6px rgba(216,169,75,.28)}
+.bst-scroll{flex:1;min-height:0;overflow-y:auto}
+.bst-pins{position:absolute;inset:0;pointer-events:none;z-index:5}
+.bst-br{position:absolute;width:16px;height:16px;border:2px solid var(--gold)}
+.bst-br.tl{top:6px;left:6px;border-right:0;border-bottom:0}
+.bst-br.tr{top:6px;right:6px;border-left:0;border-bottom:0}
+.bst-br.bl{bottom:6px;left:6px;border-right:0;border-top:0}
+.bst-br.brb{bottom:6px;right:6px;border-left:0;border-top:0}
+#bestiary .topbar{justify-content:flex-start;gap:10px}
+#bestiary .topbar h1{flex:1;min-width:0;font-weight:700;font-size:24px;color:var(--gold-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;outline:none}
+#bchip{font:700 11px/1 var(--body);letter-spacing:.08em;color:var(--gold-hi);border:1px solid rgba(216,169,75,.6);border-radius:99px;padding:6px 10px;background:rgba(216,169,75,.08)}
+.bst-back{flex:none;width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(244,215,143,.55);background:rgba(10,12,16,.62);color:var(--gold-hi);display:grid;place-items:center}
+.bst-back svg{width:18px;height:18px}
+.bst-entry{width:100%;margin-top:12px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 16px;font-size:16px}
+.bst-entry small{font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bst-note{margin:0 0 4px;font-size:13px;line-height:18.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bst-cta{width:100%;margin:8px 0 2px}
+#bestiary .ghead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid rgba(216,169,75,.25);font-family:var(--display);font-weight:700;font-size:18px;line-height:1;letter-spacing:0;text-transform:none;color:#ece4d4}
+#bestiary .ghead::after{display:none}
+#bestiary .ghead span{font-family:var(--body);font-weight:700;font-size:10px;line-height:1;letter-spacing:.1em;text-transform:none;color:var(--muted)}
+#bestiary .ghead.sub{font-size:16px;margin:12px 0 6px}
+.bst-star{color:var(--gold-hi);font-style:normal;font-size:13px;letter-spacing:0}
+.bst-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.bst-grid.mut{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.bx{padding:8px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;text-align:center}
+button.bx{color:inherit;cursor:pointer;transition:transform .12s}
+button.bx:active{transform:scale(.96)}
+.bx .plate{position:relative;width:88px}
+.bx .dart{width:88px;border-radius:8px}
+.bx .dno{position:absolute;top:4px;left:5px;z-index:2;font:600 italic 11px/1 var(--display);letter-spacing:.02em;color:#4a3a26;background:rgba(244,232,206,.85);padding:2px 4px;border-radius:4px;pointer-events:none}
+.bx .bn{max-width:100%;font-family:var(--display);font-weight:700;font-size:17px;line-height:20px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.bx em{font-style:normal;font-size:10px;line-height:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.bx small{max-width:100%;font-weight:400;font-size:11px;line-height:15px;color:var(--muted);opacity:.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mut .bx{padding:6px 4px 8px;gap:2px}
+.mut .bx .plate,.mut .bx .dart{width:64px;border-radius:6px}
+.mut .bx .bn{font-family:var(--body);font-weight:700;font-size:12px;line-height:15px}
+.mut .bx .dno{font-size:9px}
+.bx.unk .bn{color:var(--muted)}
+.bx.unk .dno{background:rgba(174,164,143,.9);color:#3a3226}
+.bx.unk .dart{background:#aea48f}
+.bx.unk .dart > img{opacity:.55;-webkit-mask:none;mask:none;object-position:50% 64%}
+#dexOv{align-items:flex-start;overflow-y:auto;background:#14110e;backdrop-filter:none}
+.dex-card{margin-block:auto;width:100%;max-width:360px}
+.dexsheet{--rf-r:22px;--rf-fill:linear-gradient(180deg,#1f1913,#120f0c);padding:16px 16px 14px;text-align:center}
+.dexsheet.rf-mut{--rf-fill:linear-gradient(180deg,#27233c,#120f0c)}
+.dexsheet .brand{font:700 10px/1 var(--body);letter-spacing:.24em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+.dexsheet .plate{width:200px;margin:12px auto 10px}
+.dexsheet .plate .dart{width:200px;border-radius:12px}
+.dexsheet .dno2{font:700 11px/1 var(--body);letter-spacing:.16em;color:var(--gold)}
+.dexsheet.rf-mut .dno2{color:#cdb8ff}
+.dexsheet .dname{font-family:var(--display);font-weight:700;font-size:32px;line-height:1;color:#ece4d4;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.dexsheet .tag{font:italic 600 16px/1.2 var(--display);color:var(--muted);margin-top:2px}
+.dexsheet .stats{display:grid;grid-template-columns:1fr 1.25fr 1fr;margin-top:12px;border-top:1px solid rgba(216,169,75,.3);border-bottom:1px solid rgba(216,169,75,.3)}
+.dexsheet.rf-mut .stats{border-color:rgba(205,184,255,.35)}
+.dexsheet .stats > div{padding:8px 4px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center}
+.dexsheet .stats > div + div{border-left:1px solid rgba(216,169,75,.18)}
+.dexsheet .stats h4{font:700 8.5px/1 var(--body);letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin:0}
+.dexsheet .stats b{font:700 12px/1.15 var(--body);color:#ece4d4}
+.dexsheet .stats .sc{font-size:10px;color:var(--muted);font-weight:400}
+.dexsheet .pips{display:flex;gap:4px}
+.dexsheet .pips i{width:9px;height:9px;border-radius:50%;border:1px solid var(--gold);display:block}
+.dexsheet .pips i.on{background:var(--gold);box-shadow:0 0 5px rgba(216,169,75,.6)}
+.dexsheet .facts{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--muted)}
+.dexsheet .facts b{color:#ece4d4;font-weight:700}
+.dexsheet .note{font:italic 500 16px/1.32 var(--display);color:#d9cfbd;margin:10px 6px 0}
+.dexsheet .dexchips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.dexchip{border-radius:99px;padding:6px 2px;font:700 9.5px/1 var(--body);letter-spacing:.04em;border:1px dashed #4a4844;color:#6d6a63;background:transparent;text-align:center}
+button.dexchip{cursor:pointer}
+.dexchip.on{border:1px solid rgba(205,184,255,.6);color:#cdb8ff;background:rgba(205,184,255,.09)}
+.dexchip.cur{box-shadow:0 0 0 1px #cdb8ff,0 0 8px rgba(205,184,255,.4)}
+.dex-card .card-actions{grid-template-columns:1fr}
+.dex-card .card-actions.two{grid-template-columns:1fr auto}
 .growth .bar{height:8px;background:var(--stone-2);border-radius:4px;margin-top:8px;overflow:hidden}
 .growth .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-lo),var(--gold));border-radius:4px}
 .growth .prog{font-size:13px;color:var(--muted);margin-top:6px}
@@ -462,6 +536,18 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
     <div id="dragonBody"></div>
   </main>
 
+  <main id="bestiary" class="screen" aria-label="Bestiary" hidden>
+    <div class="bst-pins" aria-hidden="true"><i class="bst-br tl"></i><i class="bst-br tr"></i><i class="bst-br bl"></i><i class="bst-br brb"></i></div>
+    <div class="bst-scroll pad">
+      <div class="topbar">
+        <button class="bst-back" data-act="bestiary-back" aria-label="Back to your dragon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <h1 tabindex="-1">Bestiary</h1>
+        <span class="chip" id="bchip"></span>
+      </div>
+      <div id="bestiaryBody"></div>
+    </div>
+  </main>
+
   <nav class="tabs" aria-label="Screens">
     <button class="tab" data-tab="bank" aria-current="page"><img class="ti off" src="art/nest/icon_bank_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_bank_active.webp" alt="">Bank</button>
     <button class="tab" data-tab="vendors"><img class="ti off" src="art/nest/icon_vendors_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_vendors_active.webp" alt="">Vendors</button>
@@ -472,6 +558,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 
   <div class="overlay" id="hatchOv" hidden></div>
   <div class="overlay" id="shareOv" hidden></div>
+  <div class="overlay" id="dexOv" hidden></div>
   <div class="overlay reveal-ov" id="revealOv" hidden></div>
 </div>
 
@@ -569,15 +656,50 @@ const SCENES = [
   {name:"Cliff Roost", keeper:"A stranger \u00B7 storm eggs and night trails", quip:"Sells what the storm leaves behind. Doesn\u2019t haggle.", art:artRoostVideo, pos:"50% 30%", keys:["storm","tsparks"]}
 ];
 const KEY = "scalebank.v1";
+const SAVE_VER = 2;
+const DEX_LINES = ITEMS.filter(i => i.kind === "egg").map(i => i.line);
+const MUT_KEYS = Object.keys(MUTATIONS);
+const DEX_KEYS = DEX_LINES.flatMap(l => [l, ...MUT_KEYS.map(m => l + ":" + m)]);
+const eggOf = line => ITEMS.find(i => i.kind === "egg" && i.line === line);
+const dexKeys = d => d.mut ? [d.line, d.line + ":" + d.mut] : [d.line];
+const dexName = (line, m) => (m ? MUTATIONS[m].name + " " : "") + DRAGONS[line].name;
+const dexFound = () => DEX_KEYS.filter(k => S.dex && S.dex[k]).length;
+const dexNo = (line, m) => {
+  const n = String(DEX_LINES.indexOf(line) + 1).padStart(2, "0");
+  return m ? n + "-" + MUTATIONS[m].name[0] : "No. " + n;
+};
+/* Species tags and field notes, word for word from handoff/bestiary-notes.md. */
+const DEX_NOTES = {
+  cinder:{tag:"Ash skink", note:"Sly and quick, it hides wherever the coals are warmest. Startle one and the neck frill snaps open like a red fan; the candle-tip of its tail never quite goes out."},
+  brine:{tag:"Tide wyrm", note:"Calm and unhurried ashore, it sways as if a current still holds it. The barbels taste the air for rain. Only in deep water does it turn playful."},
+  moss:{tag:"Grove warden", note:"Sleepy and patient, it lets ferns and flowers take root along its bark-plated back. Field mice nest in the shell, and it is careful never to roll over."},
+  inferno:{tag:"Forge bulwark", note:"Stubborn, proud and fiercely loyal. The magma seams between its plates brighten with every breath, and a single thump of the club tail settles most arguments."},
+  stormling:{tag:"Squall skipper", note:"Never still. Four dragonfly wings beat out of step, and its ribbon tail streams in gusts no one else can feel. Rain beads on the wing veins and rolls off."},
+  voidling:{tag:"Night prowler", note:"Shy, curious and a thief of shiny things. It hides beneath its wing-cloak, and the freckles on its back trace constellations no astronomer has named."},
+  tempest:{tag:"Storm sovereign", note:"Aloof and restless, always watching the horizon. Static crawls along the lightning scars on its hide, and a thin arc leaps between its horns before a storm."}
+};
+const MUT_NOTES = {
+  moonlit:"Hatched under a full moon; a cold silver light clings to it after dark.",
+  obsidian:"Shell-dark and glass-edged, as if it hatched from cooled volcanic stone.",
+  gilded:"A sheen of gold runs over its scales whenever it catches the light.",
+  aurora:"Faint northern lights ripple across its hide, never the same colour twice."
+};
 
 /* ================= state ================= */
-function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1}; }
+function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1, dex:{}, ver:SAVE_VER}; }
+function hydrate(obj){
+  const st = Object.assign(fresh(), obj || {});
+  if (!obj || !obj.ver) st.ver = 1;
+  if (!st.dex || typeof st.dex !== "object") st.dex = {};
+  return st;
+}
 function load(){
-  try { const raw = localStorage.getItem(KEY); if (raw) return Object.assign(fresh(), JSON.parse(raw)); } catch(e){}
+  try { const raw = localStorage.getItem(KEY); if (raw) return hydrate(JSON.parse(raw)); } catch(e){}
   return null;
 }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function save(){ dexSync(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
 let S = fresh();
+let DSUB = null;
 
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -1019,9 +1141,11 @@ function artKilnVideo(){ return sceneVideo("kiln", "The Kilnwright hammers a glo
 function artRoostVideo(){ return sceneVideo("roost", "A hooded stranger crouches with a lantern at the edge of a rain-soaked cliff while dragons circle in the mist"); }
 
 /* ================= screens ================= */
-function setTab(t){
+function setTab(t, sub){
   S.tab = t;
-  for (const id of ["bank","vendors","nest","dragon"]) document.getElementById(id).hidden = id !== t;
+  DSUB = t === "dragon" && sub === "bestiary" ? "bestiary" : null;
+  for (const id of ["bank","vendors","nest","dragon"]) document.getElementById(id).hidden = id !== t || (id === "dragon" && DSUB === "bestiary");
+  $("#bestiary").hidden = DSUB !== "bestiary";
   document.querySelectorAll(".tab").forEach((b, i) => { if (b.dataset.tab === t){ b.setAttribute("aria-current","page"); $(".tabs").style.setProperty("--ti", i); } else b.removeAttribute("aria-current"); });
   if (t === "vendors") requestAnimationFrame(() => scrollToScene(S.scene, false));
   syncVideos();
@@ -1351,6 +1475,7 @@ function renderDragon(){
         <div class="growth"><div class="growth-head"><span class="stage-pill">${st.name}</span><span class="growth-note">Steps you add while it\u2019s your prize grow it</span></div>${growth}${replayKey ? `<button class="reset replay-reveal" data-act="replay-reveal" data-id="${p.id}" hidden>Watch it grow again</button>` : ""}</div>
       </div>
       <button class="btn share-btn" data-act="share">Make share card</button>
+      ${bstEntry()}
       <div class="section"><h2>Customize</h2>
         <div class="custom">
           <div class="crow"><label for="dname">Name</label><input id="dname" maxlength="16" autocomplete="off" value="${esc(p.name)}"></div>
@@ -1367,7 +1492,7 @@ function renderDragon(){
         <p class="pname">Unclaimed</p>
         <p>${msg}</p>
         ${next ? `<button class="btn" data-act="goto-nest">Go to the nest</button>` : `<button class="btn" data-act="goto-stall">Visit the Lantern Stall</button>`}
-      </div>`;
+      </div>${bstEntry()}`;
   }
   if (S.dragons.length > 1){
     const muts = S.dragons.filter(d => d.mut).length;
@@ -1392,12 +1517,138 @@ function renderDragon(){
   }
 }
 
+const bstEntry = () => `<button class="btn ghost bst-entry" data-act="bestiary"><span>Bestiary</span><small>${dexFound()} of ${DEX_KEYS.length} found</small></button>`;
+
 function render(){
   $("#readyDot").hidden = !S.eggs.some(eggReady);
   if (S.tab === "bank") renderBank();
   if (S.tab === "vendors") renderVendors();
   if (S.tab === "nest") renderNest();
-  if (S.tab === "dragon") renderDragon();
+  if (S.tab === "dragon"){ if (DSUB === "bestiary") renderBestiary(); else renderDragon(); }
+}
+
+function dexRecord(d){
+  const now = Date.now();
+  dexKeys(d).forEach(k => {
+    const e = S.dex[k];
+    if (e) e.n += 1;
+    else S.dex[k] = {first: now, n: 1, top: 0};
+  });
+}
+function dexSync(){
+  if (!S.dex || typeof S.dex !== "object") S.dex = {};
+  S.dragons.forEach(d => dexKeys(d).forEach(k => {
+    let e = S.dex[k];
+    if (!e) e = S.dex[k] = {first: null, n: S.dragons.filter(x => dexKeys(x).includes(k)).length, top: 0};
+    e.top = Math.max(e.top || 0, stageIdx(d));
+  }));
+}
+function migrateDex(){
+  S.dex = {};
+  S.dragons.forEach(d => dexKeys(d).forEach(k => {
+    const e = S.dex[k] || (S.dex[k] = {first: null, n: 0, top: 0});
+    e.n += 1; e.top = Math.max(e.top, stageIdx(d));
+  }));
+}
+
+function renderBestiary(){
+  const found = dexFound(), total = DEX_KEYS.length;
+  $("#bchip").textContent = `${found} of ${total}`;
+  $("#bchip").setAttribute("aria-label", `${found} of ${total} pages found`);
+  const unk = (line, m) => {
+    const label = m ? "Undiscovered mutation" : "Undiscovered dragon";
+    return `<div class="bx rf rf-none unk" role="img" aria-label="${label}">
+      <div class="plate"><span class="dno">${dexNo(line, m)}</span>
+        <div class="dart" aria-hidden="true"><img src="art/bestiary/silhouettes/${line}-1-silhouette.webp" alt="" loading="lazy" draggable="false"></div></div>
+      <span class="bn">???</span>${m ? "" : "<small>Undiscovered</small>"}</div>`;
+  };
+  const tile = (line, m, i) => {
+    const k = m ? line + ":" + m : line, e = S.dex[k];
+    if (!e) return unk(line, m);
+    const it = eggOf(line), r = it.rarity, st = STAGES[e.top].name;
+    const d = {item: it.id, line, mut: m || null, name: dexName(line, m)};
+    return `<button class="bx ${rfcls(d)}"${m ? ` style="${rfd(i)}"` : ""} data-act="dex" data-k="${k}"
+        aria-label="${esc(d.name)}, ${r}, hatched ${fmt(e.n)} ${e.n === 1 ? "time" : "times"}, highest stage ${st}">
+        <div class="plate"><span class="dno">${dexNo(line, m)}</span>${dragonArt(d, {stage: e.top})}</div>
+        <span class="bn">${esc(d.name)}</span>${m ? "" : `<em class="r ${rcls(r)}">${r}</em>`}<small>×${fmt(e.n)} · ${st}</small></button>`;
+  };
+  const dFound = DEX_LINES.filter(l => S.dex[l]).length;
+  const mTotal = DEX_LINES.length * MUT_KEYS.length, mFound = DEX_KEYS.filter(k => k.includes(":") && S.dex[k]).length;
+  let h = `<p class="bst-note">${found ? "Every dragon you hatch gets a page here. Tap a page to read it." : "No pages yet. Hatch an egg and its dragon gets a page here."}</p>`;
+  if (!found) h += S.eggs.length ? `<button class="btn bst-cta" data-act="goto-nest">Go to the nest</button>` : `<button class="btn bst-cta" data-act="goto-stall">Visit the Lantern Stall</button>`;
+  h += `<h2 class="ghead">Dragons <span>${dFound} of ${DEX_LINES.length}</span></h2><div class="bst-grid">${DEX_LINES.map(l => tile(l, null, 0)).join("")}</div>`;
+  h += `<h2 class="ghead">Mutations <span>${mFound} of ${mTotal}</span></h2>`;
+  h += `<p class="bst-note">Odds per hatch: ${Object.keys(RARITY).map(r => `${r} ${pct(RARITY[r].mut)}`).join(" · ")}.</p>`;
+  DEX_LINES.forEach((l, li) => {
+    const n = MUT_KEYS.filter(m => S.dex[l + ":" + m]).length;
+    const star = n === MUT_KEYS.length ? ` <b class="bst-star">★</b>` : "";
+    h += `<h3 class="ghead sub">${S.dex[l] ? esc(DRAGONS[l].name) : "???"}<span> · ${n} / ${MUT_KEYS.length}${star}</span></h3>
+      <div class="bst-grid mut">${MUT_KEYS.map((m, mi) => tile(l, m, li * MUT_KEYS.length + mi)).join("")}</div>`;
+  });
+  h += `<div style="height:24px"></div>`;
+  $("#bestiaryBody").innerHTML = h;
+}
+
+let dexFrom = null;
+function openDex(k){
+  const e = S.dex[k]; if (!e) return;
+  const [line, m] = k.split(":"), it = eggOf(line), r = it.rarity;
+  const d = {item: it.id, line, mut: m || null, name: dexName(line, m)};
+  const note = DEX_NOTES[line] || {tag:"", note:""};
+  const first = e.first ? new Date(e.first).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"}) : "Before the bestiary";
+  const pips = STAGES.map((_, i) => `<i class="${i <= e.top ? "on" : ""}"></i>`).join("");
+  const chips = MUT_KEYS.map(mk => {
+    const kk = line + ":" + mk, on = !!S.dex[kk], cur = kk === k;
+    const name = MUTATIONS[mk].name;
+    return on
+      ? `<button class="dexchip on${cur ? " cur" : ""}" data-act="dex" data-k="${kk}">${esc(name)}</button>`
+      : `<span class="dexchip">${esc(name)}</span>`;
+  }).join("");
+  const bodyNote = m ? MUT_NOTES[m] : note.note;
+  const odds = m ? `<div class="facts"><span>Odds per hatch <b>${pct(RARITY[r].mut / MUT_KEYS.length)}</b></span></div>` : "";
+  dexFrom = k;
+  const ov = $("#dexOv");
+  ov.innerHTML = `<div class="card-wrap dex-card" role="dialog" aria-modal="true" aria-labelledby="dexName">
+      <div class="${rfcls(d)} dexsheet"${m ? ` style="${rfd(0)}"` : ""}>
+        <div class="brand"><span>Bestiary</span><span>${dexFound()} of ${DEX_KEYS.length}</span></div>
+        <div class="plate">${dragonArt(d, {live:true, stage:e.top})}</div>
+        <div class="dno2">NO. ${m ? dexNo(line, m) : String(DEX_LINES.indexOf(line) + 1).padStart(2, "0")}</div>
+        <p class="dname" id="dexName">${esc(d.name)}</p>
+        <div class="tag">${esc(note.tag)}</div>
+        ${m ? `<div class="mutb">${MUTATIONS[m].name} mutation</div>` : ""}
+        <div class="stats">
+          <div><h4>Rarity</h4><em class="r ${rcls(r)}">${r}</em></div>
+          <div><h4>Egg</h4><b>${esc(it.name)}</b><span class="sc">${esc(SCENES[it.scene].name)}</span></div>
+          <div><h4>Highest stage</h4><div class="pips">${pips}</div><span class="sc">${STAGES[e.top].name}</span></div>
+        </div>
+        <div class="facts"><span>First hatched <b>${first}</b></span><span>Owned <b>×${fmt(e.n)}</b></span></div>
+        ${odds}
+        <p class="note">${esc(bodyNote)}</p>
+        <div class="dexchips">${chips}</div>
+      </div>
+      <div class="card-actions" id="dexActions"><button class="btn ghost" data-act="close-dex">Close</button></div>
+    </div>`;
+  ov.hidden = false;
+  ov.scrollTop = 0;
+  ov.querySelector("[data-act=close-dex]").focus();
+  const best = S.dragons.filter(x => dexKeys(x).includes(k)).sort((a, b) => (b.xp || 0) - (a.xp || 0))[0];
+  const si = best ? stageIdx(best) : 0;
+  if (best && si >= 1 && REVEAL_KEY[si]){
+    revealAvailable(best.line, REVEAL_KEY[si]).then(ok => {
+      if (!ok || $("#dexOv").hidden || dexFrom !== k) return;
+      const actions = $("#dexActions");
+      if (!actions || actions.querySelector("[data-act=dex-replay]")) return;
+      actions.classList.add("two");
+      actions.insertAdjacentHTML("afterbegin", `<button class="btn" data-act="dex-replay" data-id="${best.id}">Watch it grow again</button>`);
+    });
+  }
+}
+function closeDex(){
+  const ov = $("#dexOv"); ov.hidden = true; ov.innerHTML = "";
+  const from = dexFrom; dexFrom = null;
+  const t = from && [...document.querySelectorAll('[data-act="dex"]')].find(el => el.dataset.k === from);
+  if (t) t.focus();
+  autoHatch();
 }
 
 /* ================= actions ================= */
@@ -1450,7 +1701,7 @@ function rollMutation(it){
 const HQ = []; let hatchGo = null;
 function autoHatch(){
   S.eggs.filter(eggReady).forEach(e => { if (!HQ.includes(e.id)) HQ.push(e.id); });
-  if ($("#hatchOv").hidden && $("#shareOv").hidden) nextHatch();
+  if ($("#hatchOv").hidden && $("#shareOv").hidden && $("#dexOv").hidden) nextHatch();
 }
 function nextHatch(){
   while (HQ.length){ const id = HQ.shift(); if (S.eggs.some(e => e.id === id)){ hatch(id); return; } }
@@ -1468,6 +1719,7 @@ function hatch(eggId){
   const d = {id: "drg" + (S.seq++), item: it.id, line: it.line, species, mut, xp: 0, seenStage: 0, name: species, trail: null, reveals: {}};
   S.eggs = S.eggs.filter(x => x !== e);
   S.dragons.push(d);
+  dexRecord(d);
   const toPrize = !S.prize;
   if (toPrize){ S.prize = d.id; hatchGo = "dragon"; }
   save();
@@ -1548,6 +1800,11 @@ document.addEventListener("click", ev => {
   else if (a === "equip"){ const d = prizeDragon(); if (d){ d[b.dataset.k] = b.dataset.v || null; save(); render(); } }
   else if (a === "prize"){ S.prize = b.dataset.id; save(); render(); }
   else if (a === "replay-reveal"){ const d = S.dragons.find(x => x.id === b.dataset.id); if (d) replayReveal(d); }
+  else if (a === "bestiary"){ setTab("dragon", "bestiary"); $(".bst-scroll").scrollTop = 0; $("#bestiary h1").focus(); }
+  else if (a === "bestiary-back"){ setTab("dragon"); const b2 = $(".bst-entry"); if (b2) b2.focus(); }
+  else if (a === "dex") openDex(b.dataset.k);
+  else if (a === "close-dex") closeDex();
+  else if (a === "dex-replay"){ const d = S.dragons.find(x => x.id === b.dataset.id); closeDex(); if (d) replayReveal(d); }
   else if (a === "share") openShare();
   else if (a === "close-share"){ $("#shareOv").hidden = true; $("#shareOv").innerHTML = ""; autoHatch(); }
   else if (a === "copy"){
@@ -1579,6 +1836,7 @@ document.addEventListener("keydown", ev => {
     if (revealActive.skipUnlocked){ skipReveal(); return; }
     return;
   }
+  if (!$("#dexOv").hidden){ closeDex(); return; }
   if (!$("#shareOv").hidden){ $("#shareOv").hidden = true; }
   else if (!$("#hatchOv").hidden && $("#hafter")?.classList.contains("show")) closeHatch();
 });
@@ -1659,9 +1917,10 @@ function migrate(){
   S.eggs.forEach(e => { if (!ITEM[e.item]) e.item = OLD_EGG[e.item] || "ember"; });
   Object.keys(S.owned).forEach(k => { if (!ITEM[k]) delete S.owned[k]; });
   Object.keys(S.bought).forEach(k => { if (!ITEM[k]) delete S.bought[k]; });
+  if ((S.ver || 1) < 2){ migrateDex(); S.ver = 2; }
 }
 function start(data){
-  S = (data && data.state) ? Object.assign(fresh(), data.state) : (load() || fresh());
+  S = (data && data.state) ? hydrate(data.state) : (load() || fresh());
   if (!S.opened) S.opened = {};
   migrate();
   ITEMS.forEach(it => { if (S.owned[it.id]) for (let k = 1; k <= it.scene; k++) S.opened[k] = true; });
