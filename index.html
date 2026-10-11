@@ -90,7 +90,10 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .scenes::-webkit-scrollbar{display:none}
 .scene{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;overflow-y:auto;padding-inline:16px;padding-block:2px 24px}
 .art{position:relative;aspect-ratio:6/5;max-width:100%;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:inset 0 0 0 1px rgba(216,169,75,.18);background:#0b0d10}
-.art > video{display:block;width:100%;height:100%;object-fit:cover;object-position:var(--pos,50% 50%)}
+.art > video{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.art[data-vendor="stall"] > video{object-position:20% 50%}
+.art[data-vendor="kiln"] > video{object-position:30% 50%}
+.art[data-vendor="roost"] > video{object-position:5% 50%}
 .scene.is-locked .art > video{filter:grayscale(.65) brightness(.55)}
 .art .shade{position:absolute;inset:auto 0 0 0;height:58%;background:linear-gradient(180deg,transparent,rgba(8,10,13,.92));pointer-events:none}
 .vtitle{position:absolute;left:14px;right:14px;bottom:12px;pointer-events:none}
@@ -683,9 +686,9 @@ const CHANGE_LINES = {
 const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 /* Each vendor has a specialty. A scene opens once you own its keys from the vendor before it, and stays open. */
 const SCENES = [
-  {name:"Lantern Stall", keeper:"The egg seller \u00B7 common eggs and lanterns", quip:"\u201CPaid in steps. Prices are firm.\u201D", art:artStallVideo, pos:"50% 62%", keys:[]},
-  {name:"Moon Kiln", keeper:"The Kilnwright \u00B7 kiln-fired eggs and sparks", quip:"\u201CFired at moonrise. Priced accordingly.\u201D", art:artKilnVideo, pos:"50% 42%", keys:["ember","tide"]},
-  {name:"Cliff Roost", keeper:"A stranger \u00B7 storm eggs and night trails", quip:"Sells what the storm leaves behind. Doesn\u2019t haggle.", art:artRoostVideo, pos:"50% 30%", keys:["storm","tsparks"]}
+  {id:"stall", name:"Lantern Stall", keeper:"The egg seller \u00B7 common eggs and lanterns", quip:"\u201CPaid in steps. Prices are firm.\u201D", art:artStallVideo, keys:[]},
+  {id:"kiln", name:"Moon Kiln", keeper:"The Kilnwright \u00B7 kiln-fired eggs and sparks", quip:"\u201CFired at moonrise. Priced accordingly.\u201D", art:artKilnVideo, keys:["ember","tide"]},
+  {id:"roost", name:"Cliff Roost", keeper:"A stranger \u00B7 storm eggs and night trails", quip:"Sells what the storm leaves behind. Doesn\u2019t haggle.", art:artRoostVideo, keys:["storm","tsparks"]}
 ];
 const KEY = "scalebank.v1";
 const SAVE_VER = 2;
@@ -1235,7 +1238,7 @@ const CHEV = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 function buildScenes(){
   const box = $("#scenes"), last = SCENES.length - 1;
   box.innerHTML = SCENES.map((sc, i) => `<section class="scene" id="scene-${i}" data-scene="${i}" role="tabpanel" aria-label="${esc(sc.name)}">
-      <div class="art" style="--pos:${sc.pos}">${sc.art()}<i class="shade"></i>
+      <div class="art" data-vendor="${sc.id}">${sc.art()}<i class="shade"></i>
         <div class="vtitle"><div class="eyebrow">${esc(sc.keeper)}</div><h2>${esc(sc.name)}</h2><p class="quip">${sc.quip}</p></div>
         <div class="lockbadge" hidden>${LOCK} Locked</div>
         ${i > 0 ? `<button class="vnav prev" data-act="dot" data-i="${i-1}" aria-label="Previous vendor: ${esc(SCENES[i-1].name)}">${CHEV("M15 5l-7 7 7 7")}</button>` : ""}
