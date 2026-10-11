@@ -344,9 +344,10 @@ button.bx:active{transform:scale(.96)}
 #bestiary button.bx.rf{--rf-fill:linear-gradient(#1a1612,#1a1612)}
 #bestiary button.bx.rf-mut{--rf-fill:linear-gradient(180deg,#26283a,#1a1612)}
 #bestiary .bx.rf-none{--rf-fill:linear-gradient(#1a1612,#1a1612)}
-#dexOv{align-items:stretch;justify-content:flex-start;flex-direction:column;overflow:hidden;padding:0;backdrop-filter:none}
-#dexOv .dex-scroll{flex:1;min-height:0;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px}
+#dexOv{align-items:flex-start;overflow-y:auto;backdrop-filter:none}
 .dex-card{margin-block:auto;width:100%;max-width:360px}
+.dexsheet.dex-dragon .stats{grid-template-columns:1fr 1fr}
+.dexsheet.dex-dragon .plate,.dexsheet.dex-dragon .plate .dart{width:150px}
 .dexsheet{--rf-r:22px;--rf-fill:linear-gradient(180deg,#1f1913,#120f0c);padding:16px 16px 14px;text-align:center}
 .dexsheet.rf-mut{--rf-fill:linear-gradient(180deg,#27233c,#120f0c)}
 .dexsheet .brand{font:700 10px/1 var(--body);letter-spacing:.24em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
@@ -1634,9 +1635,12 @@ function openDex(k){
       : `<span class="stg-q">???</span>`;
     return `<figure class="stg lock" aria-label="${esc(label)}"><div class="stg-ph">${ph}</div>${cap}</figure>`;
   }).join("")}</div>`;
-  const stageCell = m
-    ? `<div class="pips">${pips}</div><span class="sc">${STAGES[e.top].name}</span>`
-    : `<b>${esc(STAGES[e.top].name)}</b>`;
+  const stats = m
+    ? `<div><h4>Rarity</h4><em class="r ${rcls(r)}">${r}</em></div>
+       <div><h4>Egg</h4><b>${esc(it.name)}</b><span class="sc">${esc(SCENES[it.scene].name)}</span></div>
+       <div><h4>Highest stage</h4><div class="pips">${pips}</div><span class="sc">${STAGES[e.top].name}</span></div>`
+    : `<div><h4>Rarity</h4><em class="r ${rcls(r)}">${r}</em></div>
+       <div><h4>Egg</h4><b>${esc(it.name)}</b><span class="sc">${esc(SCENES[it.scene].name)}</span></div>`;
   const chips = MUT_KEYS.map(mk => {
     const kk = line + ":" + mk, on = !!S.dex[kk], cur = kk === k;
     const name = MUTATIONS[mk].name;
@@ -1649,19 +1653,15 @@ function openDex(k){
   dexFrom = k;
   const ov = $("#dexOv");
   ov.innerHTML = `<div class="bst-pins" aria-hidden="true"><i class="bst-br tl"></i><i class="bst-br tr"></i><i class="bst-br bl"></i><i class="bst-br brb"></i></div>
-    <div class="dex-scroll"><div class="card-wrap dex-card" role="dialog" aria-modal="true" aria-labelledby="dexName">
-      <div class="${rfcls(d)} dexsheet"${m ? ` style="${rfd(0)}"` : ""}>
+    <div class="card-wrap dex-card" role="dialog" aria-modal="true" aria-labelledby="dexName">
+      <div class="${rfcls(d)} dexsheet${m ? "" : " dex-dragon"}"${m ? ` style="${rfd(0)}"` : ""}>
         <div class="brand"><span>Bestiary</span><span>${dexFound()} of ${DEX_KEYS.length}</span></div>
         <div class="plate">${dragonArt(d, {live:true, stage:e.top})}</div>
         <div class="dno2">NO. ${m ? dexNo(line, m) : String(DEX_LINES.indexOf(line) + 1).padStart(2, "0")}</div>
         <p class="dname" id="dexName">${esc(d.name)}</p>
         <div class="tag">${esc(note.tag)}</div>
         ${m ? `<div class="mutb">${MUTATIONS[m].name} mutation</div>` : ""}
-        <div class="stats">
-          <div><h4>Rarity</h4><em class="r ${rcls(r)}">${r}</em></div>
-          <div><h4>Egg</h4><b>${esc(it.name)}</b><span class="sc">${esc(SCENES[it.scene].name)}</span></div>
-          <div><h4>Highest stage</h4>${stageCell}</div>
-        </div>
+        <div class="stats">${stats}</div>
         ${stages}
         <div class="facts"><span>First hatched <b>${first}</b></span><span>Owned <b>×${fmt(e.n)}</b></span></div>
         ${odds}
@@ -1669,9 +1669,9 @@ function openDex(k){
         <div class="dexchips">${chips}</div>
       </div>
       <div class="card-actions" id="dexActions"><button class="btn ghost" data-act="close-dex">Close</button></div>
-    </div></div>`;
+    </div>`;
   ov.hidden = false;
-  const sc = ov.querySelector(".dex-scroll"); if (sc) sc.scrollTop = 0;
+  ov.scrollTop = 0;
   ov.querySelector("[data-act=close-dex]").focus();
   const best = S.dragons.filter(x => dexKeys(x).includes(k)).sort((a, b) => (b.xp || 0) - (a.xp || 0))[0];
   const si = best ? stageIdx(best) : 0;
