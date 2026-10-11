@@ -52,12 +52,12 @@ Each mutation changes the silhouette. Moonlit floats on mist with moth wings, Ob
 
 ### 3.4 Accents (badge and rule only)
 
-| Mutation | Accent **(proposed hex, Animator to confirm)** | Used on |
+| Mutation | Accent (confirmed by Animator) | Used on |
 |---|---|---|
 | Moonlit | silver-blue `#a9c4e8` | `.mutb` badge border/text, sheet rule (`--mut-acc`) |
 | Obsidian | ember orange `#e8783a` | same |
 | Gilded | gold `#e9c46c` | same |
-| Aurora | teal-violet `linear-gradient(90deg,#5fd0c0,#a78bfa)` (text `#8fd6cf`) | same |
+| Aurora | teal-violet: badge text and border `#8fd6cf`; the gradient `linear-gradient(90deg,#5fd0c0,#a78bfa)` goes on the **rule only** | same |
 
 Accents are used **only** on the mutation badge and the sheet rule. Not on frames, chips, tile backgrounds or chrome (the Bestiary no-decoration rule still holds). Gilded's gold is close to the Legendary frame gold, but it appears only on the badge and rule, never on a frame, so it can't be mistaken for a tier.
 
@@ -73,6 +73,10 @@ Animator adds a naturalist note per mutation to `handoff/bestiary-notes.md` (a n
 {"cinder":{"moonlit":{"stages":["1_hatchling","2_juvenile","3_adult","4_elder"],"reveals":["h2j","j2a","a2e"]}}}
 ```
 - Keyed dragon → mutation → `{stages, reveals}`.
+- Each entry in `stages` and `reveals` may be a **plain string or an object**. Both forms can be mixed in one array:
+  - Stage object: `{"key":"2_juvenile","edge":"#d9c7a5"}`. `edge` is the sampled parchment edge colour for that stage (used for `--edge`). Fallback: the existing `EDGES` table (`EDGES["<line>-<n>"]`), then `#d8c8ac`.
+  - Reveal object: `{"key":"j2a","panelH":600,"change":"…"}`. `panelH` and `change` feed the payoff card. Fallback: the base reveal's `PANEL_H["<line>-<key>"]` and `CHANGE_LINES["<line>-<key>"]`.
+  - Example: `{"cinder":{"moonlit":{"stages":["1_hatchling",{"key":"2_juvenile","edge":"#d9c7a5"}],"reveals":[{"key":"h2j","panelH":600,"change":"Moth wings unfurl from the mist"}]}}}`
 - A stage name in `stages` means **all five** stage files in §3.1 exist.
 - A key in `reveals` means all three reveal files in §3.2 exist.
 - Anything missing (a dragon, a mutation, a stage or a reveal) is simply not listed. An empty or missing manifest means "no mutation art yet", so everything uses the fallback.
@@ -85,18 +89,44 @@ Animator adds a naturalist note per mutation to `handoff/bestiary-notes.md` (a n
 ### 4.3 Loading (JS)
 ```js
 const MSTAGE = ["1_hatchling","2_juvenile","3_adult","4_elder"];
-let MUT_ART = {};                                   // filled from the manifest; {} until loaded or on failure
-const mutStage  = (line, m, si) => !!(m && MUT_ART[line]?.[m]?.stages?.includes(MSTAGE[si]));
-const mutReveal = (line, m, key) => !!(m && MUT_ART[line]?.[m]?.reveals?.includes(key));
+let MUT_ART = {};   // normalized: {line:{mut:{stages:{"2_juvenile":{edge}}, reveals:{"j2a":{panelH,change}}}}}
+const HEX = /^#[0-9a-f]{6}$/i;
+function normEntries(list, known, pick){             // accepts "key" or {key,...}; drops unknown/duplicate keys
+  const out = {};
+  (Array.isArray(list) ? list : []).forEach(x => {
+    const o = typeof x === "string" ? {key:x} : (x && typeof x === "object" ? x : null);
+    if (o && typeof o.key === "string" && known.includes(o.key) && !out[o.key]) out[o.key] = pick(o);
+  });
+  return out;
+}
+function normManifest(j){
+  const M = {};
+  if (!j || typeof j !== "object") return M;
+  DEX_LINES.forEach(l => MUT_KEYS.forEach(m => {
+    const e = j[l] && j[l][m]; if (!e || typeof e !== "object") return;
+    (M[l] = M[l] || {})[m] = {
+      stages:  normEntries(e.stages,  MSTAGE, o => ({edge: HEX.test(o.edge || "") ? o.edge : null})),
+      reveals: normEntries(e.reveals, REVEAL_KEY.filter(Boolean), o => ({
+        panelH: Number.isFinite(o.panelH) && o.panelH > 0 ? o.panelH : null,
+        change: typeof o.change === "string" && o.change.trim() ? o.change : null}))
+    };
+  }));
+  return M;
+}
+const mutStage  = (line, m, si)  => !!(m && MUT_ART[line]?.[m]?.stages[MSTAGE[si]]);
+const mutReveal = (line, m, key) => !!(m && MUT_ART[line]?.[m]?.reveals[key]);
+const mutEdge   = (line, m, si)  => MUT_ART[line]?.[m]?.stages[MSTAGE[si]]?.edge || EDGES[line + "-" + (si + 1)] || "#d8c8ac";
+const mutPanelH = (line, m, key) => MUT_ART[line]?.[m]?.reveals[key]?.panelH || PANEL_H[line + "-" + key] || 600;
+const mutChange = (line, m, key) => MUT_ART[line]?.[m]?.reveals[key]?.change ?? CHANGE_LINES[line + "-" + key] ?? "";
 const mutSrc    = (line, m, si) => `art/mutations/${line}/${m}/${MSTAGE[si]}`;
 function loadMutArt(){
   return fetch("art/mutations/manifest.json", {cache:"no-cache"})
     .then(r => r.ok ? r.json() : {}).catch(() => ({}))
-    .then(j => { MUT_ART = j && typeof j === "object" ? j : {}; render(); });
+    .then(j => { MUT_ART = normManifest(j); render(); });
 }
 ```
 - Call `loadMutArt()` from `start()` right after `setTab(...)`. The first render uses the fallback for a moment, then re-renders. Don't block start on the fetch.
-- Ignore unknown keys (a dragon or mutation not in `DEX_LINES`/`MUT_KEYS`, or a stage/reveal name not in `MSTAGE`/`REVEAL_KEY`).
+- `normManifest` is the only place that reads the raw JSON. It ignores unknown dragons, mutations and stage/reveal keys, takes the first of any duplicate key, and drops an invalid `edge` (not `#rrggbb`), `panelH` (not a positive number) or empty `change`. A dropped field just uses its fallback.
 - A missing or invalid manifest is not an error: `MUT_ART = {}`, so every mutated dragon falls back.
 
 ---
@@ -115,7 +145,7 @@ In `dragonArt`:
 - Still: `<img src="${src}.webp">`.
 - Live: `<video poster="${own ? src + "-poster" : src}.webp" …>` with the `.webm`/`.mp4` sources.
 - **Card effect:** `const fx = !o.ghost && d.mut && !own ? MUTATIONS[d.mut].fx : ""`. The `fx-*` class and the `.shine` element apply **only when the base art is the fallback**. Own art never gets the old card effect.
-- `--edge`: own art uses `EDGES[d.line + "-" + (si + 1)]` too unless Animator supplies per-mutation edges **(open: see §13)**.
+- `--edge`: own art uses `mutEdge(d.line, d.mut, si)` (the manifest's sampled edge for that stage, §4.1), falling back to `EDGES[d.line + "-" + (si + 1)]`, then `#d8c8ac`. Base art keeps the `EDGES` lookup.
 - Replace the CSS comment at line 467 with `/* Mutation card effects: fallback only, when the mutation's own art isn't in the manifest. */`.
 
 This one change covers every place a mutated dragon appears:
@@ -154,6 +184,7 @@ Same journal frame (`.dex-frame`, brackets, `#dexOv.bst-journal`, the merged 8 p
 .dexsheet.rf-mut{--rf-mutin:inset 0 0 0 1px var(--mut-acc)}        /* hairline = accent, not lavender */
 .dexsheet.rf-mut .dno2{color:var(--mut-acc-text,var(--mut-acc))}
 .dexsheet .stg-h.acc{border-bottom-color:var(--mut-acc)}
+.acc-aurora .stg-h.acc{border-bottom:1px solid transparent;border-image:var(--mut-acc-grad) 1}  /* Aurora: gradient on the rule only */
 .acc-moonlit{--mut-acc:#a9c4e8}
 .acc-obsidian{--mut-acc:#e8783a}
 .acc-gilded{--mut-acc:#e9c46c}
@@ -221,7 +252,7 @@ function revealOk(d, key){
 ### 8.2 Payoff card inside the reveal
 `openReveal` (line 864) uses `PANEL_H`, `CHANGE_LINES` and portraits keyed by `${line}-${key}`:
 - Portraits: use `artSrc(d, was)` / `artSrc(d, now)` stills (own art or base).
-- `PANEL_H` and `CHANGE_LINES`: look up `${line}-${mut}-${key}` first, then fall back to `${line}-${key}`. Animator supplies the panel heights and change lines for the mutation clips **(open: see §13)**.
+- Panel height and change line: for a mutated dragon use `mutPanelH(line, mut, key)` and `mutChange(line, mut, key)` (the reveal object in the manifest, §4.1), falling back to the base reveal's `PANEL_H` / `CHANGE_LINES` for `${line}-${key}`. Base dragons are unchanged.
 
 ### 8.3 Only the playing reveal downloads
 Reveal `<video>` elements are created only inside `openReveal`, with `preload="auto"` on that one element. Nothing preloads, prefetches or HEADs other reveals. `revealOk` for mutated dragons makes no request at all.
@@ -246,25 +277,24 @@ Requirements:
 
 ## 10. Size estimate
 
-Based on Cinder's encodes on the box (`/workspace/mutations/app/cinder`, 9–10 files per type): still ≈ 87 KB, poster ≈ 77 KB, mp4 ≈ 0.96 MB, **webm ≈ 1.78 MB (over the ~1 MB target)**, silhouette ≈ 6 KB (base silhouettes, assumed similar).
+Based on Cinder's encodes on the box (`/workspace/mutations/app/cinder`): still ≈ 87 KB, poster ≈ 77 KB, mp4 ≈ 0.96 MB, silhouette ≈ 6 KB (base silhouettes, assumed similar). WebM loops are being retuned by Animator to **≈ 1 MB each** (the first Cinder webms were about 1.8 MB). Some Cinder files on the box are 0 bytes or `.tmp.mkv`: that's mid-encode, not a problem, and none of it is in the repo or the manifest.
 
-| Set | Count | At current encodes | At the ≤1 MB target |
-|---|---|---|---|
-| Stills | 112 | 9.7 MB | 9.7 MB |
-| Posters | 112 | 8.6 MB | 8.6 MB |
-| Loops mp4 | 112 | 108 MB | ≤ 112 MB |
-| Loops webm | 112 | 200 MB | ≤ 112 MB |
-| Silhouettes | 112 | 0.7 MB | 0.7 MB |
-| Reveals (84 × ~2 MB both formats + posters) | 84 | ~170 MB | ~170 MB |
-| **Repo total added** | | **≈ 500 MB** | **≈ 410 MB** |
+| Set | Count | Size |
+|---|---|---|
+| Stills | 112 | 9.7 MB |
+| Posters | 112 | 8.6 MB |
+| Silhouettes (`-sil`) | 112 | 0.7 MB |
+| Loops mp4 (≈ 1 MB) | 112 | ≈ 108 MB |
+| Loops webm (≈ 1 MB, retuned) | 112 | ≈ 112 MB |
+| Reveals (84 × ~2 MB both formats + posters) | 84 | ≈ 170 MB |
+| **Repo total added** | | **≈ 410 MB** |
 
 What a player actually downloads (the browser takes the first supported `<source>`, which is webm in Chrome/Firefox and mp4 in Safari):
 - Bestiary grid: one still per **found** variant, lazy (max 28 × 87 KB ≈ 2.4 MB if all found; typically a few hundred KB). Undiscovered tiles: base silhouettes (6 KB).
-- Variant sheet: **one** loop (≈ 1.0–1.8 MB) + its poster (77 KB) + up to 3 reached stills (≤ 260 KB) + locked `-sil` files (≤ 18 KB). Chips: text only.
+- Variant sheet: **one** loop (≈ 1 MB) + its poster (77 KB) + up to 3 reached stills (≤ 260 KB) + locked `-sil` files (≤ 18 KB). Chips: text only.
 - Hoard: one still per mutated dragon owned.
 - A growth reveal: one clip in one format (~1 MB) + poster.
 
-**Ask Animator** to bring webm loops to ≤ 1 MB (it's currently about 1.8× mp4). That alone saves about 90 MB in the repo and about 0.8 MB per sheet open.
 
 ---
 
@@ -288,8 +318,10 @@ Open with `?debug=1`, viewport 390 × 844 unless stated, DevTools Network open w
 **Manifest and art integrity**
 - **M1. Every entry exists:** for each listed stage, all 5 files in §3.1 exist; for each listed reveal, all 3 files in §3.2 exist. Script it: `jq` over `art/mutations/manifest.json` → `test -s` each path. Zero missing, zero 0-byte files. Run on every art pull request.
 - **M2. Every file is listed:** every file under `art/mutations/**` and every `art/reveals/*-{moonlit,obsidian,gilded,aurora}-*` maps to a manifest entry. No orphans (e.g. a stray `.tmp.mkv` or a `.webm` without its stage listed).
-- **M3. Schema:** only known dragons, mutations, stage names and reveal keys; arrays have no duplicates; the JSON parses.
-- **M4. Size budget:** each loop file ≤ 1.1 MB (report anything over, with webm and mp4 separately); each reveal's mp4 + webm ≤ 2.2 MB; widths 540 px (`ffprobe`). Total added under `art/mutations` + mutation reveals reported against §10.
+- **M3. Schema:** the JSON parses; only known dragons, mutations, stage names and reveal keys; no duplicate keys in an array (string and object forms count as the same key); every `edge` is `#rrggbb`; every `panelH` is a positive integer; every `change` is a non-empty string.
+- **M3b. Both forms normalize:** a local manifest mixing `"1_hatchling"` with `{"key":"2_juvenile","edge":"#c0ffee"}`, and `"h2j"` with `{"key":"j2a","panelH":640,"change":"Test line"}`: both stages and both reveals are treated as listed. The Juvenile `.dart` has `--edge:#c0ffee` and the Hatchling uses the `EDGES` value. The J→A payoff card is 640 high with "Test line", and the H→J card uses the base `PANEL_H`/`CHANGE_LINES`.
+- **M3c. Bad fields fall back:** `{"key":"2_juvenile","edge":"red"}` and `{"key":"j2a","panelH":-5,"change":""}`: the stage and reveal still count as listed, but the edge comes from `EDGES` and the card uses the base panel height and change line. An unknown key (`{"key":"5_ancient"}`) and a non-string, non-object entry are ignored without errors.
+- **M4. Size budget:** each loop file ≤ 1.1 MB, webm and mp4 separately (webm retuned to about 1 MB); each reveal's mp4 + webm ≤ 2.2 MB; widths 540 px (`ffprobe`). Total added under `art/mutations` + mutation reveals reported against the ≈ 410 MB estimate in §10 (flag anything over 450 MB). Ignore 0-byte and `.tmp.mkv` files on Animator's box (mid-encode); they must never appear in the repo (M2).
 
 **Save upgrade**
 - **S1.** Load a v2 save with a Moonlit Cinder at Adult (xp ≥ adult threshold) and a plain Brine. After reload: `ver: 3`, `dex["cinder:moonlit"].top === 2`, Brine's pages unchanged, **no** other `cinder:*` or `brine:*` variant key created.
@@ -317,7 +349,7 @@ Open with `?debug=1`, viewport 390 × 844 unless stated, DevTools Network open w
 - **A2.** Reduced motion on: the sheet top art, prize and hatch show `-poster.webp`, no video request.
 
 **Sheet look and fit**
-- **V1.** The variant sheet uses the journal frame and brackets, a 136 px plate, the badge under the name, and the accent (not lavender) on the badge, hairline and growth rule. Per mutation: Moonlit silver-blue, Obsidian ember orange, Gilded gold, Aurora teal. Grid tiles and the hoard still use the `rf-mut` lavender frame.
+- **V1.** The variant sheet uses the journal frame and brackets, a 136 px plate, the badge under the name, and the accent (not lavender) on the badge, hairline and growth rule. Per mutation: Moonlit `#a9c4e8`, Obsidian `#e8783a`, Gilded `#e9c46c`, Aurora badge `#8fd6cf` with the teal→violet gradient on the growth rule only. Grid tiles and the hoard still use the `rf-mut` lavender frame.
 - **V2. Fit:** at 390 × 844 the Moonlit Cinder sheet (all 4 stages reached, longest note) shows Close with no scroll, and so does the base Tempest sheet. Check every mutation's longest note.
 - **V3. Scroll:** at 375 × 667 the sheet scrolls vertically; the frame keeps its 8 px margins; brackets are visible; no sideways scroll; Close reachable; Escape closes and focus returns to the tile.
 
@@ -325,8 +357,5 @@ Open with `?debug=1`, viewport 390 × 844 unless stated, DevTools Network open w
 
 ## 13. Open decisions
 
-1. **Accent hexes** (§3.4) are proposals from the color names; Animator to confirm or replace.
-2. **Webm size:** current Cinder webm loops are about 1.8 MB vs the ~1 MB target. Re-encode, or accept about +90 MB in the repo.
-3. **Reveal payoff data:** `PANEL_H` and `CHANGE_LINES` for the 84 mutation reveals (or confirm the base values apply). Without them, the base line's panel height and change line are used.
-4. **Per-mutation `--edge` colors** for the radial edge mask on own art (or confirm the base edge colors are fine).
-5. **Repo weight:** about 410–500 MB more on GitHub Pages. Pages has a 1 GB published-site soft limit, and the repo already holds about 125 MB of base reveals plus the dragon loops. Worth checking the total before all 84 reveals land.
+1. **Repo weight:** about 410 MB more on GitHub Pages. Pages has a 1 GB published-site soft limit, and the repo already holds about 125 MB of base reveals plus the dragon loops. Worth checking the total before all 84 reveals land.
+2. **390 × 844 fit:** my headless check had a 757 px viewport, which made even the base sheet scroll, so the no-scroll fit (§9) must be confirmed on a true 844 px viewport (test V2).
