@@ -949,7 +949,7 @@ function openReveal(d, was, now, key){
     mediaHTML = `<img class="rv-still" src="${clip}-poster.webp" alt="">`;
   } else {
     mediaHTML = `<video id="rvVideo" muted playsinline autoplay preload="auto" disablepictureinpicture style="opacity:0">
-      <source src="${clip}.webm" type="video/webm">
+      ${d.mut ? "" : `<source src="${clip}.webm" type="video/webm">`}
       <source src="${clip}.mp4" type="video/mp4">
     </video>`;
   }
@@ -1246,7 +1246,7 @@ function dragonArt(d, o){
   const trail = !o.ghost && d.trail && ITEM[d.trail] ? trailSVG(ITEM[d.trail].fx || "lantern", "t" + (uid++)) : "";
   const label = o.ghost ? "Empty prize slot" : esc(`${d.name || DRAGONS[d.line].name}, ${STAGES[si].name.toLowerCase()}`);
   const media = live
-    ? `<video poster="${poster}" autoplay muted loop playsinline preload="auto" aria-hidden="true"><source src="${src}.webm" type="video/webm"><source src="${src}.mp4" type="video/mp4"></video>`
+    ? `<video poster="${poster}" autoplay muted loop playsinline preload="auto" aria-hidden="true">${a.own ? "" : `<source src="${src}.webm" type="video/webm">`}<source src="${src}.mp4" type="video/mp4"></video>`
     : o.ghost ? "" : `<img src="${src}.webp" alt="" loading="lazy" draggable="false">`;
   return `<div class="dart${live || trail ? " anim" : ""}${fx ? " fx-" + fx : ""}${o.ghost ? " ghost" : ""}${o.grow ? " grow-in" : ""}" style="--edge:${edge}" role="img" aria-label="${label}">${media}${trail}${fx === "shine" ? `<b class="shine"></b>` : ""}</div>`;
 }
