@@ -1,1 +1,302 @@
-{}
+{
+ "cinder": {
+  "moonlit": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#dbc7aa"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#d8c2a6"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#c9b097"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#aa998b"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "A moon halo rises behind the head \u00b7 The wings grow fuller \u00b7 The mist thickens"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "The neck lengthens \u00b7 Long crescent horns \u00b7 Mist hides the rock"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A horn crown and a starry halo \u00b7 Glowing blue markings \u00b7 A sea of mist below"
+    }
+   ]
+  },
+  "obsidian": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#d9bf9f"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#d4b592"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#d4af86"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#c19468"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "Fire streams from the nose \u00b7 The lava cracks spread"
+    },
+    {
+     "key": "j2a",
+     "panelH": 640,
+     "change": "Bulkier and taller \u00b7 The back spines sharpen \u00b7 The rock glows hotter"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "Massive and hunched \u00b7 Crystal flames crown the club tail \u00b7 The rock runs with lava"
+    }
+   ]
+  },
+  "gilded": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#d7c0a0"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#d5bb9a"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#d6b58f"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#c8a178"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The crown grows taller \u00b7 A jeweled collar appears"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "The wings unfold \u00b7 Rubies set in the crown \u00b7 The hoard grows"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A towering jeweled crest \u00b7 Gold plates armor the chest \u00b7 Treasure chests join the hoard"
+    }
+   ]
+  },
+  "aurora": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#dac2a3"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#dbc1a1"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#d8b998"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#bf9d7f"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The light wings widen \u00b7 The coils thicken"
+    },
+    {
+     "key": "j2a",
+     "panelH": 640,
+     "change": "The neck stretches up \u00b7 The wings stand tall \u00b7 Glowing seams appear"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "Coiled around a tall rock spire \u00b7 A fiery crest \u00b7 Light streamers trail from the wings"
+    }
+   ]
+  }
+ },
+ "voidling": {
+  "moonlit": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b8a084"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b49b7e"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#97806f"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#514450"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "Twin crescent moons rise \u00b7 The star cloak lengthens \u00b7 Violet mist curls out"
+    },
+    {
+     "key": "j2a",
+     "panelH": 640,
+     "change": "Taller and leaner \u00b7 The cloak becomes flowing shadow \u00b7 A violet gem appears"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A spiked crown of night \u00b7 The shadows surge like flames \u00b7 The moons grow brighter"
+    }
+   ]
+  },
+  "obsidian": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#baa285"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b89f80"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#af9477"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#997d61"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "The legs lengthen \u00b7 Lava veins spread \u00b7 Smoke curls from the ears"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "A lean, hound-like body \u00b7 Back spines grow \u00b7 The rock darkens"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "Towering and gaunt \u00b7 Brighter magma seams \u00b7 The rock splits with lava"
+    }
+   ]
+  },
+  "gilded": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b79f81"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#a2896d"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#856d55"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#70594b"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "Bat wings unfurl \u00b7 Gold chains drape the chest \u00b7 The hoard grows"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "Horns sharpen \u00b7 Wings spread wide \u00b7 Sapphires join the gold"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A horned crown \u00b7 Violet flame wreathes the body \u00b7 A mountain of jewels"
+    }
+   ]
+  },
+  "aurora": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#bba285"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b79c7f"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#ae937f"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#887776"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "The wings grow sharp \u00b7 Glowing veins brighten \u00b7 The tail lengthens"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "Swept-back horns \u00b7 The wings stand tall \u00b7 The neck stretches up"
+    },
+    {
+     "key": "a2e",
+     "panelH": 600,
+     "change": "A fiery crest \u00b7 Wings spread wide \u00b7 Perched on a glowing spire"
+    }
+   ]
+  }
+ }
+}
