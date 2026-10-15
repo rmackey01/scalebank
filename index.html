@@ -355,8 +355,8 @@ button.bx:active{transform:scale(.96)}
 #bestiary button.bx.rf{--rf-fill:linear-gradient(#1a1612,#1a1612)}
 #bestiary button.bx.rf-mut{--rf-fill:linear-gradient(180deg,#26283a,#1a1612)}
 #bestiary .bx.rf-none{--rf-fill:linear-gradient(#1a1612,#1a1612)}
-#dexOv{align-items:flex-start;overflow-y:auto;padding:4px;backdrop-filter:none}
-.dex-frame{position:relative;box-sizing:border-box;width:100%;margin:8px 0;padding:14px;display:flex;flex-direction:column;align-items:center;box-shadow:inset 0 0 0 1px rgba(216,169,75,.55),inset 0 0 0 5px #14110e,inset 0 0 0 6px rgba(216,169,75,.28)}
+#dexOv{align-items:flex-start;overflow-y:auto;padding:4px 4px 0;backdrop-filter:none}
+.dex-frame{position:relative;box-sizing:border-box;width:100%;margin:8px 0 0;padding:14px;display:flex;flex-direction:column;align-items:center;box-shadow:inset 0 0 0 1px rgba(216,169,75,.55),inset 0 0 0 5px #14110e,inset 0 0 0 6px rgba(216,169,75,.28)}
 .dex-frame .bst-br.tl{top:-3px;left:-3px}
 .dex-frame .bst-br.tr{top:-3px;right:-3px}
 .dex-frame .bst-br.bl{bottom:-3px;left:-3px}
@@ -400,20 +400,21 @@ button.bx:active{transform:scale(.96)}
 .dexsheet .stg-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0}
 .dexsheet .stg{margin:0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}
 .dexsheet .stg > img,.dexsheet .stg-ph{width:100%;aspect-ratio:784/1168;border-radius:8px;object-fit:cover;background:#1a1612;border:1px solid rgba(216,169,75,.35);display:block}
+.dexsheet .stg.lock > img{background:radial-gradient(ellipse 70% 60% at 50% 50%,#e8dcc4,#aea48f 80%)}
 .dexsheet .stg.top > img,.dexsheet .stg.top .stg-ph{border:2px solid var(--gold);box-shadow:0 0 8px rgba(216,169,75,.35)}
 .dexsheet .stg figcaption{max-width:100%;font:700 8.5px/1.15 var(--body);letter-spacing:.04em;text-transform:uppercase;color:#ece4d4;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dexsheet .stg.lock figcaption{color:var(--muted)}
 .dexsheet .stg-ph{display:grid;place-items:center;overflow:hidden;color:#6d6a63}
 .dexsheet .stg-ph img{width:100%;height:100%;object-fit:cover;opacity:.45;border:0;border-radius:0}
 .dexsheet .stg-q{font:700 13px/1 var(--body);letter-spacing:.08em}
-.dexsheet .facts{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--muted)}
+.dexsheet .facts{display:flex;justify-content:center;gap:4px 10px;flex-wrap:wrap;margin-top:8px;font-size:10.5px;color:var(--muted)}
 .dexsheet .facts b{color:#ece4d4;font-weight:700}
-.dexsheet .note{font:italic 500 16px/1.32 var(--display);color:#d9cfbd;margin:10px 6px 0}
+.dexsheet .note{font:italic 500 16px/1.32 var(--display);color:#d9cfbd;margin:7px 6px 0}
 .dexsheet .dexchips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
 .dexchip{border-radius:99px;padding:6px 2px;font:700 9.5px/1 var(--body);letter-spacing:.04em;border:1px dashed #4a4844;color:#6d6a63;background:transparent;text-align:center}
 button.dexchip{cursor:pointer}
 .dexchip.on{border:1px solid rgba(205,184,255,.6);color:#cdb8ff;background:rgba(205,184,255,.09)}
-.dexchip.cur{box-shadow:0 0 0 1px #cdb8ff,0 0 8px rgba(205,184,255,.4)}
+.dexchip.cur{border-color:var(--mut-acc);color:var(--mut-acc)}
 .dex-card .card-actions{grid-template-columns:1fr}
 .dex-card .card-actions.two{grid-template-columns:1fr auto}
 .growth .bar{height:8px;background:var(--stone-2);border-radius:4px;margin-top:8px;overflow:hidden}
@@ -1731,8 +1732,8 @@ function openDex(k){
   }).join("")}</div>`;
   const stages = m ? `<h3 class="stg-h acc">Growth</h3><div class="stg-row">${STAGES.map((st, i) => {
     const reached = i <= e.top, top = i === e.top, listed = mutStage(line, m, i);
-    const label = reached ? `${st.name}, reached` : `Stage ${i + 1}, not reached yet`;
-    const cap = `<figcaption>${reached ? esc(st.name) : "???"}</figcaption>`;
+    const label = `${st.name}, ${reached ? "reached" : "not reached yet"}`;
+    const cap = `<figcaption>${esc(st.name)}</figcaption>`;
     if (reached && listed) return `<figure class="stg${top ? " top" : ""}" aria-label="${esc(label)}"><img src="${mutSrc(line, m, i)}.webp" alt="" loading="lazy" draggable="false">${cap}</figure>`;
     if (reached){
       const fx = MUTATIONS[m].fx, edge = EDGES[line + "-" + (i + 1)] || "#d8c8ac";
