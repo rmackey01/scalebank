@@ -264,11 +264,11 @@ add("chicago-tokyo", t => {
   t.equal(g.snapshot().keep.streak.last, "2026-10-16", "last stays the Chicago day");
   t.equal(g.snapshot().keep.streak.tz, CHI, "the saved offset stays Chicago");
   t.equal(g.snapshot().bank, bank, "the bank stays put");
-  off = CHI;
-  clock = Date.UTC(2026, 9, 18, 1, 0, 0);
-  t.equal(g.claimStreak(), 10, "the next day in both offsets pays once");
+  clock = Date.UTC(2026, 9, 17, 12, 0, 0);
+  t.equal(g.claimStreak(), 10, "the next Chicago date, read from the saved offset, pays once");
   t.equal(g.snapshot().keep.streak.count, 2, "that day adds one");
-  t.equal(g.snapshot().keep.streak.last, "2026-10-17", "Saturday is the new day");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-17", "last is the saved-offset date");
+  t.equal(g.snapshot().keep.streak.tz, TYO, "the offset updates to Tokyo once the day counts");
   t.equal(g.claimStreak(), 0, "Saturday does not pay twice");
 });
 
@@ -285,20 +285,20 @@ add("tokyo-chicago", t => {
   const bank = g.snapshot().bank;
   const writes = g.writes();
   off = CHI;
-  clock = Date.UTC(2026, 9, 17, 1, 0, 0);
   const moved = g.visitKeep();
-  t.equal(moved.fresh, false, "Chicago still on Oct 16 is not a new day");
-  t.equal(moved.count, 1, "Chicago does not add a day while Tokyo has already turned");
-  t.equal(g.claimStreak(), 0, "Chicago does not pay");
+  t.equal(moved.fresh, false, "Chicago at that same instant still uses the Tokyo date");
+  t.equal(moved.count, 1, "switching west does not add a day");
+  t.equal(g.claimStreak(), 0, "Chicago does not pay for the same Tokyo date");
   t.equal(g.writes(), writes, "the westward change is not saved");
   t.equal(g.snapshot().keep.streak.last, "2026-10-16", "last stays the Tokyo day");
   t.equal(g.snapshot().keep.streak.tz, TYO, "the saved offset stays Tokyo");
   t.equal(g.snapshot().bank, bank, "no steps are added");
-  clock = Date.UTC(2026, 9, 18, 1, 0, 0);
-  t.equal(g.claimStreak(), 10, "the later day in both offsets pays once");
-  t.equal(g.snapshot().keep.streak.count, 2, "Chicago Saturday adds one");
-  t.equal(g.snapshot().keep.streak.last, "2026-10-17", "the counted date is Chicago's");
-  t.equal(g.snapshot().keep.streak.tz, CHI, "the offset updates when the day counts");
+  clock = Date.UTC(2026, 9, 17, 12, 0, 0);
+  t.equal(g.claimStreak(), 10, "the next Tokyo date pays once");
+  t.equal(g.snapshot().keep.streak.count, 2, "Saturday adds one");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-17", "last is the saved Tokyo date");
+  t.equal(g.snapshot().keep.streak.tz, CHI, "the offset updates to Chicago once the day counts");
+  t.equal(g.claimStreak(), 0, "that day does not pay twice");
 });
 
 add("dst", t => {
@@ -342,26 +342,37 @@ add("zone-continue", t => {
   t.equal(east.snapshot().keep.streak.last, "2026-10-20", "Chicago records Oct 20");
   off = TYO;
   t.equal(east.visitKeep().fresh, false, "the same instant in Tokyo is not a new day");
-  clock = Date.UTC(2026, 9, 22, 1, 0, 0);
+  clock = Date.UTC(2026, 9, 21, 12, 0, 0);
   const next = east.visitKeep();
   t.equal(next.count, 5, "the next Tokyo day continues the streak");
   t.equal(next.fresh, true, "that Tokyo day is a visit");
-  t.equal(east.snapshot().keep.streak.last, "2026-10-22", "Tokyo records Oct 22");
+  t.equal(east.snapshot().keep.streak.last, "2026-10-21", "last stays on the saved Chicago date");
   t.equal(east.snapshot().keep.streak.best, 5, "best follows the continued streak");
+  t.equal(east.snapshot().keep.streak.tz, TYO, "Tokyo becomes the saved offset");
   t.equal(east.claimStreak(), 30, "the continued 5-day streak pays 30");
+});
 
-  off = TYO;
-  clock = Date.UTC(2026, 9, 20, 1, 0, 0);
-  const west = boot(save({last: "2026-10-19", count: 3, best: 3, claimed: "2026-10-19", tz: TYO}));
-  west.setCareClock(() => clock);
-  west.setZoneOffset(() => off);
-  t.equal(west.visitKeep().count, 4, "Tokyo Tuesday continues");
+add("tokyo-skip-tuesday", t => {
+  const CHI = 300, TYO = -540;
+  let off = TYO;
+  let clock = Date.UTC(2026, 9, 19, 1, 0, 0);
+  const g = boot(save());
+  g.setCareClock(() => clock);
+  g.setZoneOffset(() => off);
+  t.equal(g.claimStreak(), 10, "Tokyo Monday is day 1");
+  t.equal(g.snapshot().keep.streak.count, 1, "the streak starts at 1");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-19", "Monday is the Tokyo date");
+  t.equal(g.snapshot().keep.streak.tz, TYO, "Tokyo is the saved offset");
   off = CHI;
-  clock = Date.UTC(2026, 9, 22, 1, 0, 0);
-  const back = west.visitKeep();
-  t.equal(back.count, 5, "the next Chicago day continues the streak");
-  t.equal(west.snapshot().keep.streak.last, "2026-10-21", "Chicago records Oct 21");
-  t.equal(west.claimStreak(), 30, "the continued streak pays 30");
+  clock = Date.UTC(2026, 9, 21, 13, 0, 0);
+  const wed = g.visitKeep();
+  t.equal(wed.count, 1, "skipping Tuesday breaks the streak");
+  t.equal(g.snapshot().keep.streak.best, 1, "best stays at the first day");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-21", "Wednesday is judged on the saved Tokyo date");
+  t.equal(g.snapshot().keep.streak.tz, CHI, "Chicago is saved once Wednesday counts");
+  t.equal(g.claimStreak(), 10, "the reset day pays the first-day gift once");
+  t.equal(g.snapshot().keep.streak.count, 1, "Wednesday is not day 2");
+  t.equal(g.claimStreak(), 0, "Wednesday does not pay twice");
 });
 
 add("missed-weekday", t => {

@@ -2925,11 +2925,7 @@ function streakView(streak){
   const ms = now();
   const cur = zoneOffset(ms);
   const saved = streak && Number.isInteger(streak.tz) ? streak.tz : cur;
-  return {cur, day: ymdAt(ms, cur), savedDay: ymdAt(ms, saved)};
-}
-function laterInBoth(view, prev){
-  if (!isoDay(prev)) return true;
-  return view.day > prev && view.savedDay > prev;
+  return {cur, day: ymdAt(ms, saved)};
 }
 const SABBATH_NOTE = "Sabbath rest. No chores required.";
 const STREAK_PRIZES = [{at:30, steps:300}, {at:14, steps:140}, {at:7, steps:70}, {at:3, steps:30}, {at:1, steps:10}];
@@ -2966,10 +2962,7 @@ function gapMissesWeekday(last, day){
   }
   return false;
 }
-/* A weekday was missed only when the saved offset and the current offset both skipped one. */
-function streakBroken(last, day, other){
-  return gapMissesWeekday(last, day) && gapMissesWeekday(last, other == null ? day : other);
-}
+function streakBroken(last, day){ return gapMissesWeekday(last, day); }
 function streakPrize(count){
   const n = Math.max(0, Math.round(+count || 0));
   for (let i = 0; i < STREAK_PRIZES.length; i++) if (n >= STREAK_PRIZES[i].at) return STREAK_PRIZES[i].steps;
@@ -2981,14 +2974,14 @@ function streakBag(){
   S.keep = keep;
   return keep.streak;
 }
-/* A day counts only when this instant is a later date in both the current offset and the saved one. */
+/* Today's date is the saved offset only. A new day is strictly later than last on that calendar. */
 function visitKeep(){
   const streak = streakBag();
   const view = streakView(streak);
   const day = view.day;
   const rest = isRestDay(day);
   const note = rest ? SABBATH_NOTE : "";
-  const held = {fresh:false, clamped:false, rest, note, blessing:false, count:streak.count, best:streak.best};
+  const held = {fresh:false, clamped:false, rest, note, blessing:false, day, count:streak.count, best:streak.best};
   if (dayAfter(streak.last, day)) return Object.assign(held, {clamped:true});
   if (rest){
     if (dayAfter(streak.seen, day)) return held;
@@ -2997,28 +2990,28 @@ function visitKeep(){
     save();
     return Object.assign(held, {fresh:true});
   }
-  if (isoDay(streak.last) && !laterInBoth(view, streak.last)) return held;
-  const count = !isoDay(streak.last) || streakBroken(streak.last, day, view.savedDay) ? 1 : Math.max(0, Math.round(+streak.count || 0)) + 1;
+  if (isoDay(streak.last) && !(day > streak.last)) return held;
+  const count = !isoDay(streak.last) || streakBroken(streak.last, day) ? 1 : Math.max(0, Math.round(+streak.count || 0)) + 1;
   const best = Math.max(Math.round(+streak.best || 0), count);
   streak.last = day;
   streak.count = count;
   streak.best = best;
   streak.tz = view.cur;
   save();
-  return {fresh:true, clamped:false, rest, note, blessing:true, count, best};
+  return {fresh:true, clamped:false, rest, note, blessing:true, day, count, best};
 }
 /* Pay the current tier once per later local date. Sunday and a day that is not past claimed pay nothing. */
 function claimStreak(){
   const v = visitKeep();
   if (v.clamped || v.rest) return 0;
   const streak = streakBag();
-  const view = streakView(streak);
-  if (isoDay(streak.claimed) && !laterInBoth(view, streak.claimed)) return 0;
-  if (streak.last !== view.day) return 0;
+  const day = v.day;
+  if (isoDay(streak.claimed) && !(day > streak.claimed)) return 0;
+  if (streak.last !== day) return 0;
   const steps = streakPrize(streak.count);
   if (steps <= 0) return 0;
   S.bank += steps;
-  streak.claimed = view.day;
+  streak.claimed = day;
   save();
   return steps;
 }
@@ -3033,7 +3026,7 @@ function renderStreak(){
   if (!el) return;
   if (!keepOn()){ el.hidden = true; return; }
   const streak = streakBag();
-  const day = today();
+  const day = streakView(streak).day;
   const rest = isRestDay(day);
   const prize = streakPrize(streak.count);
   const blocked = isoDay(streak.claimed) && !(day > streak.claimed);
