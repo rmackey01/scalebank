@@ -88,10 +88,10 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-filters{position:absolute;width:0;height:0;overflow:hidden}
 .keep-slot{position:absolute;margin:0;padding:0;border:0;background:transparent;line-height:0;pointer-events:auto}
 .keep-slot img{width:100%;height:100%;display:block;object-fit:fill;pointer-events:none}
-.keep-ledger{z-index:5;display:flex;align-items:flex-end;justify-content:center;border-radius:0;background:transparent;color:#f0d59a}
-.keep-ledger span{display:flex;align-items:center;justify-content:center;gap:4px;width:88%;height:46%;margin-bottom:8%;border-radius:999px;border:1.5px solid #c9a15a;background:#140e0a;box-shadow:inset 0 0 0 1px rgba(240,213,154,.25);font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.12em;line-height:1;text-transform:uppercase;color:#f0d59a;pointer-events:none}
+.keep-ledger{z-index:6;display:flex;align-items:center;justify-content:center;border-radius:999px;background:transparent;color:#f0d59a;filter:none}
+.keep-ledger span{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;height:100%;margin:0;border-radius:999px;border:1.5px solid #c9a15a;background:#140e0a;box-shadow:inset 0 0 0 1px rgba(240,213,154,.25);font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.12em;line-height:1;text-transform:uppercase;color:#f0d59a;pointer-events:none}
 .keep-ledger svg{width:12px;height:12px;flex:none}
-.keep-ledger img{display:none;width:100%;height:100%;object-fit:fill;pointer-events:none}
+.keep-ledger img{display:none;width:100%;height:100%;object-fit:fill;pointer-events:none;filter:none}
 .keep-ledger.is-art{border-radius:999px}
 .keep-ledger.is-art span{display:none}
 .keep-ledger.is-art img{display:block}
@@ -2672,7 +2672,8 @@ const PENS = [
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
-const KEEP_LEDGER = {x:62.6, y:42.5, w:19.2, h:7.8};
+/* Plaque pixels on the 1008×1792 painting. slot-map plaques.ledger replaces this when it is present. */
+const LEDGER_PLAQUE = {file:"ledger-plaque.webp", x:653, y:836, w:166, h:49};
 const KEEP_BUILD = {x:70, y:88.2, w:26, h:3.6};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
 const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
@@ -2884,21 +2885,30 @@ function markPenReady(){
   world.dataset.ready = ok ? "1" : "0";
 }
 let ledgerArt = "";
+function ledgerPlaqueRow(){
+  const row = slotMap && slotMap.plaques && slotMap.plaques.ledger;
+  if (!row || typeof row !== "object" || typeof row.file !== "string" || !row.file) return {file:LEDGER_PLAQUE.file, x:LEDGER_PLAQUE.x, y:LEDGER_PLAQUE.y, w:LEDGER_PLAQUE.w, h:LEDGER_PLAQUE.h};
+  const x = +row.x, y = +row.y, w = +row.w, h = +row.h;
+  if (![x, y, w, h].every(Number.isFinite) || w <= 0 || h <= 0) return {file:LEDGER_PLAQUE.file, x:LEDGER_PLAQUE.x, y:LEDGER_PLAQUE.y, w:LEDGER_PLAQUE.w, h:LEDGER_PLAQUE.h};
+  return {file: row.file.split("/").pop() || LEDGER_PLAQUE.file, x, y, w, h};
+}
 function placeLedgerPlaque(){
   const el = $(".keep-ledger");
   if (!el) return;
-  const row = slotMap && slotMap.ledgerPlaque;
-  const file = row && typeof row.file === "string" ? row.file.split("/").pop() : "";
-  const url = file ? "art/keep/" + file : "";
+  const mapped = ledgerPlaqueRow();
+  const row = ledgerArt === "miss" ? {file:LEDGER_PLAQUE.file, x:LEDGER_PLAQUE.x, y:LEDGER_PLAQUE.y, w:LEDGER_PLAQUE.w, h:LEDGER_PLAQUE.h} : mapped;
+  const url = "art/keep/" + mapped.file;
   const img = el.querySelector("img");
+  const fit = el.parentElement;
+  if (fit && fit.lastElementChild !== el) fit.appendChild(el);
   const paint = art => {
-    el.classList.toggle("is-art", art);
+    el.classList.toggle("is-art", !!art);
     if (img) img.hidden = !art;
-    if (art && row){
-      placeKeepBox(el, {x: row.x / KEEP_W * 100, y: row.y / KEEP_H * 100, w: row.w / KEEP_W * 100, h: row.h / KEEP_H * 100});
-    } else placeKeepBox(el, KEEP_LEDGER);
+    el.style.filter = "none";
+    if (img) img.style.filter = "none";
+    placeKeepBox(el, {x: row.x / KEEP_W * 100, y: row.y / KEEP_H * 100, w: row.w / KEEP_W * 100, h: row.h / KEEP_H * 100});
   };
-  if (!url || ledgerArt === "miss"){ paint(false); return; }
+  if (ledgerArt === "miss"){ paint(false); return; }
   if (ledgerArt === "ok"){ paint(true); return; }
   paint(false);
   if (!img || img.dataset.ask === url) return;
@@ -3295,13 +3305,15 @@ function readSlotMap(json){
       if (Array.isArray(row) && row.length >= 4 && row.slice(0, 4).every(v => Number.isFinite(+v))) tint[key] = row.slice(0, 4).map(Number);
     });
   }
-  let ledgerPlaque = null;
-  const lp = json.ledgerPlaque;
-  if (lp && typeof lp === "object" && typeof lp.file === "string" && lp.file){
-    const x = +lp.x, y = +lp.y, w = +lp.w, h = +lp.h;
-    if ([x, y, w, h].every(Number.isFinite) && w > 0 && h > 0) ledgerPlaque = {file: lp.file, x, y, w, h};
+  const plaques = {};
+  const ledger = json.plaques && json.plaques.ledger;
+  if (ledger && typeof ledger === "object"){
+    const x = +ledger.x, y = +ledger.y, w = +ledger.w, h = +ledger.h;
+    if ([x, y, w, h].every(Number.isFinite) && w > 0 && h > 0){
+      plaques.ledger = {file: typeof ledger.file === "string" ? ledger.file : "", x, y, w, h};
+    }
   }
-  return {slots, tint, ledgerPlaque};
+  return {slots, tint, plaques};
 }
 function slotLines(){
   if (!slotMap || !slotMap.slots) return [];
