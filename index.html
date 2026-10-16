@@ -2294,8 +2294,8 @@ function hidePenFence(img){
 }
 function showPenFence(img, url){
   const state = fenceState.get(url);
-  if (state === "ok"){
-    if (img.getAttribute("src") !== url) img.src = url;
+  if (state && state !== "miss" && state !== "pend"){
+    if (img.getAttribute("src") !== state) img.src = state;
     img.hidden = false;
     img.classList.add("is-ok");
     return;
@@ -2304,8 +2304,9 @@ function showPenFence(img, url){
   if (state === "pend") return;
   fenceState.set(url, "pend");
   hidePenFence(img);
-  fetch(url).then(r => {
-    fenceState.set(url, r.ok ? "ok" : "miss");
+  fetch(url).then(r => r.ok ? r.blob() : null).then(blob => {
+    if (!blob){ fenceState.set(url, "miss"); }
+    else fenceState.set(url, URL.createObjectURL(blob));
     if (img.dataset.file === url) showPenFence(img, url);
   }).catch(() => {
     fenceState.set(url, "miss");
