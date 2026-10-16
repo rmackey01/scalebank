@@ -52,9 +52,9 @@ html.keep-on .tabs{grid-template-columns:repeat(5,1fr)}
 html.keep-on .tab-ul{left:calc((var(--ti,0) + .5) * 20%)}
 html.keep-on .tab-keep{display:flex!important}
 html.keep-on .tab-keep .ti{object-fit:contain}
-/* Missing Keep art stays invisible until the file loads. The paths are real. */
-img[src^="art/keep/"]{visibility:hidden}
-img[src^="art/keep/"].is-ok{visibility:visible}
+/* Keep art is assigned from script only while the flag is on, so these files are never requested otherwise. */
+.keep-art{visibility:hidden}
+.keep-art.is-ok{visibility:visible}
 html.keep-on #keep{position:relative;overflow:visible;background:var(--ink)}
 html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;top:0;right:0;height:calc(100% + var(--keep-cover,96px))}
 html.keep-open #app::before{content:"";position:absolute;z-index:1;left:0;right:0;bottom:0;height:var(--keep-cover,96px);background:var(--ink);pointer-events:none}
@@ -617,7 +617,7 @@ button.dexchip{cursor:pointer}
 
   <main id="keep" class="screen" aria-label="Keep" hidden>
     <div class="keep-stage">
-      <img class="keep-bg" src="art/keep/keep-v6.webp" alt="" draggable="false">
+      <img class="keep-bg keep-art" alt="" draggable="false">
       <button type="button" class="keep-build" data-act="keep-build">Build</button>
       <button type="button" class="keep-hot" data-act="keep-ledger" aria-label="Ledger"><span>Ledger</span></button>
     </div>
@@ -644,7 +644,7 @@ button.dexchip{cursor:pointer}
     <button class="tab" data-tab="vendors"><img class="ti off" src="art/nest/icon_vendors_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_vendors_active.webp" alt="">Vendors</button>
     <button class="tab" data-tab="nest"><img class="ti off" src="art/nest/icon_nest_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_nest_active.webp" alt="">Nest<img class="dot" id="readyDot" src="art/nest/nav_notification_dot.webp" alt="" hidden></button>
     <button class="tab" data-tab="dragon"><img class="ti off" src="art/nest/icon_dragon_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_dragon_active.webp" alt="">Dragon</button>
-    <button class="tab tab-keep" data-tab="keep"><img class="ti off" src="art/keep/icon_keep_inactive.png" alt=""><img class="ti on" src="art/keep/icon_keep_active.png" alt="">Keep</button>
+    <button class="tab tab-keep" data-tab="keep"><img class="ti off keep-art" alt=""><img class="ti on keep-art" alt="">Keep</button>
     <i class="tab-ul" aria-hidden="true"></i>
   </nav>
 
@@ -654,7 +654,7 @@ button.dexchip{cursor:pointer}
   <div class="overlay reveal-ov" id="revealOv" hidden></div>
   <div class="overlay" id="ledgerOv" hidden>
     <div class="ledger" role="dialog" aria-modal="true" aria-label="Ledger">
-      <div class="ledger-sheet"><img src="art/keep/ledger-v3.webp" alt=""></div>
+      <div class="ledger-sheet"><img class="keep-art" alt=""></div>
       <p>Nothing written here yet.</p>
       <button type="button" class="btn" data-act="close-ledger">Close</button>
     </div>
@@ -2111,9 +2111,21 @@ function syncKeepCover(){
   const cover = app.getBoundingClientRect().bottom - tabs.getBoundingClientRect().top;
   if (cover > 0) app.style.setProperty("--keep-cover", Math.ceil(cover) + "px");
 }
+function keepArt(img, url){
+  if (!img || img.getAttribute("src")) return;
+  img.addEventListener("load", () => { if (img.naturalWidth) img.classList.add("is-ok"); });
+  img.src = url;
+}
+function mountKeepArt(){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  keepArt($(".keep-bg"), "art/keep/keep-v6.webp");
+  keepArt($(".tab-keep .ti.off"), "art/keep/icon_keep_inactive.png");
+  keepArt($(".tab-keep .ti.on"), "art/keep/icon_keep_active.png");
+}
 function openLedger(){
   if (!document.documentElement.classList.contains("keep-on")) return;
   const ov = $("#ledgerOv");
+  keepArt(ov.querySelector(".ledger-sheet img"), "art/keep/ledger-v3.webp");
   ov.hidden = false;
   const b = ov.querySelector("[data-act=close-ledger]");
   if (b) b.focus();
@@ -2127,11 +2139,7 @@ function closeLedger(){
 }
 window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncKeepCover);
-document.querySelectorAll('img[src^="art/keep/"]').forEach(img => {
-  const ok = () => { if (img.naturalWidth) img.classList.add("is-ok"); };
-  img.addEventListener("load", ok);
-  if (img.complete) ok();
-});
+mountKeepArt();
 
 /* ================= debug panel ================= */
 /* For testing late-game states without thousands of taps. Only shown with ?debug=1 or #debug. */
