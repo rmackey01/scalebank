@@ -1,1 +1,1239 @@
-{"frames":8,"sprites":{"cinder-hatchling":{"file":"cinder-hatchling.webp","still":"cinder-hatchling-still.webp","frameWidth":241,"frameHeight":176,"frames":8,"fps":10.0},"cinder-juvenile":{"file":"cinder-juvenile.webp","still":"cinder-juvenile-still.webp","frameWidth":244,"frameHeight":176,"frames":8,"fps":8.7},"cinder-adult":{"file":"cinder-adult.webp","still":"cinder-adult-still.webp","frameWidth":223,"frameHeight":176,"frames":8,"fps":7.3},"cinder-elder":{"file":"cinder-elder.webp","still":"cinder-elder-still.webp","frameWidth":183,"frameHeight":176,"frames":8,"fps":6.0},"inferno-hatchling":{"file":"inferno-hatchling.webp","still":"inferno-hatchling-still.webp","frameWidth":244,"frameHeight":176,"frames":8,"fps":10.0},"inferno-juvenile":{"file":"inferno-juvenile.webp","still":"inferno-juvenile-still.webp","frameWidth":171,"frameHeight":176,"frames":8,"fps":8.7},"inferno-adult":{"file":"inferno-adult.webp","still":"inferno-adult-still.webp","frameWidth":244,"frameHeight":176,"frames":8,"fps":7.3},"inferno-elder":{"file":"inferno-elder.webp","still":"inferno-elder-still.webp","frameWidth":199,"frameHeight":176,"frames":8,"fps":6.0},"brine-hatchling":{"file":"brine-hatchling.webp","still":"brine-hatchling-still.webp","frameWidth":181,"frameHeight":176,"frames":8,"fps":10.0},"brine-juvenile":{"file":"brine-juvenile.webp","still":"brine-juvenile-still.webp","frameWidth":207,"frameHeight":176,"frames":8,"fps":8.7},"brine-adult":{"file":"brine-adult.webp","still":"brine-adult-still.webp","frameWidth":201,"frameHeight":176,"frames":8,"fps":7.3},"brine-elder":{"file":"brine-elder.webp","still":"brine-elder-still.webp","frameWidth":148,"frameHeight":176,"frames":8,"fps":6.0},"voidling-hatchling":{"file":"voidling-hatchling.webp","still":"voidling-hatchling-still.webp","frameWidth":190,"frameHeight":176,"frames":8,"fps":10.0},"voidling-juvenile":{"file":"voidling-juvenile.webp","still":"voidling-juvenile-still.webp","frameWidth":229,"frameHeight":176,"frames":8,"fps":8.7},"voidling-adult":{"file":"voidling-adult.webp","still":"voidling-adult-still.webp","frameWidth":202,"frameHeight":176,"frames":8,"fps":7.3},"voidling-elder":{"file":"voidling-elder.webp","still":"voidling-elder-still.webp","frameWidth":182,"frameHeight":176,"frames":8,"fps":6.0},"stormling-hatchling":{"file":"stormling-hatchling.webp","still":"stormling-hatchling-still.webp","frameWidth":176,"frameHeight":176,"frames":8,"fps":10.0},"stormling-juvenile":{"file":"stormling-juvenile.webp","still":"stormling-juvenile-still.webp","frameWidth":190,"frameHeight":176,"frames":8,"fps":8.7},"stormling-adult":{"file":"stormling-adult.webp","still":"stormling-adult-still.webp","frameWidth":185,"frameHeight":176,"frames":8,"fps":7.3},"stormling-elder":{"file":"stormling-elder.webp","still":"stormling-elder-still.webp","frameWidth":175,"frameHeight":176,"frames":8,"fps":6.0},"moss-hatchling":{"file":"moss-hatchling.webp","still":"moss-hatchling-still.webp","frameWidth":243,"frameHeight":176,"frames":8,"fps":10.0},"moss-juvenile":{"file":"moss-juvenile.webp","still":"moss-juvenile-still.webp","frameWidth":214,"frameHeight":176,"frames":8,"fps":8.7},"moss-adult":{"file":"moss-adult.webp","still":"moss-adult-still.webp","frameWidth":244,"frameHeight":176,"frames":8,"fps":7.3},"moss-elder":{"file":"moss-elder.webp","still":"moss-elder-still.webp","frameWidth":200,"frameHeight":176,"frames":8,"fps":6.0},"tempest-hatchling":{"file":"tempest-hatchling.webp","still":"tempest-hatchling-still.webp","frameWidth":179,"frameHeight":176,"frames":8,"fps":10.0},"tempest-juvenile":{"file":"tempest-juvenile.webp","still":"tempest-juvenile-still.webp","frameWidth":209,"frameHeight":176,"frames":8,"fps":8.7},"tempest-adult":{"file":"tempest-adult.webp","still":"tempest-adult-still.webp","frameWidth":214,"frameHeight":176,"frames":8,"fps":7.3},"tempest-elder":{"file":"tempest-elder.webp","still":"tempest-elder-still.webp","frameWidth":185,"frameHeight":176,"frames":8,"fps":6.0}}}
+{
+ "frames": 8,
+ "sprites": {
+  "cinder-hatchling": {
+   "file": "cinder-hatchling.webp",
+   "still": "cinder-hatchling-still.webp",
+   "frameWidth": 241,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 10.0
+  },
+  "cinder-juvenile": {
+   "file": "cinder-juvenile.webp",
+   "still": "cinder-juvenile-still.webp",
+   "frameWidth": 244,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 8.7
+  },
+  "cinder-adult": {
+   "file": "cinder-adult.webp",
+   "still": "cinder-adult-still.webp",
+   "frameWidth": 223,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 7.3
+  },
+  "cinder-elder": {
+   "file": "cinder-elder.webp",
+   "still": "cinder-elder-still.webp",
+   "frameWidth": 183,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 6.0
+  },
+  "inferno-hatchling": {
+   "file": "inferno-hatchling.webp",
+   "still": "inferno-hatchling-still.webp",
+   "frameWidth": 244,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 10.0
+  },
+  "inferno-juvenile": {
+   "file": "inferno-juvenile.webp",
+   "still": "inferno-juvenile-still.webp",
+   "frameWidth": 171,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 8.7
+  },
+  "inferno-adult": {
+   "file": "inferno-adult.webp",
+   "still": "inferno-adult-still.webp",
+   "frameWidth": 244,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 7.3
+  },
+  "inferno-elder": {
+   "file": "inferno-elder.webp",
+   "still": "inferno-elder-still.webp",
+   "frameWidth": 199,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 6.0
+  },
+  "brine-hatchling": {
+   "file": "brine-hatchling.webp",
+   "still": "brine-hatchling-still.webp",
+   "frameWidth": 181,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 10.0
+  },
+  "brine-juvenile": {
+   "file": "brine-juvenile.webp",
+   "still": "brine-juvenile-still.webp",
+   "frameWidth": 207,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 8.7
+  },
+  "brine-adult": {
+   "file": "brine-adult.webp",
+   "still": "brine-adult-still.webp",
+   "frameWidth": 201,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 7.3
+  },
+  "brine-elder": {
+   "file": "brine-elder.webp",
+   "still": "brine-elder-still.webp",
+   "frameWidth": 148,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 6.0
+  },
+  "voidling-hatchling": {
+   "file": "voidling-hatchling.webp",
+   "still": "voidling-hatchling-still.webp",
+   "frameWidth": 190,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 10.0
+  },
+  "voidling-juvenile": {
+   "file": "voidling-juvenile.webp",
+   "still": "voidling-juvenile-still.webp",
+   "frameWidth": 229,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 8.7
+  },
+  "voidling-adult": {
+   "file": "voidling-adult.webp",
+   "still": "voidling-adult-still.webp",
+   "frameWidth": 202,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 7.3
+  },
+  "voidling-elder": {
+   "file": "voidling-elder.webp",
+   "still": "voidling-elder-still.webp",
+   "frameWidth": 182,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 6.0
+  },
+  "stormling-hatchling": {
+   "file": "stormling-hatchling.webp",
+   "still": "stormling-hatchling-still.webp",
+   "frameWidth": 176,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 10.0
+  },
+  "stormling-juvenile": {
+   "file": "stormling-juvenile.webp",
+   "still": "stormling-juvenile-still.webp",
+   "frameWidth": 190,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 8.7
+  },
+  "stormling-adult": {
+   "file": "stormling-adult.webp",
+   "still": "stormling-adult-still.webp",
+   "frameWidth": 185,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 7.3
+  },
+  "stormling-elder": {
+   "file": "stormling-elder.webp",
+   "still": "stormling-elder-still.webp",
+   "frameWidth": 175,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 6.0
+  },
+  "moss-hatchling": {
+   "file": "moss-hatchling.webp",
+   "still": "moss-hatchling-still.webp",
+   "frameWidth": 243,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 10.0
+  },
+  "moss-juvenile": {
+   "file": "moss-juvenile.webp",
+   "still": "moss-juvenile-still.webp",
+   "frameWidth": 214,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 8.7
+  },
+  "moss-adult": {
+   "file": "moss-adult.webp",
+   "still": "moss-adult-still.webp",
+   "frameWidth": 244,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 7.3
+  },
+  "moss-elder": {
+   "file": "moss-elder.webp",
+   "still": "moss-elder-still.webp",
+   "frameWidth": 200,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 6.0
+  },
+  "tempest-hatchling": {
+   "file": "tempest-hatchling.webp",
+   "still": "tempest-hatchling-still.webp",
+   "frameWidth": 179,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 10.0
+  },
+  "tempest-juvenile": {
+   "file": "tempest-juvenile.webp",
+   "still": "tempest-juvenile-still.webp",
+   "frameWidth": 209,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 8.7
+  },
+  "tempest-adult": {
+   "file": "tempest-adult.webp",
+   "still": "tempest-adult-still.webp",
+   "frameWidth": 214,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 7.3
+  },
+  "tempest-elder": {
+   "file": "tempest-elder.webp",
+   "still": "tempest-elder-still.webp",
+   "frameWidth": 185,
+   "frameHeight": 176,
+   "frames": 8,
+   "fps": 6.0
+  }
+ },
+ "mutations": {
+  "cinder-moonlit-hatchling": {
+   "file": "mut/cinder-moonlit-hatchling.webp",
+   "still": "mut/cinder-moonlit-hatchling-still.webp",
+   "frameWidth": 181,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "moonlit"
+  },
+  "cinder-moonlit-juvenile": {
+   "file": "mut/cinder-moonlit-juvenile.webp",
+   "still": "mut/cinder-moonlit-juvenile-still.webp",
+   "frameWidth": 162,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "moonlit"
+  },
+  "cinder-moonlit-adult": {
+   "file": "mut/cinder-moonlit-adult.webp",
+   "still": "mut/cinder-moonlit-adult-still.webp",
+   "frameWidth": 143,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "moonlit"
+  },
+  "cinder-moonlit-elder": {
+   "file": "mut/cinder-moonlit-elder.webp",
+   "still": "mut/cinder-moonlit-elder-still.webp",
+   "frameWidth": 137,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "moonlit"
+  },
+  "cinder-obsidian-hatchling": {
+   "file": "mut/cinder-obsidian-hatchling.webp",
+   "still": "mut/cinder-obsidian-hatchling-still.webp",
+   "frameWidth": 220,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "obsidian"
+  },
+  "cinder-obsidian-juvenile": {
+   "file": "mut/cinder-obsidian-juvenile.webp",
+   "still": "mut/cinder-obsidian-juvenile-still.webp",
+   "frameWidth": 166,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "obsidian"
+  },
+  "cinder-obsidian-adult": {
+   "file": "mut/cinder-obsidian-adult.webp",
+   "still": "mut/cinder-obsidian-adult-still.webp",
+   "frameWidth": 151,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "obsidian"
+  },
+  "cinder-obsidian-elder": {
+   "file": "mut/cinder-obsidian-elder.webp",
+   "still": "mut/cinder-obsidian-elder-still.webp",
+   "frameWidth": 140,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "obsidian"
+  },
+  "cinder-gilded-hatchling": {
+   "file": "mut/cinder-gilded-hatchling.webp",
+   "still": "mut/cinder-gilded-hatchling-still.webp",
+   "frameWidth": 199,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "gilded"
+  },
+  "cinder-gilded-juvenile": {
+   "file": "mut/cinder-gilded-juvenile.webp",
+   "still": "mut/cinder-gilded-juvenile-still.webp",
+   "frameWidth": 170,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "gilded"
+  },
+  "cinder-gilded-adult": {
+   "file": "mut/cinder-gilded-adult.webp",
+   "still": "mut/cinder-gilded-adult-still.webp",
+   "frameWidth": 154,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "gilded"
+  },
+  "cinder-gilded-elder": {
+   "file": "mut/cinder-gilded-elder.webp",
+   "still": "mut/cinder-gilded-elder-still.webp",
+   "frameWidth": 158,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "gilded"
+  },
+  "cinder-aurora-hatchling": {
+   "file": "mut/cinder-aurora-hatchling.webp",
+   "still": "mut/cinder-aurora-hatchling-still.webp",
+   "frameWidth": 171,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "aurora"
+  },
+  "cinder-aurora-juvenile": {
+   "file": "mut/cinder-aurora-juvenile.webp",
+   "still": "mut/cinder-aurora-juvenile-still.webp",
+   "frameWidth": 160,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "aurora"
+  },
+  "cinder-aurora-adult": {
+   "file": "mut/cinder-aurora-adult.webp",
+   "still": "mut/cinder-aurora-adult-still.webp",
+   "frameWidth": 151,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "aurora"
+  },
+  "cinder-aurora-elder": {
+   "file": "mut/cinder-aurora-elder.webp",
+   "still": "mut/cinder-aurora-elder-still.webp",
+   "frameWidth": 139,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "aurora"
+  },
+  "inferno-moonlit-hatchling": {
+   "file": "mut/inferno-moonlit-hatchling.webp",
+   "still": "mut/inferno-moonlit-hatchling-still.webp",
+   "frameWidth": 233,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "moonlit"
+  },
+  "inferno-moonlit-juvenile": {
+   "file": "mut/inferno-moonlit-juvenile.webp",
+   "still": "mut/inferno-moonlit-juvenile-still.webp",
+   "frameWidth": 178,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "moonlit"
+  },
+  "inferno-moonlit-adult": {
+   "file": "mut/inferno-moonlit-adult.webp",
+   "still": "mut/inferno-moonlit-adult-still.webp",
+   "frameWidth": 218,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "moonlit"
+  },
+  "inferno-moonlit-elder": {
+   "file": "mut/inferno-moonlit-elder.webp",
+   "still": "mut/inferno-moonlit-elder-still.webp",
+   "frameWidth": 207,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "moonlit"
+  },
+  "inferno-obsidian-hatchling": {
+   "file": "mut/inferno-obsidian-hatchling.webp",
+   "still": "mut/inferno-obsidian-hatchling-still.webp",
+   "frameWidth": 156,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "obsidian"
+  },
+  "inferno-obsidian-juvenile": {
+   "file": "mut/inferno-obsidian-juvenile.webp",
+   "still": "mut/inferno-obsidian-juvenile-still.webp",
+   "frameWidth": 159,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "obsidian"
+  },
+  "inferno-obsidian-adult": {
+   "file": "mut/inferno-obsidian-adult.webp",
+   "still": "mut/inferno-obsidian-adult-still.webp",
+   "frameWidth": 153,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "obsidian"
+  },
+  "inferno-obsidian-elder": {
+   "file": "mut/inferno-obsidian-elder.webp",
+   "still": "mut/inferno-obsidian-elder-still.webp",
+   "frameWidth": 194,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "obsidian"
+  },
+  "inferno-gilded-hatchling": {
+   "file": "mut/inferno-gilded-hatchling.webp",
+   "still": "mut/inferno-gilded-hatchling-still.webp",
+   "frameWidth": 208,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "gilded"
+  },
+  "inferno-gilded-juvenile": {
+   "file": "mut/inferno-gilded-juvenile.webp",
+   "still": "mut/inferno-gilded-juvenile-still.webp",
+   "frameWidth": 176,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "gilded"
+  },
+  "inferno-gilded-adult": {
+   "file": "mut/inferno-gilded-adult.webp",
+   "still": "mut/inferno-gilded-adult-still.webp",
+   "frameWidth": 150,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "gilded"
+  },
+  "inferno-gilded-elder": {
+   "file": "mut/inferno-gilded-elder.webp",
+   "still": "mut/inferno-gilded-elder-still.webp",
+   "frameWidth": 140,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "gilded"
+  },
+  "inferno-aurora-hatchling": {
+   "file": "mut/inferno-aurora-hatchling.webp",
+   "still": "mut/inferno-aurora-hatchling-still.webp",
+   "frameWidth": 251,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "aurora"
+  },
+  "inferno-aurora-juvenile": {
+   "file": "mut/inferno-aurora-juvenile.webp",
+   "still": "mut/inferno-aurora-juvenile-still.webp",
+   "frameWidth": 192,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "aurora"
+  },
+  "inferno-aurora-adult": {
+   "file": "mut/inferno-aurora-adult.webp",
+   "still": "mut/inferno-aurora-adult-still.webp",
+   "frameWidth": 196,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "aurora"
+  },
+  "inferno-aurora-elder": {
+   "file": "mut/inferno-aurora-elder.webp",
+   "still": "mut/inferno-aurora-elder-still.webp",
+   "frameWidth": 156,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "aurora"
+  },
+  "brine-moonlit-hatchling": {
+   "file": "mut/brine-moonlit-hatchling.webp",
+   "still": "mut/brine-moonlit-hatchling-still.webp",
+   "frameWidth": 202,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "moonlit"
+  },
+  "brine-moonlit-juvenile": {
+   "file": "mut/brine-moonlit-juvenile.webp",
+   "still": "mut/brine-moonlit-juvenile-still.webp",
+   "frameWidth": 145,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "moonlit"
+  },
+  "brine-moonlit-adult": {
+   "file": "mut/brine-moonlit-adult.webp",
+   "still": "mut/brine-moonlit-adult-still.webp",
+   "frameWidth": 136,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "moonlit"
+  },
+  "brine-moonlit-elder": {
+   "file": "mut/brine-moonlit-elder.webp",
+   "still": "mut/brine-moonlit-elder-still.webp",
+   "frameWidth": 136,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "moonlit"
+  },
+  "brine-obsidian-hatchling": {
+   "file": "mut/brine-obsidian-hatchling.webp",
+   "still": "mut/brine-obsidian-hatchling-still.webp",
+   "frameWidth": 191,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "obsidian"
+  },
+  "brine-obsidian-juvenile": {
+   "file": "mut/brine-obsidian-juvenile.webp",
+   "still": "mut/brine-obsidian-juvenile-still.webp",
+   "frameWidth": 168,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "obsidian"
+  },
+  "brine-obsidian-adult": {
+   "file": "mut/brine-obsidian-adult.webp",
+   "still": "mut/brine-obsidian-adult-still.webp",
+   "frameWidth": 122,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "obsidian"
+  },
+  "brine-obsidian-elder": {
+   "file": "mut/brine-obsidian-elder.webp",
+   "still": "mut/brine-obsidian-elder-still.webp",
+   "frameWidth": 122,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "obsidian"
+  },
+  "brine-gilded-hatchling": {
+   "file": "mut/brine-gilded-hatchling.webp",
+   "still": "mut/brine-gilded-hatchling-still.webp",
+   "frameWidth": 178,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "gilded"
+  },
+  "brine-gilded-juvenile": {
+   "file": "mut/brine-gilded-juvenile.webp",
+   "still": "mut/brine-gilded-juvenile-still.webp",
+   "frameWidth": 132,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "gilded"
+  },
+  "brine-gilded-adult": {
+   "file": "mut/brine-gilded-adult.webp",
+   "still": "mut/brine-gilded-adult-still.webp",
+   "frameWidth": 131,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "gilded"
+  },
+  "brine-gilded-elder": {
+   "file": "mut/brine-gilded-elder.webp",
+   "still": "mut/brine-gilded-elder-still.webp",
+   "frameWidth": 129,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "gilded"
+  },
+  "brine-aurora-hatchling": {
+   "file": "mut/brine-aurora-hatchling.webp",
+   "still": "mut/brine-aurora-hatchling-still.webp",
+   "frameWidth": 244,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "aurora"
+  },
+  "brine-aurora-juvenile": {
+   "file": "mut/brine-aurora-juvenile.webp",
+   "still": "mut/brine-aurora-juvenile-still.webp",
+   "frameWidth": 171,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "aurora"
+  },
+  "brine-aurora-adult": {
+   "file": "mut/brine-aurora-adult.webp",
+   "still": "mut/brine-aurora-adult-still.webp",
+   "frameWidth": 148,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "aurora"
+  },
+  "brine-aurora-elder": {
+   "file": "mut/brine-aurora-elder.webp",
+   "still": "mut/brine-aurora-elder-still.webp",
+   "frameWidth": 139,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "aurora"
+  },
+  "voidling-moonlit-hatchling": {
+   "file": "mut/voidling-moonlit-hatchling.webp",
+   "still": "mut/voidling-moonlit-hatchling-still.webp",
+   "frameWidth": 181,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "moonlit"
+  },
+  "voidling-moonlit-juvenile": {
+   "file": "mut/voidling-moonlit-juvenile.webp",
+   "still": "mut/voidling-moonlit-juvenile-still.webp",
+   "frameWidth": 143,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "moonlit"
+  },
+  "voidling-moonlit-adult": {
+   "file": "mut/voidling-moonlit-adult.webp",
+   "still": "mut/voidling-moonlit-adult-still.webp",
+   "frameWidth": 141,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "moonlit"
+  },
+  "voidling-moonlit-elder": {
+   "file": "mut/voidling-moonlit-elder.webp",
+   "still": "mut/voidling-moonlit-elder-still.webp",
+   "frameWidth": 142,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "moonlit"
+  },
+  "voidling-obsidian-hatchling": {
+   "file": "mut/voidling-obsidian-hatchling.webp",
+   "still": "mut/voidling-obsidian-hatchling-still.webp",
+   "frameWidth": 157,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "obsidian"
+  },
+  "voidling-obsidian-juvenile": {
+   "file": "mut/voidling-obsidian-juvenile.webp",
+   "still": "mut/voidling-obsidian-juvenile-still.webp",
+   "frameWidth": 148,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "obsidian"
+  },
+  "voidling-obsidian-adult": {
+   "file": "mut/voidling-obsidian-adult.webp",
+   "still": "mut/voidling-obsidian-adult-still.webp",
+   "frameWidth": 136,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "obsidian"
+  },
+  "voidling-obsidian-elder": {
+   "file": "mut/voidling-obsidian-elder.webp",
+   "still": "mut/voidling-obsidian-elder-still.webp",
+   "frameWidth": 125,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "obsidian"
+  },
+  "voidling-gilded-hatchling": {
+   "file": "mut/voidling-gilded-hatchling.webp",
+   "still": "mut/voidling-gilded-hatchling-still.webp",
+   "frameWidth": 144,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "gilded"
+  },
+  "voidling-gilded-juvenile": {
+   "file": "mut/voidling-gilded-juvenile.webp",
+   "still": "mut/voidling-gilded-juvenile-still.webp",
+   "frameWidth": 133,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "gilded"
+  },
+  "voidling-gilded-adult": {
+   "file": "mut/voidling-gilded-adult.webp",
+   "still": "mut/voidling-gilded-adult-still.webp",
+   "frameWidth": 132,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "gilded"
+  },
+  "voidling-gilded-elder": {
+   "file": "mut/voidling-gilded-elder.webp",
+   "still": "mut/voidling-gilded-elder-still.webp",
+   "frameWidth": 132,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "gilded"
+  },
+  "voidling-aurora-hatchling": {
+   "file": "mut/voidling-aurora-hatchling.webp",
+   "still": "mut/voidling-aurora-hatchling-still.webp",
+   "frameWidth": 198,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "aurora"
+  },
+  "voidling-aurora-juvenile": {
+   "file": "mut/voidling-aurora-juvenile.webp",
+   "still": "mut/voidling-aurora-juvenile-still.webp",
+   "frameWidth": 163,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "aurora"
+  },
+  "voidling-aurora-adult": {
+   "file": "mut/voidling-aurora-adult.webp",
+   "still": "mut/voidling-aurora-adult-still.webp",
+   "frameWidth": 143,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "aurora"
+  },
+  "voidling-aurora-elder": {
+   "file": "mut/voidling-aurora-elder.webp",
+   "still": "mut/voidling-aurora-elder-still.webp",
+   "frameWidth": 154,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "aurora"
+  },
+  "stormling-moonlit-hatchling": {
+   "file": "mut/stormling-moonlit-hatchling.webp",
+   "still": "mut/stormling-moonlit-hatchling-still.webp",
+   "frameWidth": 213,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "moonlit"
+  },
+  "stormling-moonlit-juvenile": {
+   "file": "mut/stormling-moonlit-juvenile.webp",
+   "still": "mut/stormling-moonlit-juvenile-still.webp",
+   "frameWidth": 165,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "moonlit"
+  },
+  "stormling-moonlit-adult": {
+   "file": "mut/stormling-moonlit-adult.webp",
+   "still": "mut/stormling-moonlit-adult-still.webp",
+   "frameWidth": 138,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "moonlit"
+  },
+  "stormling-moonlit-elder": {
+   "file": "mut/stormling-moonlit-elder.webp",
+   "still": "mut/stormling-moonlit-elder-still.webp",
+   "frameWidth": 135,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "moonlit"
+  },
+  "stormling-obsidian-hatchling": {
+   "file": "mut/stormling-obsidian-hatchling.webp",
+   "still": "mut/stormling-obsidian-hatchling-still.webp",
+   "frameWidth": 172,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "obsidian"
+  },
+  "stormling-obsidian-juvenile": {
+   "file": "mut/stormling-obsidian-juvenile.webp",
+   "still": "mut/stormling-obsidian-juvenile-still.webp",
+   "frameWidth": 125,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "obsidian"
+  },
+  "stormling-obsidian-adult": {
+   "file": "mut/stormling-obsidian-adult.webp",
+   "still": "mut/stormling-obsidian-adult-still.webp",
+   "frameWidth": 129,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "obsidian"
+  },
+  "stormling-obsidian-elder": {
+   "file": "mut/stormling-obsidian-elder.webp",
+   "still": "mut/stormling-obsidian-elder-still.webp",
+   "frameWidth": 132,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "obsidian"
+  },
+  "stormling-gilded-hatchling": {
+   "file": "mut/stormling-gilded-hatchling.webp",
+   "still": "mut/stormling-gilded-hatchling-still.webp",
+   "frameWidth": 150,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "gilded"
+  },
+  "stormling-gilded-juvenile": {
+   "file": "mut/stormling-gilded-juvenile.webp",
+   "still": "mut/stormling-gilded-juvenile-still.webp",
+   "frameWidth": 137,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "gilded"
+  },
+  "stormling-gilded-adult": {
+   "file": "mut/stormling-gilded-adult.webp",
+   "still": "mut/stormling-gilded-adult-still.webp",
+   "frameWidth": 131,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "gilded"
+  },
+  "stormling-gilded-elder": {
+   "file": "mut/stormling-gilded-elder.webp",
+   "still": "mut/stormling-gilded-elder-still.webp",
+   "frameWidth": 131,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "gilded"
+  },
+  "stormling-aurora-hatchling": {
+   "file": "mut/stormling-aurora-hatchling.webp",
+   "still": "mut/stormling-aurora-hatchling-still.webp",
+   "frameWidth": 141,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "aurora"
+  },
+  "stormling-aurora-juvenile": {
+   "file": "mut/stormling-aurora-juvenile.webp",
+   "still": "mut/stormling-aurora-juvenile-still.webp",
+   "frameWidth": 143,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "aurora"
+  },
+  "stormling-aurora-adult": {
+   "file": "mut/stormling-aurora-adult.webp",
+   "still": "mut/stormling-aurora-adult-still.webp",
+   "frameWidth": 136,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "aurora"
+  },
+  "stormling-aurora-elder": {
+   "file": "mut/stormling-aurora-elder.webp",
+   "still": "mut/stormling-aurora-elder-still.webp",
+   "frameWidth": 137,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "aurora"
+  },
+  "moss-moonlit-hatchling": {
+   "file": "mut/moss-moonlit-hatchling.webp",
+   "still": "mut/moss-moonlit-hatchling-still.webp",
+   "frameWidth": 248,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "moonlit"
+  },
+  "moss-moonlit-juvenile": {
+   "file": "mut/moss-moonlit-juvenile.webp",
+   "still": "mut/moss-moonlit-juvenile-still.webp",
+   "frameWidth": 141,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "moonlit"
+  },
+  "moss-moonlit-adult": {
+   "file": "mut/moss-moonlit-adult.webp",
+   "still": "mut/moss-moonlit-adult-still.webp",
+   "frameWidth": 138,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "moonlit"
+  },
+  "moss-moonlit-elder": {
+   "file": "mut/moss-moonlit-elder.webp",
+   "still": "mut/moss-moonlit-elder-still.webp",
+   "frameWidth": 129,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "moonlit"
+  },
+  "moss-obsidian-hatchling": {
+   "file": "mut/moss-obsidian-hatchling.webp",
+   "still": "mut/moss-obsidian-hatchling-still.webp",
+   "frameWidth": 209,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "obsidian"
+  },
+  "moss-obsidian-juvenile": {
+   "file": "mut/moss-obsidian-juvenile.webp",
+   "still": "mut/moss-obsidian-juvenile-still.webp",
+   "frameWidth": 138,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "obsidian"
+  },
+  "moss-obsidian-adult": {
+   "file": "mut/moss-obsidian-adult.webp",
+   "still": "mut/moss-obsidian-adult-still.webp",
+   "frameWidth": 136,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "obsidian"
+  },
+  "moss-obsidian-elder": {
+   "file": "mut/moss-obsidian-elder.webp",
+   "still": "mut/moss-obsidian-elder-still.webp",
+   "frameWidth": 132,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "obsidian"
+  },
+  "moss-gilded-hatchling": {
+   "file": "mut/moss-gilded-hatchling.webp",
+   "still": "mut/moss-gilded-hatchling-still.webp",
+   "frameWidth": 190,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "gilded"
+  },
+  "moss-gilded-juvenile": {
+   "file": "mut/moss-gilded-juvenile.webp",
+   "still": "mut/moss-gilded-juvenile-still.webp",
+   "frameWidth": 154,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "gilded"
+  },
+  "moss-gilded-adult": {
+   "file": "mut/moss-gilded-adult.webp",
+   "still": "mut/moss-gilded-adult-still.webp",
+   "frameWidth": 163,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "gilded"
+  },
+  "moss-gilded-elder": {
+   "file": "mut/moss-gilded-elder.webp",
+   "still": "mut/moss-gilded-elder-still.webp",
+   "frameWidth": 131,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "gilded"
+  },
+  "moss-aurora-hatchling": {
+   "file": "mut/moss-aurora-hatchling.webp",
+   "still": "mut/moss-aurora-hatchling-still.webp",
+   "frameWidth": 264,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "aurora"
+  },
+  "moss-aurora-juvenile": {
+   "file": "mut/moss-aurora-juvenile.webp",
+   "still": "mut/moss-aurora-juvenile-still.webp",
+   "frameWidth": 191,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "aurora"
+  },
+  "moss-aurora-adult": {
+   "file": "mut/moss-aurora-adult.webp",
+   "still": "mut/moss-aurora-adult-still.webp",
+   "frameWidth": 168,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "aurora"
+  },
+  "moss-aurora-elder": {
+   "file": "mut/moss-aurora-elder.webp",
+   "still": "mut/moss-aurora-elder-still.webp",
+   "frameWidth": 143,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "aurora"
+  },
+  "tempest-moonlit-hatchling": {
+   "file": "mut/tempest-moonlit-hatchling.webp",
+   "still": "mut/tempest-moonlit-hatchling-still.webp",
+   "frameWidth": 196,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "moonlit"
+  },
+  "tempest-moonlit-juvenile": {
+   "file": "mut/tempest-moonlit-juvenile.webp",
+   "still": "mut/tempest-moonlit-juvenile-still.webp",
+   "frameWidth": 152,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "moonlit"
+  },
+  "tempest-moonlit-adult": {
+   "file": "mut/tempest-moonlit-adult.webp",
+   "still": "mut/tempest-moonlit-adult-still.webp",
+   "frameWidth": 142,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "moonlit"
+  },
+  "tempest-moonlit-elder": {
+   "file": "mut/tempest-moonlit-elder.webp",
+   "still": "mut/tempest-moonlit-elder-still.webp",
+   "frameWidth": 137,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "moonlit"
+  },
+  "tempest-obsidian-hatchling": {
+   "file": "mut/tempest-obsidian-hatchling.webp",
+   "still": "mut/tempest-obsidian-hatchling-still.webp",
+   "frameWidth": 180,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "obsidian"
+  },
+  "tempest-obsidian-juvenile": {
+   "file": "mut/tempest-obsidian-juvenile.webp",
+   "still": "mut/tempest-obsidian-juvenile-still.webp",
+   "frameWidth": 134,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "obsidian"
+  },
+  "tempest-obsidian-adult": {
+   "file": "mut/tempest-obsidian-adult.webp",
+   "still": "mut/tempest-obsidian-adult-still.webp",
+   "frameWidth": 162,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "obsidian"
+  },
+  "tempest-obsidian-elder": {
+   "file": "mut/tempest-obsidian-elder.webp",
+   "still": "mut/tempest-obsidian-elder-still.webp",
+   "frameWidth": 135,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "obsidian"
+  },
+  "tempest-gilded-hatchling": {
+   "file": "mut/tempest-gilded-hatchling.webp",
+   "still": "mut/tempest-gilded-hatchling-still.webp",
+   "frameWidth": 176,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "gilded"
+  },
+  "tempest-gilded-juvenile": {
+   "file": "mut/tempest-gilded-juvenile.webp",
+   "still": "mut/tempest-gilded-juvenile-still.webp",
+   "frameWidth": 183,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "gilded"
+  },
+  "tempest-gilded-adult": {
+   "file": "mut/tempest-gilded-adult.webp",
+   "still": "mut/tempest-gilded-adult-still.webp",
+   "frameWidth": 169,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "gilded"
+  },
+  "tempest-gilded-elder": {
+   "file": "mut/tempest-gilded-elder.webp",
+   "still": "mut/tempest-gilded-elder-still.webp",
+   "frameWidth": 165,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "gilded"
+  },
+  "tempest-aurora-hatchling": {
+   "file": "mut/tempest-aurora-hatchling.webp",
+   "still": "mut/tempest-aurora-hatchling-still.webp",
+   "frameWidth": 190,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 10.0,
+   "motion": "aurora"
+  },
+  "tempest-aurora-juvenile": {
+   "file": "mut/tempest-aurora-juvenile.webp",
+   "still": "mut/tempest-aurora-juvenile-still.webp",
+   "frameWidth": 182,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 8.7,
+   "motion": "aurora"
+  },
+  "tempest-aurora-adult": {
+   "file": "mut/tempest-aurora-adult.webp",
+   "still": "mut/tempest-aurora-adult-still.webp",
+   "frameWidth": 172,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 7.3,
+   "motion": "aurora"
+  },
+  "tempest-aurora-elder": {
+   "file": "mut/tempest-aurora-elder.webp",
+   "still": "mut/tempest-aurora-elder-still.webp",
+   "frameWidth": 162,
+   "frameHeight": 180,
+   "frames": 8,
+   "fps": 6.0,
+   "motion": "aurora"
+  }
+ }
+}
