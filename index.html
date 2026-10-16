@@ -2672,7 +2672,7 @@ const PENS = [
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
-/* Plaque pixels on the 1008×1792 painting. slot-map plaques.ledger replaces this when it is present. */
+/* Plaque pixels on the 1008×1792 painting. ledgerPlaque wins, then plaques.ledger. */
 const LEDGER_PLAQUE = {file:"ledger-plaque.webp", x:653, y:836, w:166, h:49};
 const KEEP_BUILD = {x:70, y:88.2, w:26, h:3.6};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
@@ -2886,11 +2886,9 @@ function markPenReady(){
 }
 let ledgerArt = "";
 function ledgerPlaqueRow(){
-  const row = slotMap && slotMap.plaques && slotMap.plaques.ledger;
-  if (!row || typeof row !== "object" || typeof row.file !== "string" || !row.file) return {file:LEDGER_PLAQUE.file, x:LEDGER_PLAQUE.x, y:LEDGER_PLAQUE.y, w:LEDGER_PLAQUE.w, h:LEDGER_PLAQUE.h};
-  const x = +row.x, y = +row.y, w = +row.w, h = +row.h;
-  if (![x, y, w, h].every(Number.isFinite) || w <= 0 || h <= 0) return {file:LEDGER_PLAQUE.file, x:LEDGER_PLAQUE.x, y:LEDGER_PLAQUE.y, w:LEDGER_PLAQUE.w, h:LEDGER_PLAQUE.h};
-  return {file: row.file.split("/").pop() || LEDGER_PLAQUE.file, x, y, w, h};
+  const picked = (slotMap && slotMap.ledgerPlaque) || (slotMap && slotMap.plaques && slotMap.plaques.ledger);
+  if (picked && picked.file && [picked.x, picked.y, picked.w, picked.h].every(Number.isFinite) && picked.w > 0 && picked.h > 0) return picked;
+  return {file:LEDGER_PLAQUE.file, x:LEDGER_PLAQUE.x, y:LEDGER_PLAQUE.y, w:LEDGER_PLAQUE.w, h:LEDGER_PLAQUE.h};
 }
 function placeLedgerPlaque(){
   const el = $(".keep-ledger");
@@ -3305,15 +3303,19 @@ function readSlotMap(json){
       if (Array.isArray(row) && row.length >= 4 && row.slice(0, 4).every(v => Number.isFinite(+v))) tint[key] = row.slice(0, 4).map(Number);
     });
   }
+  const readPlaque = row => {
+    if (!row || typeof row !== "object") return null;
+    const x = +row.x, y = +row.y, w = +row.w, h = +row.h;
+    if (![x, y, w, h].every(Number.isFinite) || w <= 0 || h <= 0) return null;
+    const file = typeof row.file === "string" ? row.file.split("/").pop() : "";
+    if (!file) return null;
+    return {file, x, y, w, h};
+  };
+  const ledgerPlaque = readPlaque(json.ledgerPlaque);
   const plaques = {};
-  const ledger = json.plaques && json.plaques.ledger;
-  if (ledger && typeof ledger === "object"){
-    const x = +ledger.x, y = +ledger.y, w = +ledger.w, h = +ledger.h;
-    if ([x, y, w, h].every(Number.isFinite) && w > 0 && h > 0){
-      plaques.ledger = {file: typeof ledger.file === "string" ? ledger.file : "", x, y, w, h};
-    }
-  }
-  return {slots, tint, plaques};
+  const ledger = readPlaque(json.plaques && json.plaques.ledger);
+  if (ledger) plaques.ledger = ledger;
+  return {slots, tint, ledgerPlaque, plaques};
 }
 function slotLines(){
   if (!slotMap || !slotMap.slots) return [];
