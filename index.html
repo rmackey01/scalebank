@@ -61,6 +61,11 @@ html.keep-open #app::before{content:"";position:absolute;z-index:1;left:0;right:
 html.keep-open .tabs{position:relative;z-index:2}
 .keep-bg{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
 .keep-build{position:absolute;z-index:3;top:12px;right:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206;font-size:12px;font-weight:700;letter-spacing:.06em;box-shadow:inset 0 1px 0 rgba(255,240,200,.5),0 2px 0 #5c3d0c}
+.keep-streak{position:absolute;z-index:5;top:72px;left:12px;width:min(200px,calc(100% - 24px));padding:8px 10px 10px;border-radius:14px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.9);pointer-events:auto}
+.keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:22px;line-height:1;color:var(--gold-hi)}
+.keep-streak .ks-best{margin:2px 0 0;font-size:11px;letter-spacing:.06em;color:var(--muted)}
+.keep-streak .ks-note{margin:6px 0 0;font-size:12px;line-height:1.3;color:var(--gold-hi)}
+.keep-streak .btn{min-width:0;width:100%;margin-top:8px;padding:7px 8px;font-size:12px}
 .keep-build:active{transform:translateY(1px)}
 /* Lectern hotspot, fractions of the full painting (1008×1792, tab strip included). */
 .keep-hot{position:absolute;z-index:3;left:27%;top:70%;width:46%;height:14%;padding:0;border:0;background:transparent;color:var(--gold-hi)}
@@ -686,6 +691,7 @@ button.dexchip{cursor:pointer}
       <img class="keep-bg keep-art" alt="" draggable="false">
       <div class="keep-world" id="keepWorld"></div>
       <button type="button" class="keep-build" data-act="keep-build">Build</button>
+      <div class="keep-streak" id="keepStreak" hidden></div>
       <button type="button" class="keep-hot" data-act="keep-ledger" aria-label="Ledger"><span>Ledger</span></button>
     </div>
   </main>
@@ -939,6 +945,7 @@ function normKeep(k){
     base.streak.last = (s.last == null || typeof s.last === "string" || typeof s.last === "number") ? (s.last ?? null) : null;
     base.streak.count = Number.isFinite(+s.count) ? +s.count : 0;
     base.streak.best = Number.isFinite(+s.best) ? +s.best : 0;
+    if (typeof s.claimed === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.claimed)) base.streak.claimed = s.claimed;
   }
   if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
   return base;
@@ -1429,7 +1436,12 @@ function setTab(t, sub){
   for (const id of ["bank","vendors","nest","dragon","keep"]) document.getElementById(id).hidden = id !== t || (id === "dragon" && DSUB === "bestiary");
   $("#bestiary").hidden = DSUB !== "bestiary";
   if (t !== "keep"){ closeLedger({restore:false}); stopPenLoop(); }
-  else requestAnimationFrame(() => { syncKeepCover(); syncPens(); startPenLoop(); });
+  else {
+    requestAnimationFrame(() => { syncKeepCover(); syncPens(); startPenLoop(); });
+    const v = visitKeep();
+    if (v.fresh) toast(v.rest ? "Sabbath rest. No chores required." : "A blessing for this day.");
+    renderStreak();
+  }
   document.querySelectorAll(".tab").forEach((b, i) => { if (b.dataset.tab === t){ b.setAttribute("aria-current","page"); $(".tabs").style.setProperty("--ti", i); } else b.removeAttribute("aria-current"); });
   if (t === "vendors") requestAnimationFrame(() => scrollToScene(S.scene, false));
   syncVideos();
@@ -2145,6 +2157,7 @@ document.addEventListener("click", ev => {
   }
   else if (a === "close-dex") closeDex();
   else if (a === "keep-build") toast("Coming soon");
+  else if (a === "streak-claim"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "keep-ledger") openLedger();
   else if (a === "close-ledger") closeLedger();
   else if (a === "ledger-dragon" || a === "pen-dragon") openLedgerDragon(b.dataset.id);
@@ -2891,6 +2904,101 @@ function now(){ return careClock ? careClock() : Date.now(); }
 function today(){
   const d = new Date(now()), p = n => String(n).padStart(2, "0");
   return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+const SABBATH_NOTE = "Sabbath rest. No chores required.";
+const STREAK_PRIZES = [{at:30, steps:300}, {at:14, steps:140}, {at:7, steps:70}, {at:3, steps:30}, {at:1, steps:10}];
+function isoDay(s){
+  if (typeof s !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+  const [y, m, d] = s.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+  return dt;
+}
+function dayAfter(a, b){ return !!(isoDay(a) && isoDay(b) && a > b); }
+function daysBetween(a, b){
+  const da = isoDay(a), db = isoDay(b);
+  if (!da || !db) return null;
+  const ms = new Date(db.getFullYear(), db.getMonth(), db.getDate()) - new Date(da.getFullYear(), da.getMonth(), da.getDate());
+  return Math.round(ms / 86400000);
+}
+function restDayNum(){
+  const n = S.keep && S.keep.restDay;
+  return Number.isInteger(n) && n >= 0 && n <= 6 ? n : 0;
+}
+function isRestDay(iso){
+  const dt = isoDay(iso) || new Date(now());
+  return dt.getDay() === restDayNum();
+}
+/* True when a day that is not the rest day was skipped between the two visits. */
+function streakBroken(last, day){
+  const gap = daysBetween(last, day);
+  if (gap == null || gap <= 1) return false;
+  const start = isoDay(last);
+  const rest = restDayNum();
+  for (let i = 1; i < gap; i++){
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    if (d.getDay() !== rest) return true;
+  }
+  return false;
+}
+function streakPrize(count){
+  const n = Math.max(0, Math.round(+count || 0));
+  for (let i = 0; i < STREAK_PRIZES.length; i++) if (n >= STREAK_PRIZES[i].at) return STREAK_PRIZES[i].steps;
+  return 0;
+}
+function streakBag(){
+  if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
+  const keep = normKeep(S.keep);
+  S.keep = keep;
+  return keep.streak;
+}
+/* Record today's visit. A saved day ahead of now is clamped to today and pays nothing. */
+function visitKeep(){
+  const day = today();
+  const streak = streakBag();
+  const rest = isRestDay(day);
+  const note = rest ? SABBATH_NOTE : "";
+  if (dayAfter(streak.last, day) || dayAfter(streak.claimed, day)){
+    if (dayAfter(streak.last, day)) streak.last = day;
+    streak.claimed = day;
+    save();
+    return {fresh:false, clamped:true, rest, note, blessing:false, count:streak.count, best:streak.best};
+  }
+  if (streak.last === day) return {fresh:false, clamped:false, rest, note, blessing:false, count:streak.count, best:streak.best};
+  const count = !isoDay(streak.last) || streakBroken(streak.last, day) ? 1 : Math.max(0, Math.round(+streak.count || 0)) + 1;
+  const best = Math.max(Math.round(+streak.best || 0), count);
+  streak.last = day;
+  streak.count = count;
+  streak.best = best;
+  save();
+  return {fresh:true, clamped:false, rest, note, blessing:!rest, count, best};
+}
+/* One prize per local day, sized by the current streak. A clamped day does not pay. */
+function claimStreak(){
+  const v = visitKeep();
+  if (v.clamped) return 0;
+  const day = today();
+  const streak = streakBag();
+  if (streak.claimed === day) return 0;
+  const steps = streakPrize(streak.count);
+  if (steps <= 0) return 0;
+  S.bank += steps;
+  streak.claimed = day;
+  save();
+  return steps;
+}
+function renderStreak(){
+  const el = $("#keepStreak");
+  if (!el) return;
+  if (!document.documentElement.classList.contains("keep-on")){ el.hidden = true; return; }
+  const streak = streakBag();
+  const day = today();
+  const rest = isRestDay(day);
+  const prize = streakPrize(streak.count);
+  const claimed = streak.claimed === day;
+  const note = rest ? `<p class="ks-note">${SABBATH_NOTE}</p>` : "";
+  el.hidden = false;
+  el.innerHTML = `<p class="ks-day">Day ${streak.count || 0}</p><p class="ks-best">Best ${streak.best || 0}</p>${note}<button type="button" class="btn" data-act="streak-claim"${claimed || prize <= 0 ? " disabled" : ""}>${claimed ? "Claimed today" : "Claim " + fmt(prize) + " steps"}</button>`;
 }
 const CARE_ACTS = {
   feed:  {key:"fed", ms:4 * 60 * 60 * 1000, label:"Feed"},

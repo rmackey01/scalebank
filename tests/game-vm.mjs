@@ -72,6 +72,9 @@ export function boot(raw){
     if (typeof spriteChain === "function") __api.spriteChain = spriteChain;
     if (typeof pensOpen === "function") __api.pensOpen = pensOpen;
     if (typeof breedCount === "function") __api.breedCount = breedCount;
+    if (typeof visitKeep === "function") __api.visitKeep = visitKeep;
+    if (typeof claimStreak === "function") __api.claimStreak = claimStreak;
+    if (typeof streakPrize === "function") __api.streakPrize = streakPrize;
     return __api;
   `;
 
