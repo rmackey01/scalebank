@@ -83,6 +83,18 @@ export function boot(raw, opts){
     if (typeof streakPrize === "function") __api.streakPrize = streakPrize;
     if (typeof noteDailyVisit === "function") __api.noteDailyVisit = noteDailyVisit;
     if (typeof start === "function") __api.start = start;
+    if (typeof weatherKind === "function") __api.weatherKind = weatherKind;
+    if (typeof roundWeatherCoord === "function") __api.roundWeatherCoord = roundWeatherCoord;
+    if (typeof weatherFresh === "function") __api.weatherFresh = weatherFresh;
+    if (typeof weatherCached === "function") __api.weatherCached = weatherCached;
+    if (typeof weatherSky === "function") __api.weatherSky = weatherSky;
+    if (typeof weatherHuddle === "function") __api.weatherHuddle = weatherHuddle;
+    if (typeof weatherUrl === "function") __api.weatherUrl = weatherUrl;
+    if (typeof weatherResult === "function") __api.weatherResult = weatherResult;
+    if (typeof weatherDecision === "function") __api.weatherDecision = weatherDecision;
+    if (typeof keepSkyFile === "function") __api.keepSkyFile = keepSkyFile;
+    if (typeof weatherCacheRecord === "function") __api.weatherCacheRecord = weatherCacheRecord;
+    if (typeof storeWeather === "function") __api.storeWeather = storeWeather;
     return __api;
   `;
 

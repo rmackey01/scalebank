@@ -93,6 +93,11 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-spot.is-live::before{content:"";position:absolute;inset:-35%;border-radius:50%;pointer-events:none;mix-blend-mode:screen}
 .keep-forge.is-live::before{background:radial-gradient(ellipse at 50% 42%, rgba(255,226,160,.95), rgba(255,150,40,.5) 42%, transparent 72%)}
 .keep-pool.is-live::before{background:radial-gradient(ellipse at 50% 55%, rgba(220,248,255,.95), rgba(90,190,255,.55) 46%, transparent 74%)}
+/* Weather sits on the stage, above the tab bar, and does not pan with the painting. */
+.keep-weather{position:absolute;z-index:6;left:12px;bottom:36px;max-width:calc(100% - 24px);padding:6px 10px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.9);color:var(--gold-hi);font-size:12px;font-weight:700;letter-spacing:.02em;pointer-events:auto}
+.keep-weather[aria-pressed="true"]{border-color:var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206}
+.keep-weather:active{transform:translateY(1px)}
+.keep-credit{position:absolute;z-index:6;left:12px;bottom:10px;margin:0;font-size:10px;line-height:1.2;letter-spacing:.04em;color:var(--muted);text-decoration:none;pointer-events:auto}
 /* Pens are percentages of the full 1008×1792 painting, inside the same fit as the art. */
 .keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .keep-fence{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
@@ -745,6 +750,8 @@ button.dexchip{cursor:pointer}
       </div>
       </div>
       </div>
+      <button type="button" class="keep-weather" data-act="keep-weather" aria-pressed="false">Show my weather</button>
+      <a class="keep-credit" id="keepCredit" href="https://open-meteo.com/" hidden>Weather by Open-Meteo</a>
     </div>
     <button type="button" class="keep-build" data-act="keep-build">Build</button>
   </main>
@@ -1015,6 +1022,8 @@ function normKeep(k){
       if (id) base.shown[line] = id;
     });
   }
+  const weather = normWeather(k.weather);
+  if (weather) base.weather = weather;
   return base;
 }
 function hydrate(obj){
@@ -1507,6 +1516,8 @@ function setTab(t, sub){
     requestAnimationFrame(() => { syncKeepCover(); syncPens(); startPenLoop(); });
     noteDailyVisit();
     renderStreak();
+    syncWeatherChrome();
+    refreshWeather();
   }
   document.querySelectorAll(".tab").forEach((b, i) => { if (b.dataset.tab === t){ b.setAttribute("aria-current","page"); $(".tabs").style.setProperty("--ti", i); } else b.removeAttribute("aria-current"); });
   if (t === "vendors") requestAnimationFrame(() => scrollToScene(S.scene, false));
@@ -2255,6 +2266,7 @@ document.addEventListener("click", ev => {
   else if (a === "keep-build") toast("Coming soon");
   else if (a === "keep-forge"){ if (b.dataset.id) openCare(b.dataset.id); }
   else if (a === "keep-pool"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
+  else if (a === "keep-weather") toggleWeather();
   else if (a === "streak-claim"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "keep-ledger") openLedger();
   else if (a === "close-ledger") closeLedger();
@@ -2329,6 +2341,213 @@ function keepScrollPad(){
   const border = parseFloat(frame.borderTopWidth);
   const lift = (isFinite(ornament) && ornament < 0 ? -ornament : 0) + (isFinite(border) ? border : 0);
   return Math.ceil(rect.height + lift + 16);
+}
+/* Opt-in local sky. Rounded coordinates and the reading live on keep.weather; the key stays absent until the keeper asks. */
+const WEATHER_MS = 30 * 60 * 1000;
+const WEATHER_CODE = {
+  0:"clear", 1:"clear",
+  2:"cloudy", 3:"cloudy",
+  45:"fog", 48:"fog",
+  51:"rain", 53:"rain", 55:"rain", 56:"rain", 57:"rain",
+  61:"rain", 63:"rain", 65:"rain", 66:"rain", 67:"rain",
+  80:"rain", 81:"rain", 82:"rain",
+  71:"snow", 73:"snow", 75:"snow", 77:"snow", 85:"snow", 86:"snow",
+  95:"storm", 96:"storm", 99:"storm"
+};
+const WEATHER_SKY = {clear:1, cloudy:1, rain:1, snow:1, storm:1, fog:1, night:1};
+let skyKind = "";
+let weatherDenied = false;
+let weatherBusy = false;
+let weatherGen = 0;
+const skyFailed = new Set();
+function roundWeatherCoord(n){
+  if (n == null || n === "") return null;
+  const x = +n;
+  if (!Number.isFinite(x)) return null;
+  const r = Math.round(x * 10) / 10;
+  return Object.is(r, -0) ? 0 : r;
+}
+function weatherKind(code, isDay){
+  const named = WEATHER_CODE[+code];
+  const night = isDay === 0 || isDay === false;
+  if (named === "rain" || named === "snow" || named === "storm" || named === "fog") return named;
+  if (night) return "night";
+  if (named === "clear" || named === "cloudy") return named;
+  return "clear";
+}
+function weatherHuddle(kind){ return kind === "rain" || kind === "snow" || kind === "storm"; }
+function weatherSky(kind){
+  return WEATHER_SKY[kind] ? "art/keep/keep-weather-" + kind + ".webp" : null;
+}
+function keepSkyFile(kind, enabled){
+  if (!enabled) return "art/keep/keep-v6.webp";
+  return weatherSky(kind) || "art/keep/keep-v6.webp";
+}
+function weatherUrl(lat, lon){
+  const la = roundWeatherCoord(lat), lo = roundWeatherCoord(lon);
+  if (la == null || lo == null || la < -90 || la > 90 || lo < -180 || lo > 180) return null;
+  return "https://api.open-meteo.com/v1/forecast?latitude=" + la + "&longitude=" + lo + "&current=weather_code,is_day";
+}
+function weatherCacheRecord(lat, lon, code, day, ms){
+  const la = roundWeatherCoord(lat), lo = roundWeatherCoord(lon);
+  if (la == null || lo == null || !Number.isFinite(+code) || !Number.isFinite(+ms)) return null;
+  if (weatherUrl(la, lo) == null) return null;
+  return {on:true, at:+ms, lat:la, lon:lo, code:+code, day:(day === 0 || day === false) ? 0 : 1};
+}
+function weatherCached(w, ms){
+  if (!w || typeof w !== "object" || Array.isArray(w)) return false;
+  if (!Number.isFinite(+w.at) || !Number.isFinite(+ms)) return false;
+  const age = +ms - +w.at;
+  if (!(age >= 0 && age < WEATHER_MS)) return false;
+  if (roundWeatherCoord(w.lat) == null || roundWeatherCoord(w.lon) == null) return false;
+  if (!Number.isFinite(+w.code)) return false;
+  if (w.day !== 0 && w.day !== 1 && w.day !== true && w.day !== false) return false;
+  return true;
+}
+function weatherFresh(w, lat, lon, ms){
+  if (!weatherCached(w, ms)) return false;
+  return roundWeatherCoord(w.lat) === roundWeatherCoord(lat) && roundWeatherCoord(w.lon) === roundWeatherCoord(lon);
+}
+function weatherResult(json){
+  const cur = json && json.current;
+  if (!cur || !Number.isFinite(+cur.weather_code)) return null;
+  const code = +cur.weather_code;
+  const day = cur.is_day === 0 || cur.is_day === false ? 0 : 1;
+  const kind = weatherKind(code, day);
+  return {code, day, kind, sky:weatherSky(kind), huddle:weatherHuddle(kind)};
+}
+function weatherDecision(o){
+  const none = () => ({request:"none", url:null, sky:null, kind:null, huddle:false});
+  const fromCache = w => {
+    const kind = weatherKind(w.code, w.day);
+    return {request:"none", url:null, sky:weatherSky(kind), kind, huddle:weatherHuddle(kind)};
+  };
+  o = o || {};
+  if (!o.keepOn || !o.toggle) return none();
+  const placed = o.lat != null || o.lon != null;
+  if (!placed && o.cache && weatherCached(o.cache, o.now)) return fromCache(o.cache);
+  const lat = o.lat == null ? null : roundWeatherCoord(o.lat);
+  const lon = o.lon == null ? null : roundWeatherCoord(o.lon);
+  if (lat != null && lon != null && o.cache && weatherFresh(o.cache, lat, lon, o.now)) return fromCache(o.cache);
+  if (o.denied || o.failed) return none();
+  if (!placed) return {request:"geo", url:null, sky:null, kind:null, huddle:false};
+  if (lat == null || lon == null || weatherUrl(lat, lon) == null) return none();
+  return {request:"fetch", url:weatherUrl(lat, lon), sky:null, kind:null, huddle:false, lat, lon};
+}
+function normWeather(w){
+  if (!w || typeof w !== "object" || Array.isArray(w) || (w.on !== true && w.on !== false)) return null;
+  const rec = weatherCacheRecord(w.lat, w.lon, w.code, w.day, w.at);
+  if (!rec) return {on:w.on === true};
+  rec.on = w.on === true;
+  return rec;
+}
+function storeWeather(w){
+  if (!S || !S.keep) return null;
+  const n = normWeather(w);
+  if (n) S.keep.weather = n;
+  else delete S.keep.weather;
+  save();
+  return S.keep && S.keep.weather ? S.keep.weather : null;
+}
+function weatherOn(){ return !!(S && S.keep && S.keep.weather && S.keep.weather.on === true); }
+function syncWeatherChrome(){
+  const btn = $(".keep-weather");
+  const credit = $("#keepCredit");
+  const on = !!(keepOn() && weatherOn());
+  if (btn) btn.setAttribute("aria-pressed", on ? "true" : "false");
+  if (credit) credit.hidden = !on;
+}
+function setSkyKind(kind){
+  const next = kind || "";
+  const flip = weatherHuddle(skyKind) !== weatherHuddle(next);
+  skyKind = next;
+  paintKeepSky(next);
+  if (flip) penActors.forEach(actor => { actor.mode = "idle"; actor.until = 0; });
+  if (S && S.tab === "keep"){ penSig = ""; syncPens(); }
+}
+function skySrcIs(img, file){
+  const cur = (img && img.getAttribute("src")) || "";
+  return cur === file || cur.endsWith("/" + file);
+}
+function paintKeepSky(kind){
+  const img = $(".keep-bg");
+  if (!img || !keepOn()) return;
+  let next = keepSkyFile(kind, weatherOn());
+  if (next !== "art/keep/keep-v6.webp" && skyFailed.has(next)) next = "art/keep/keep-v6.webp";
+  if (skySrcIs(img, next)) return;
+  const asked = next;
+  img.classList.remove("is-ok");
+  img.onerror = () => {
+    img.onerror = null;
+    if (asked !== "art/keep/keep-v6.webp") skyFailed.add(asked);
+    if (skySrcIs(img, "art/keep/keep-v6.webp")) return;
+    img.src = "art/keep/keep-v6.webp";
+  };
+  img.src = next;
+}
+function toggleWeather(){
+  if (!keepOn() || !S) return;
+  if (!S.keep || typeof S.keep !== "object") S.keep = freshKeep();
+  if (weatherOn()){
+    weatherGen++;
+    weatherBusy = false;
+    weatherDenied = false;
+    const prev = S.keep.weather;
+    const rec = weatherCacheRecord(prev.lat, prev.lon, prev.code, prev.day, prev.at);
+    S.keep.weather = rec ? Object.assign({}, rec, {on:false}) : {on:false};
+    save();
+    setSkyKind("");
+    syncWeatherChrome();
+    return;
+  }
+  const prev = S.keep.weather && typeof S.keep.weather === "object" ? S.keep.weather : {};
+  S.keep.weather = Object.assign({}, prev, {on:true});
+  save();
+  syncWeatherChrome();
+  refreshWeather();
+}
+function refreshWeather(){
+  if (!keepOn() || !weatherOn()) return;
+  const w = S.keep.weather;
+  const ms = now();
+  if (weatherCached(w, ms)){ setSkyKind(weatherKind(w.code, w.day)); return; }
+  if (weatherDenied){ setSkyKind(""); return; }
+  if (weatherBusy) return;
+  const geo = typeof navigator !== "undefined" && navigator.geolocation;
+  if (!geo || typeof geo.getCurrentPosition !== "function"){ setSkyKind(""); return; }
+  const gen = weatherGen;
+  weatherBusy = true;
+  geo.getCurrentPosition(pos => {
+    if (gen !== weatherGen) return;
+    weatherBusy = false;
+    if (!keepOn() || !weatherOn()) return;
+    const coords = pos && pos.coords;
+    const lat = roundWeatherCoord(coords && coords.latitude);
+    const lon = roundWeatherCoord(coords && coords.longitude);
+    if (lat == null || lon == null){ setSkyKind(""); return; }
+    const cur = S.keep.weather;
+    if (weatherFresh(cur, lat, lon, now())){ setSkyKind(weatherKind(cur.code, cur.day)); return; }
+    const url = weatherUrl(lat, lon);
+    if (!url){ setSkyKind(""); return; }
+    fetch(url).then(r => r && r.ok ? r.json() : Promise.reject(new Error("weather"))).then(j => {
+      if (gen !== weatherGen || !keepOn() || !weatherOn()) return;
+      const read = weatherResult(j);
+      const rec = read && weatherCacheRecord(lat, lon, read.code, read.day, now());
+      if (!rec){ setSkyKind(""); return; }
+      S.keep.weather = rec;
+      save();
+      setSkyKind(read.kind);
+    }).catch(() => {
+      if (gen !== weatherGen || !keepOn() || !weatherOn()) return;
+      setSkyKind("");
+    });
+  }, () => {
+    if (gen !== weatherGen) return;
+    weatherBusy = false;
+    weatherDenied = true;
+    if (!keepOn() || !weatherOn()) return;
+    setSkyKind("");
+  }, {enableHighAccuracy:false, maximumAge:WEATHER_MS, timeout:10000});
 }
 function keepArt(img, url){
   if (!img || img.getAttribute("src")) return;
