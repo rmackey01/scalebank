@@ -712,7 +712,8 @@ const SCENES = [
   {id:"roost", name:"Cliff Roost", keeper:"A stranger \u00B7 storm eggs and night trails", quip:"Sells what the storm leaves behind. Doesn\u2019t haggle.", art:artRoostVideo, keys:["storm","tsparks"]}
 ];
 const KEY = "scalebank.v1";
-const SAVE_VER = 3;
+const BAK_KEY = "scalebank.bak.v3";
+const SAVE_VER = 4;
 const DEX_LINES = ITEMS.filter(i => i.kind === "egg").map(i => i.line);
 const MUT_KEYS = Object.keys(MUTATIONS);
 const DEX_KEYS = DEX_LINES.flatMap(l => [l, ...MUT_KEYS.map(m => l + ":" + m)]);
@@ -787,9 +788,42 @@ function loadMutArt(){
 }
 
 /* ================= state ================= */
-function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1, dex:{}, ver:SAVE_VER}; }
+/* restDay 0 is Sunday. */
+function freshKeep(){ return {roaming:[], stables:[], zones:[], care:{}, streak:{last:null, count:0, best:0}, restDay:0}; }
+function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1, dex:{}, keep:freshKeep(), ver:SAVE_VER}; }
 function asList(v){ return Array.isArray(v) ? v : []; }
 function asMap(v){ return v && typeof v === "object" && !Array.isArray(v) ? v : {}; }
+function asIdList(v){
+  if (!Array.isArray(v)) return [];
+  const out = [], seen = new Set();
+  v.forEach(id => {
+    const k = idKey(id);
+    if (k == null || seen.has(k)) return;
+    seen.add(k); out.push(k);
+  });
+  return out;
+}
+function idKey(id){
+  if (typeof id === "string" && id) return id;
+  if (typeof id === "number" && Number.isFinite(id)) return String(id);
+  return null;
+}
+function normKeep(k){
+  const base = freshKeep();
+  if (!k || typeof k !== "object" || Array.isArray(k)) return base;
+  base.roaming = asIdList(k.roaming);
+  base.stables = asIdList(k.stables);
+  base.zones = Array.isArray(k.zones) ? k.zones.slice() : [];
+  base.care = (k.care && typeof k.care === "object" && !Array.isArray(k.care)) ? k.care : {};
+  const s = k.streak;
+  if (s && typeof s === "object" && !Array.isArray(s)){
+    base.streak.last = (s.last == null || typeof s.last === "string" || typeof s.last === "number") ? (s.last ?? null) : null;
+    base.streak.count = Number.isFinite(+s.count) ? +s.count : 0;
+    base.streak.best = Number.isFinite(+s.best) ? +s.best : 0;
+  }
+  if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
+  return base;
+}
 function hydrate(obj){
   const st = Object.assign(fresh(), obj || {});
   if (!obj || !obj.ver) st.ver = 1;
@@ -799,6 +833,7 @@ function hydrate(obj){
   st.opened = asMap(st.opened);
   st.eggs = asList(st.eggs);
   st.dragons = asList(st.dragons);
+  st.keep = normKeep(st.keep);
   return st;
 }
 function load(){
@@ -1661,12 +1696,15 @@ function dexRecord(d){
   });
 }
 function dexSync(){
-  if (!S.dex || typeof S.dex !== "object") S.dex = {};
-  S.dragons.forEach(d => dexKeys(d).forEach(k => {
-    let e = S.dex[k];
-    if (!e) e = S.dex[k] = {first: null, n: S.dragons.filter(x => dexKeys(x).includes(k)).length, top: 0};
-    e.top = Math.max(e.top || 0, stageIdx(d));
-  }));
+  if (!S.dex || typeof S.dex !== "object" || Array.isArray(S.dex)) S.dex = {};
+  S.dragons.forEach(d => {
+    if (!d || typeof d !== "object") return;
+    dexKeys(d).forEach(k => {
+      let e = S.dex[k];
+      if (!e || typeof e !== "object" || Array.isArray(e)) e = S.dex[k] = {first: null, n: S.dragons.filter(x => x && typeof x === "object" && dexKeys(x).includes(k)).length, top: 0};
+      e.top = Math.max(e.top || 0, stageIdx(d));
+    });
+  });
 }
 function migrateDex(){
   S.dex = {};
@@ -2074,8 +2112,8 @@ function debugAct(a, b){
 const OLD_EGG = {ember:"ember", tide:"tide", forest:"forest", frost:"tide", inferno:"inferno", storm:"storm", void:"void", tempest:"tempest"};
 const OLD_SPECIES = ["Cinder","Soot","Brine","Kelp","Moss","Fernback","Frostling","Rimeback","Inferno","Cinderking","Stormling","Pearl Stormling","Voidling","Starveil","Tempest","Stormcrown"];
 function migrate(){
-  S.eggs = asList(S.eggs);
-  S.dragons = asList(S.dragons);
+  S.eggs = asList(S.eggs).filter(e => e && typeof e === "object" && !Array.isArray(e));
+  S.dragons = asList(S.dragons).filter(d => d && typeof d === "object" && !Array.isArray(d));
   S.owned = asMap(S.owned);
   S.bought = asMap(S.bought);
   S.opened = asMap(S.opened);
@@ -2105,16 +2143,73 @@ function migrateV3(){
     if (!e || typeof e !== "object") continue;
     e.top = Math.min(3, Math.max(0, e.top | 0));
   }
-  S.dragons.forEach(d => { if (!d.mut || !MUTATIONS[d.mut]) return;
+  S.dragons.forEach(d => { if (!d || !d.mut || !MUTATIONS[d.mut]) return;
     const k = d.line + ":" + d.mut, e = S.dex[k] || (S.dex[k] = {first:null, n:0, top:0});
-    if (!e.n) e.n = S.dragons.filter(x => dexKeys(x).includes(k)).length;
+    if (!e.n) e.n = S.dragons.filter(x => x && dexKeys(x).includes(k)).length;
     e.top = Math.max(e.top | 0, stageIdx(d)); });
 }
+/* Dragon Keep. Highest stage, then highest rarity, then id. Each id once: six roaming, the rest stabled. */
+const RARITY_RANK = {Common:0, Uncommon:1, Rare:2, Epic:3, Legendary:4};
+function dragonKey(d){ return d && typeof d === "object" ? idKey(d.id) : null; }
+function rarityRank(d){
+  const it = d && ITEM[d.item];
+  const r = it && RARITY_RANK[it.rarity];
+  return r == null ? -1 : r;
+}
+function migrateV4(){
+  try {
+    const owned = [];
+    asList(S.dragons).forEach((d, i) => {
+      const id = dragonKey(d);
+      if (id == null) return;
+      const prev = owned.find(o => o.id === id);
+      if (!prev){ owned.push({id, d, i}); return; }
+      const better = stageIdx(d) > stageIdx(prev.d) || (stageIdx(d) === stageIdx(prev.d) && rarityRank(d) > rarityRank(prev.d));
+      if (better){ prev.d = d; prev.i = i; }
+    });
+    const keep = normKeep(S.keep);
+    const placed = keep.roaming.concat(keep.stables);
+    const placedSet = new Set(placed);
+    const exact = placed.length === owned.length && placedSet.size === placed.length && owned.every(o => placedSet.has(o.id));
+    if (!exact){
+      owned.sort((a, b) => {
+        const ds = stageIdx(b.d) - stageIdx(a.d); if (ds) return ds;
+        const dr = rarityRank(b.d) - rarityRank(a.d); if (dr) return dr;
+        if (a.id < b.id) return -1;
+        if (a.id > b.id) return 1;
+        return a.i - b.i;
+      });
+      const ids = owned.map(o => o.id);
+      keep.roaming = ids.slice(0, 6);
+      keep.stables = ids.slice(6);
+      keep.zones = [];
+      keep.care = {};
+      keep.streak = {last:null, count:0, best:0};
+      keep.restDay = 0;
+    }
+    S.keep = keep;
+  } catch(e){ S.keep = freshKeep(); }
+}
+function backupV3(raw){
+  if (raw == null) return;
+  try { if (localStorage.getItem(BAK_KEY) == null) localStorage.setItem(BAK_KEY, raw); } catch(e){}
+}
 function start(data){
-  S = (data && data.state) ? hydrate(data.state) : (load() || fresh());
-  if (!S.opened) S.opened = {};
-  migrate();
-  if ((S.ver || 1) < 3){ migrateV3(); S.ver = 3; save(); }
+  let raw = null;
+  try { raw = localStorage.getItem(KEY); } catch(e){}
+  const injected = !!(data && data.state);
+  let corrupt = false;
+  if (!injected && raw != null){ try { JSON.parse(raw); } catch(e){ corrupt = true; } }
+  S = injected ? hydrate(data.state) : (load() || fresh());
+  if (!S.opened || typeof S.opened !== "object" || Array.isArray(S.opened)) S.opened = {};
+  const migrating = corrupt || (S.ver || 1) < 4;
+  if (migrating) backupV3(raw);
+  try {
+    migrate();
+    if ((S.ver || 1) < 3){ migrateV3(); S.ver = 3; }
+    if ((S.ver || 1) < 4){ migrateV4(); S.ver = 4; }
+  } catch(e){ S = fresh(); }
+  if (migrating) save();
   ITEMS.forEach(it => { if (S.owned[it.id]) for (let k = 1; k <= it.scene; k++) S.opened[k] = true; });
   applyDebugParams();
   shown = S.bank;
