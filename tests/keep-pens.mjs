@@ -121,6 +121,26 @@ add("mutations", t => {
   t.equal(g.spriteChain(other, withPix)[0].bag, "pixel", "a mutation with no entry uses the pixel art");
 });
 
+add("shown dragon", t => {
+  const high = [dragon("low", "cinder", 0), dragon("grown", "cinder", 120000), dragon("moon", "cinder", 0)];
+  high[2].mut = "moonlit";
+  const g = boot(save(high));
+  t.equal(g.shownDragon("cinder").id, "grown", "highest stage is shown");
+  t.equal(g.shownDragon("brine"), null, "an unowned breed has no dragon");
+  const pair = [dragon("plain", "moss", 30000), dragon("glow", "moss", 30000)];
+  pair[1].mut = "moonlit";
+  const moss = boot(save(pair));
+  t.equal(moss.shownDragon("moss").id, "glow", "a mutation wins a stage tie");
+  const picked = moss.snapshot();
+  picked.keep.shown = {moss: "plain"};
+  const over = boot(JSON.stringify(picked));
+  t.equal(over.shownDragon("moss").id, "plain", "a saved Ledger pick overrides the default");
+  t.equal(over.snapshot().keep.shown.moss, "plain", "the pick survives a reload");
+  const stale = over.snapshot();
+  stale.keep.shown = {moss: "gone"};
+  t.equal(boot(JSON.stringify(stale)).shownDragon("moss").id, "glow", "a missing pick falls back to the default");
+});
+
 add("breeds", t => {
   const g = boot(save([
     dragon("a", "cinder", 0),

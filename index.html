@@ -67,8 +67,18 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-streak .ks-best{margin:0;font-size:11px;line-height:1;letter-spacing:.02em;color:var(--muted);white-space:nowrap}
 .keep-streak .ks-note{display:none}
 .keep-streak .btn{min-width:0;width:auto;height:auto;margin:0;padding:0 7px;border-radius:999px;box-shadow:none;font-size:11px;line-height:1;white-space:nowrap}
-/* Invisible taps on the painted lectern and Build sign. A ring shows for keyboard focus only. */
-.keep-spot{position:absolute;z-index:4;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;font-size:0;line-height:0;cursor:pointer}
+/* Invisible taps on the painted lectern. A ring shows for keyboard focus only. */
+.keep-spot{position:absolute;z-index:4;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;font-size:0;line-height:0;cursor:pointer;pointer-events:auto}
+/* The painting no longer includes a header or a Build sign. Both sit in the same fit as the art. */
+.keep-head{position:absolute;z-index:6;left:2%;right:2%;top:.4%;height:3.4%;display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:none;color:#f4d78f;text-shadow:0 1px 2px #000,0 0 6px rgba(0,0,0,.75)}
+.keep-head h1{margin:0;min-width:0;font-family:var(--display);font-weight:700;font-size:calc(var(--ks,.39)*36px);letter-spacing:.16em;text-transform:uppercase;line-height:1;white-space:nowrap}
+.keep-head .kh-steps{position:absolute;left:0;margin:0;font-weight:700;font-variant-numeric:tabular-nums;font-size:calc(var(--ks,.39)*30px);letter-spacing:.02em;line-height:1;white-space:nowrap}
+.keep-build{position:absolute;z-index:6;display:flex;align-items:center;justify-content:center;margin:0;padding:0 2px;border:1.5px solid #5a3810;border-radius:8px;color:#3a2412;background:linear-gradient(180deg,rgba(255,244,214,.55),rgba(255,244,214,0) 42%),linear-gradient(180deg,#f0d59a 0%,#c8923e 48%,#8a5a1c 100%);box-shadow:inset 0 1px 0 rgba(255,248,220,.85),inset 0 -2px 0 rgba(74,40,8,.28),0 2px 3px rgba(0,0,0,.45);font-family:var(--display);font-weight:700;font-size:calc(var(--ks,.39)*20px);letter-spacing:.08em;line-height:1;text-transform:uppercase;cursor:pointer;pointer-events:auto}
+.keep-build:focus{outline:none}
+.keep-build:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.keep-filters{position:absolute;width:0;height:0;overflow:hidden}
+.keep-slot{position:absolute;margin:0;padding:0;border:0;background:transparent;line-height:0;pointer-events:auto}
+.keep-slot img{width:100%;height:100%;display:block;object-fit:fill;pointer-events:none}
 .keep-spot:focus{outline:none}
 .keep-spot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
 .keep-spot.is-live::before{content:"";position:absolute;inset:-35%;border-radius:50%;pointer-events:none;mix-blend-mode:screen}
@@ -705,12 +715,14 @@ button.dexchip{cursor:pointer}
       <div class="keep-clip" id="keepClip">
       <div class="keep-fit" id="keepFit">
         <img class="keep-bg keep-art" alt="" draggable="false">
+        <svg class="keep-filters" aria-hidden="true" focusable="false"><filter id="keepSlotTint" color-interpolation-filters="sRGB"><feColorMatrix id="keepSlotMatrix" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/></filter></svg>
+        <header class="keep-head"><p class="kh-steps" id="keepSteps">0 steps</p><h1>Dragon Keep</h1></header>
         <div class="keep-world" id="keepWorld"></div>
         <div class="keep-plates" id="keepPlates"></div>
         <div class="keep-wing" id="keepWing"><p class="wing-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span></p></div>
         <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
         <button type="button" class="keep-spot keep-pool" data-act="keep-pool" aria-label="Moon Pool" hidden></button>
-        <button type="button" class="keep-spot keep-build" data-act="keep-build" aria-label="Build"></button>
+        <button type="button" class="keep-build" data-act="keep-build">Build</button>
         <div class="keep-streak" id="keepStreak" hidden></div>
         <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"></button>
       </div>
@@ -937,7 +949,7 @@ function loadMutArt(){
 
 /* ================= state ================= */
 /* restDay 0 is Sunday. */
-function freshKeep(){ return {roaming:[], stables:[], zones:[], care:{}, streak:{last:null, count:0, best:0}, restDay:0}; }
+function freshKeep(){ return {roaming:[], stables:[], zones:[], care:{}, streak:{last:null, count:0, best:0}, restDay:0, shown:{}}; }
 function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1, dex:{}, keep:freshKeep(), ver:SAVE_VER}; }
 function asList(v){ return Array.isArray(v) ? v : []; }
 function asMap(v){ return v && typeof v === "object" && !Array.isArray(v) ? v : {}; }
@@ -977,6 +989,14 @@ function normKeep(k){
     if (typeof s.homeZone === "string" && s.homeZone) base.streak.homeZone = s.homeZone;
   }
   if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
+  base.shown = {};
+  const shown = k.shown;
+  if (shown && typeof shown === "object" && !Array.isArray(shown)){
+    DEX_LINES.forEach(line => {
+      const id = idKey(shown[line]);
+      if (id) base.shown[line] = id;
+    });
+  }
   return base;
 }
 function hydrate(obj){
@@ -1852,6 +1872,11 @@ function render(){
   if (S.tab === "dragon"){ if (DSUB === "bestiary") renderBestiary(); else renderDragon(); }
   if (keepOn() && !$("#ledgerOv").hidden) renderLedger();
   if (keepOn() && S.tab === "keep"){ syncPens(); syncKeepSpots(); }
+  renderKeepChrome();
+}
+function renderKeepChrome(){
+  const el = $("#keepSteps");
+  if (el) el.textContent = fmt(S && S.bank || 0) + " steps";
 }
 
 function dexRecord(d){
@@ -2340,9 +2365,10 @@ function syncPenFences(src){
       img.draggable = false;
       img.hidden = true;
       img.dataset.pen = pen.name;
-      img.style.zIndex = String(i * 20 + 10);
       world.appendChild(img);
     }
+    const z = penFenceZ(pen.name);
+    img.style.zIndex = String(z == null ? i * 20 + 10 : z);
     if (!variant){
       img.dataset.file = "";
       hidePenFence(img);
@@ -2356,6 +2382,7 @@ function syncPenFences(src){
     img.dataset.file = url;
     showPenFence(img, url);
   });
+  applySlotTint(variant);
 }
 function mountKeepArt(){
   if (!keepOn()) return;
@@ -2380,17 +2407,15 @@ const PENS = [
   {id:"green", x:45.14, y:83.15, w:26.79, h:8.37, at:5}
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
-/* The painting's bottom strip is a second tab bar. The scene stops above it. */
-const KEEP_PLAY_H = 1584;
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
 const KEEP_LEDGER = {x:62.6, y:42.5, w:19.2, h:7.8};
-const KEEP_BUILD = {x:88.6, y:81.4, w:8.8, h:5.2};
+const KEEP_BUILD = {x:70, y:88.2, w:26, h:3.6};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
 const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
 const KEEP_STREAK = {x:18, y:4.12, w:60, h:2.35};
 /* Cleared stone where the painted lock was. */
 const KEEP_WING = {x:68.5, y:60.9, w:31.2, h:20.3};
-let spriteBook = null, spriteAsked = false, spotBook = null;
+let spriteBook = null, spriteAsked = false, spotBook = null, slotMap = null;
 const spriteMode = new Map();
 const penActors = new Map();
 const penEls = new Map();
@@ -2466,8 +2491,9 @@ function loadSpriteBook(){
   Promise.all([
     read("art/keep/sprites/manifest.json"),
     read("art/keep/sprites/pixel/manifest.json"),
-    read("art/keep/pen-spots.json")
-  ]).then(([oldM, pixM, spots]) => {
+    read("art/keep/pen-spots.json"),
+    read("art/keep/slot-map.json")
+  ]).then(([oldM, pixM, spots, slots]) => {
     const old = oldM && oldM.sprites ? oldM : {frames:8, sprites:{}};
     spriteBook = {
       frames: old.frames || 8,
@@ -2478,6 +2504,8 @@ function loadSpriteBook(){
     };
     const readSpots = readSpotBook(spots);
     if (readSpots) spotBook = readSpots;
+    const readSlots = readSlotMap(slots);
+    if (readSlots) slotMap = readSlots;
     penSig = "";
     syncPens();
   });
@@ -2606,16 +2634,17 @@ function measureKeepWorld(){
   if (!stage || !fit || !world || !scroll || !clip) return false;
   const availW = stage.clientWidth, availH = stage.clientHeight;
   if (availW < 20 || availH < 20) return false;
-  /* Width fit. The painted tab bar is clipped, and the rest can scroll clear of the real one. */
+  /* Width fit of the whole painting. Header, slots, fences, and Build share this scale. */
   const scale = availW / KEEP_W;
-  const rw = availW, rh = KEEP_H * scale, sceneH = KEEP_PLAY_H * scale;
+  const rw = availW, rh = KEEP_H * scale;
   const pad = keepScrollPad();
   fit.style.width = rw + "px";
   fit.style.height = rh + "px";
   fit.style.left = "0px";
   fit.style.top = "0px";
-  clip.style.height = sceneH + "px";
-  scroll.style.height = (sceneH + pad) + "px";
+  fit.style.setProperty("--ks", String(scale));
+  clip.style.height = rh + "px";
+  scroll.style.height = (rh + pad) + "px";
   scroll.style.paddingBottom = pad + "px";
   world.style.left = "0";
   world.style.top = "0";
@@ -2655,9 +2684,8 @@ function plaqueOverlap(a, b, gap){
 function nudgePlaque(el, dx, dy, fit){
   const left = parseFloat(el.style.left) + dx / fit.width * 100;
   const top = parseFloat(el.style.top) + dy / fit.height * 100;
-  const scene = KEEP_PLAY_H / KEEP_H * 100;
   el.style.left = Math.max(6, Math.min(94, left)).toFixed(3) + "%";
-  el.style.top = Math.max(2, Math.min(scene - 2, top)).toFixed(3) + "%";
+  el.style.top = Math.max(2, Math.min(98, top)).toFixed(3) + "%";
 }
 function layoutPlaques(){
   const plates = $("#keepPlates");
@@ -2904,6 +2932,219 @@ function startPenLoop(){
   if (penRaf || !penLive() || penStill()) return;
   penRaf = requestAnimationFrame(penTick);
 }
+/* One shown dragon per breed. Highest stage, mutated wins a tie, and a saved Ledger pick overrides both. */
+function mutRank(d){ return d && d.mut && MUTATIONS[d.mut] ? 1 : 0; }
+function shownDragon(line){
+  const owned = asList(S && S.dragons).filter(d => d && d.line === line);
+  if (!owned.length) return null;
+  const pick = normKeep(S.keep).shown[line];
+  if (pick){
+    const chosen = owned.find(d => dragonKey(d) === pick);
+    if (chosen) return chosen;
+  }
+  return owned.slice().sort((a, b) => stageIdx(b) - stageIdx(a) || mutRank(b) - mutRank(a) || String(dragonKey(a)).localeCompare(String(dragonKey(b))))[0];
+}
+function readSlotMap(json){
+  if (!json || typeof json !== "object" || !json.slots || typeof json.slots !== "object") return null;
+  const slots = {};
+  let n = 0;
+  Object.keys(json.slots).forEach(line => {
+    const s = json.slots[line];
+    if (!s || typeof s !== "object") return;
+    const x = +s.x, y = +s.y, w = +s.w, h = +s.h, drawOrder = +s.drawOrder;
+    if (![x, y, w, h, drawOrder].every(Number.isFinite) || w <= 0 || h <= 0) return;
+    slots[line] = {pen: typeof s.pen === "string" ? s.pen : "", x, y, w, h, feetY: Number.isFinite(+s.feetY) ? +s.feetY : y + h, drawOrder};
+    n++;
+  });
+  if (!n) return null;
+  const tint = {};
+  if (json.tint && typeof json.tint === "object"){
+    Object.keys(json.tint).forEach(key => {
+      const row = json.tint[key];
+      if (Array.isArray(row) && row.length >= 4 && row.slice(0, 4).every(v => Number.isFinite(+v))) tint[key] = row.slice(0, 4).map(Number);
+    });
+  }
+  return {slots, tint};
+}
+function slotLines(){
+  if (!slotMap || !slotMap.slots) return [];
+  return Object.keys(slotMap.slots).map(line => ({line, slot: slotMap.slots[line]})).sort((a, b) => a.slot.drawOrder - b.slot.drawOrder);
+}
+function penFenceZ(name){
+  const rows = slotLines().filter(row => row.slot.pen === name);
+  if (!rows.length) return null;
+  return Math.max.apply(null, rows.map(row => row.slot.drawOrder * 2)) + 1;
+}
+function slotCandidates(d){
+  if (!d || !d.line) return [];
+  const line = d.line;
+  const stage = STAGES[stageIdx(d)].name.toLowerCase();
+  const mut = d.mut && MUTATIONS[d.mut] ? d.mut : "";
+  const urls = [];
+  if (mut) urls.push("art/keep/sprites/slot/" + line + "-" + mut + "-" + stage + ".webp");
+  urls.push("art/keep/sprites/slot/" + line + "-" + stage + ".webp");
+  if (mut) urls.push("art/keep/sprites/slot/" + line + "-" + mut + ".webp");
+  urls.push("art/keep/sprites/slot/" + line + ".webp");
+  return urls;
+}
+const slotFile = new Map();
+function askSlot(url){
+  if (slotFile.has(url)) return;
+  slotFile.set(url, "pend");
+  fetch(url).then(r => r.ok ? r.blob() : null).then(blob => {
+    slotFile.set(url, blob ? URL.createObjectURL(blob) : "miss");
+    penSig = "";
+    if (keepOn() && S && S.tab === "keep") syncPens();
+  }).catch(() => {
+    slotFile.set(url, "miss");
+    penSig = "";
+    if (keepOn() && S && S.tab === "keep") syncPens();
+  });
+}
+/* null means every candidate missed. "pend" means a file is still being checked. */
+function slotSrc(d){
+  const urls = slotCandidates(d);
+  for (let i = 0; i < urls.length; i++){
+    const hit = slotFile.get(urls[i]);
+    if (hit && hit !== "miss" && hit !== "pend") return hit;
+    if (hit === "pend") return "pend";
+    if (hit === "miss") continue;
+    askSlot(urls[i]);
+    return "pend";
+  }
+  return null;
+}
+function applySlotTint(variant){
+  const row = slotMap && slotMap.tint && slotMap.tint[variant];
+  const tint = row || [1, 1, 1, 1];
+  const r = tint[0] * tint[3], g = tint[1] * tint[3], b = tint[2] * tint[3];
+  const mat = $("#keepSlotMatrix");
+  if (mat) mat.setAttribute("values", r + " 0 0 0 0  0 " + g + " 0 0 0  0 0 " + b + " 0 0  0 0 0 1 0");
+  const identity = Math.abs(r - 1) < 1e-4 && Math.abs(g - 1) < 1e-4 && Math.abs(b - 1) < 1e-4;
+  document.querySelectorAll(".keep-slot").forEach(el => { el.style.filter = identity ? "" : "url(#keepSlotTint)"; });
+}
+function dropPixel(id){
+  penActors.delete(id);
+  const el = penEls.get(id);
+  if (el) el.remove();
+  penEls.delete(id);
+}
+/* Pixel strips and the 6-spot packer, used only when a slot file is missing or the map has not loaded. */
+function syncPixelActors(world, open, allow){
+  const roaming = allow ? [...allow] : normKeep(S.keep).roaming;
+  const live = new Set();
+  const slots = new Map();
+  if (open > 0) roaming.forEach((id, i) => {
+    if (!ledgerDragon(id)) return;
+    const pen = PENS[i % open];
+    const list = slots.get(pen.id) || [];
+    list.push(id);
+    slots.set(pen.id, list);
+  });
+  const seat = new Map();
+  slots.forEach((ids, penId) => {
+    const dragons = ids.map((id, ord) => {
+      const d = ledgerDragon(id);
+      return {id, stage: d ? stageIdx(d) : 0, ord};
+    });
+    assignSpots(dragons, penSpots(penId)).forEach((slot, id) => seat.set(id, slot));
+  });
+  if (open > 0) roaming.forEach((id, i) => {
+    const d = ledgerDragon(id);
+    if (!d) return;
+    live.add(id);
+    const pen = PENS[i % open];
+    const mates = slots.get(pen.id) || [id];
+    const chain = spriteChain(d);
+    const chainSig = chain.map(s => s.bag + ":" + s.kind + ":" + s.file).join("|");
+    let actor = penActors.get(id);
+    const slot = seat.has(id) ? seat.get(id) : 0;
+    if (!actor){
+      actor = {id, pen: pen.id, key: spriteKey(d), chain, chainSig, step:0, spec: chain[0] ? chain[0].spec : null, kind:"load", x:0, y:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, slot:-1, count:0, dirty:true};
+      placeActor(actor, pen, slot, mates.length);
+      penActors.set(id, actor);
+    } else if (actor.pen !== pen.id || actor.slot !== slot || actor.count !== mates.length){
+      actor.pen = pen.id;
+      placeActor(actor, pen, slot, mates.length);
+    }
+    if (actor.chainSig !== chainSig){
+      actor.chain = chain;
+      actor.chainSig = chainSig;
+      actor.step = 0;
+      actor.frame = 0;
+      actor.acc = 0;
+      actor.shown = -1;
+      actor.spec = chain[0] ? chain[0].spec : null;
+    }
+    let el = penEls.get(id);
+    if (!el || !el.classList.contains("pen-dragon")){
+      if (el) el.remove();
+      el = document.createElement("button");
+      el.type = "button";
+      el.className = "pen-dragon";
+      el.dataset.act = "pen-dragon";
+      el.dataset.id = id;
+      el.innerHTML = '<span class="pen-shadow"></span><span class="pen-sprite is-ph"><svg viewBox="0 0 72 48" aria-hidden="true"><path fill="#e8bd5f" d="M2 31c5-2 9 0 13 2 0 5 5 9 12 9 9 0 16-6 20-11 2 2 6 3 9 1 2-2 2-5 0-7 4-1 7-4 7-8 0-5-5-8-9-7-1-5-7-8-12-6-2 1-4 3-5 6-6-6-16-6-20-1-1 2-1 5 0 7-6 1-12 4-14 10-4 1-7 0-9-1z"/><path fill="#c4923a" d="M22 22c7-12 18-9 17 3-7 1-13-1-17-3z"/><path fill="#f6e2a8" d="M44 24c3-7 10-9 14-6 2 2 3 4 2 6-5 2-11 2-16 0z"/><path fill="#b8862e" d="M56 20l14 3-14 3zM22 38l-2 8h6zM34 38l-2 8h6z"/></svg></span>';
+      world.appendChild(el);
+      penEls.set(id, el);
+    }
+    const stageName = STAGES[stageIdx(d)].name;
+    el.setAttribute("aria-label", (d.name || d.species || "Dragon") + ", " + stageName);
+    el._px = spritePx(d, actor.spec, actor);
+    probeActor(id);
+    paintEl(el, actor);
+    drawActor(actor);
+  });
+  [...penActors.keys()].forEach(id => { if (!live.has(id)) dropPixel(id); });
+}
+function syncSlotDragons(world){
+  const rows = slotLines();
+  const fallback = new Set();
+  const placed = new Set();
+  rows.forEach(row => {
+    const d = shownDragon(row.line);
+    let el = world.querySelector('.keep-slot[data-line="' + row.line + '"]');
+    if (!d){
+      if (el) el.remove();
+      return;
+    }
+    const id = dragonKey(d);
+    placed.add(id);
+    dropPixel(id);
+    if (!el){
+      el = document.createElement("button");
+      el.type = "button";
+      el.className = "keep-slot";
+      el.dataset.act = "pen-dragon";
+      el.dataset.line = row.line;
+      el.innerHTML = '<img alt="" draggable="false">';
+      world.appendChild(el);
+    }
+    el.dataset.id = id;
+    el.setAttribute("aria-label", (d.name || d.species || row.line) + ", " + STAGES[stageIdx(d)].name);
+    const slot = row.slot;
+    el.style.left = (slot.x / KEEP_W * 100) + "%";
+    el.style.top = (slot.y / KEEP_H * 100) + "%";
+    el.style.width = (slot.w / KEEP_W * 100) + "%";
+    el.style.height = (slot.h / KEEP_H * 100) + "%";
+    el.style.zIndex = String(slot.drawOrder * 2);
+    const src = slotSrc(d);
+    const img = el.querySelector("img");
+    if (src && src !== "pend"){
+      if (img.getAttribute("src") !== src) img.src = src;
+      el.hidden = false;
+    } else if (src === "pend"){
+      el.hidden = true;
+    } else {
+      el.remove();
+      fallback.add(id);
+    }
+  });
+  world.querySelectorAll(".keep-slot").forEach(el => {
+    if (!rows.some(row => row.line === el.dataset.line)) el.remove();
+  });
+  return {fallback, placed};
+}
 function syncPens(){
   if (!keepOn() || !S || S.tab !== "keep") return;
   const world = $("#keepWorld");
@@ -2924,81 +3165,24 @@ function syncPens(){
   const wing = $("#keepWing");
   if (wing) wing.classList.toggle("is-open", !wingLocked());
   layoutPlaques();
+  const bg = $(".keep-bg");
+  const variant = fenceVariant(bg ? bg.getAttribute("src") : "");
   const roaming = normKeep(S.keep).roaming;
-  const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
-    + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
+  const shownSig = slotLines().map(row => {
+    const d = shownDragon(row.line);
+    return row.line + "=" + (d ? dragonKey(d) + ":" + stageIdx(d) + ":" + (d.mut || "") : "");
+  }).join(",");
+  const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + (slotMap ? "s" : "p") + "|" + variant + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
+    + shownSig + "|" + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
   if (sig !== penSig){
     penSig = sig;
-    const live = new Set();
-    const slots = new Map();
-    if (open > 0) roaming.forEach((id, i) => {
-      if (!ledgerDragon(id)) return;
-      const pen = PENS[i % open];
-      const list = slots.get(pen.id) || [];
-      list.push(id);
-      slots.set(pen.id, list);
-    });
-    const seat = new Map();
-    slots.forEach((ids, penId) => {
-      const dragons = ids.map((id, ord) => {
-        const d = ledgerDragon(id);
-        return {id, stage: d ? stageIdx(d) : 0, ord};
-      });
-      assignSpots(dragons, penSpots(penId)).forEach((slot, id) => seat.set(id, slot));
-    });
-    if (open > 0) roaming.forEach((id, i) => {
-      const d = ledgerDragon(id);
-      if (!d) return;
-      live.add(id);
-      const pen = PENS[i % open];
-      const mates = slots.get(pen.id) || [id];
-      const chain = spriteChain(d);
-      const chainSig = chain.map(s => s.bag + ":" + s.kind + ":" + s.file).join("|");
-      let actor = penActors.get(id);
-      const slot = seat.has(id) ? seat.get(id) : 0;
-      if (!actor){
-        actor = {id, pen: pen.id, key: spriteKey(d), chain, chainSig, step:0, spec: chain[0] ? chain[0].spec : null, kind:"load", x:0, y:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, slot:-1, count:0, dirty:true};
-        placeActor(actor, pen, slot, mates.length);
-        penActors.set(id, actor);
-      } else if (actor.pen !== pen.id || actor.slot !== slot || actor.count !== mates.length){
-        actor.pen = pen.id;
-        placeActor(actor, pen, slot, mates.length);
-      }
-      if (actor.chainSig !== chainSig){
-        actor.chain = chain;
-        actor.chainSig = chainSig;
-        actor.step = 0;
-        actor.frame = 0;
-        actor.acc = 0;
-        actor.shown = -1;
-        actor.spec = chain[0] ? chain[0].spec : null;
-      }
-      let el = penEls.get(id);
-      if (!el){
-        el = document.createElement("button");
-        el.type = "button";
-        el.className = "pen-dragon";
-        el.dataset.act = "pen-dragon";
-        el.dataset.id = id;
-        el.innerHTML = '<span class="pen-shadow"></span><span class="pen-sprite is-ph"><svg viewBox="0 0 72 48" aria-hidden="true"><path fill="#e8bd5f" d="M2 31c5-2 9 0 13 2 0 5 5 9 12 9 9 0 16-6 20-11 2 2 6 3 9 1 2-2 2-5 0-7 4-1 7-4 7-8 0-5-5-8-9-7-1-5-7-8-12-6-2 1-4 3-5 6-6-6-16-6-20-1-1 2-1 5 0 7-6 1-12 4-14 10-4 1-7 0-9-1z"/><path fill="#c4923a" d="M22 22c7-12 18-9 17 3-7 1-13-1-17-3z"/><path fill="#f6e2a8" d="M44 24c3-7 10-9 14-6 2 2 3 4 2 6-5 2-11 2-16 0z"/><path fill="#b8862e" d="M56 20l14 3-14 3zM22 38l-2 8h6zM34 38l-2 8h6z"/></svg></span>';
-        world.appendChild(el);
-        penEls.set(id, el);
-      }
-      const stageName = STAGES[stageIdx(d)].name;
-      el.setAttribute("aria-label", (d.name || d.species || "Dragon") + ", " + stageName);
-      el._px = spritePx(d, actor.spec, actor);
-      probeActor(id);
-      paintEl(el, actor);
-      drawActor(actor);
-    });
-    [...penActors.keys()].forEach(id => {
-      if (live.has(id)) return;
-      penActors.delete(id);
-      const el = penEls.get(id);
-      if (el) el.remove();
-      penEls.delete(id);
-    });
+    if (slotMap){
+      const slot = syncSlotDragons(world);
+      syncPixelActors(world, open, slot.fallback);
+    } else syncPixelActors(world, open, null);
+    syncPenFences(bg ? bg.getAttribute("src") : "");
   }
+  applySlotTint(variant);
   markPenReady();
   if (penStill()) stopPenLoop();
   else startPenLoop();
