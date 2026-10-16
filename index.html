@@ -60,11 +60,12 @@ html.keep-open .tabs{position:relative;z-index:2}
 /* Full painting width stays on screen (the locked wing is at the right edge). The frame clips the baked tab strip. */
 .keep-frame{position:absolute;left:0;top:0;width:100%;aspect-ratio:1008/1572;overflow:hidden;pointer-events:none}
 .keep-bg{position:absolute;left:0;top:0;width:100%;height:calc(100% * 1792 / 1572);max-width:none;object-fit:fill;object-position:center top}
-.keep-streak{position:absolute;z-index:5;left:20%;top:5%;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;width:54%;padding:2px 6px 2px 10px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);pointer-events:auto}
-.keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.1;color:var(--gold-hi);white-space:nowrap}
-.keep-streak .ks-best{margin:0;font-size:11px;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
-.keep-streak .ks-note{flex:1 0 100%;margin:0;font-size:11px;line-height:1.25;color:var(--gold-hi)}
-.keep-streak .btn{min-width:0;width:auto;margin:0 0 0 auto;padding:3px 8px;font-size:11px;line-height:1.2;white-space:nowrap}
+/* Slim one-line pill in the sky band under the painted header. It does not grow over the castle. */
+.keep-streak{position:absolute;z-index:5;display:flex;flex-flow:row nowrap;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;overflow:hidden;padding:0 8px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);pointer-events:auto}
+.keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:12px;line-height:1;color:var(--gold-hi);white-space:nowrap}
+.keep-streak .ks-best{margin:0;font-size:11px;line-height:1;letter-spacing:.02em;color:var(--muted);white-space:nowrap}
+.keep-streak .ks-note{display:none}
+.keep-streak .btn{min-width:0;width:auto;height:auto;margin:0;padding:0 7px;border-radius:999px;box-shadow:none;font-size:11px;line-height:1;white-space:nowrap}
 /* Invisible taps on the painted lectern and Build sign. A ring shows for keyboard focus only. */
 .keep-spot{position:absolute;z-index:4;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;font-size:0;line-height:0;cursor:pointer}
 .keep-spot:focus{outline:none}
@@ -84,7 +85,7 @@ html.keep-open .tabs{position:relative;z-index:2}
 .wing-lock{position:absolute;left:50%;top:50%;width:88%;max-width:100%;box-sizing:border-box;transform:translate(-50%,-50%);margin:0;padding:6px 8px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);color:var(--gold-hi);font-size:12px;font-weight:700;line-height:1.25;text-align:center}
 .wing-lock span{display:block;margin-top:2px;font-size:11px;font-weight:700}
 .keep-wing.is-open{display:none}
-.pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto}
+.pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto;transition:none}
 .pen-dragon:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:10px}
 .pen-sprite{position:relative;display:block;background-repeat:no-repeat;background-position:left center}
 .pen-sprite svg{display:none;width:100%;height:100%}
@@ -2273,7 +2274,7 @@ const KEEP_LEDGER = {x:62.6, y:42.5, w:19.2, h:7.8};
 const KEEP_BUILD = {x:88.6, y:81.4, w:8.8, h:5.2};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
 const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
-const KEEP_STREAK = {x:22, y:4.15, w:52};
+const KEEP_STREAK = {x:18, y:4.12, w:60, h:2.35};
 /* Cleared stone where the painted lock was. Snow art sits 8px lower. */
 const KEEP_WING = {x:68.5, y:60.9, w:31.2, h:20.3};
 const KEEP_WING_SNOW_Y = 61.4;
@@ -2490,32 +2491,27 @@ function penLimits(pen){
   const mx = Math.min(pen.w * 0.28, (28 / rw) * 100);
   return {x0: pen.x + mx, x1: pen.x + pen.w - mx, y0: pen.y + pen.h * 0.62, y1: pen.y + pen.h * 0.92};
 }
+/* One fixed spot per dragon. Feet stay on the pen floor. Nothing walks or slides. */
 function placeActor(actor, pen, slot, count){
   const box = penLimits(pen);
   const n = Math.max(1, count || 1);
   const span = (box.x1 - box.x0) / n;
   const h = u32(actor.id + ":home");
-  actor.x = box.x0 + span * (slot || 0) + span * (0.28 + (h % 400) / 1000);
-  actor.y = box.y0 + (box.y1 - box.y0) * (0.2 + ((h >>> 12) % 650) / 1000);
+  const i = Math.max(0, slot || 0);
+  actor.x = box.x0 + span * (i + 0.5);
+  actor.y = box.y0 + (box.y1 - box.y0) * 0.72;
   actor.mode = "idle";
   actor.face = (h & 1) ? -1 : 1;
-  actor.until = penNow() / 1000 + 0.35 + (h % 1600) / 1000;
+  actor.until = penNow() / 1000 + 6 + (h % 8000) / 1000;
   actor.seed = 1;
+  actor.slot = i;
+  actor.count = n;
   actor.dirty = true;
-}
-function retarget(actor, pen, now){
-  const box = penLimits(pen);
-  const h = u32(actor.id + ":go:" + actor.seed);
-  actor.seed = (actor.seed + 1) | 0;
-  actor.tx = box.x0 + (box.x1 - box.x0) * ((h & 65535) / 65535);
-  actor.ty = box.y0 + (box.y1 - box.y0) * (((h >>> 16) & 65535) / 65535);
-  actor.mode = "walk";
-  actor.until = now + 8;
 }
 function drawActor(actor){
   const el = penEls.get(actor.id);
   if (!el) return;
-  if (actor.dirty || actor.mode === "walk"){
+  if (actor.dirty){
     el.style.left = actor.x.toFixed(3) + "%";
     el.style.top = actor.y.toFixed(3) + "%";
     actor.dirty = false;
@@ -2530,24 +2526,10 @@ function drawActor(actor){
 }
 function stepActors(dt, now){
   penActors.forEach(actor => {
-    const pen = PENS.find(p => p.id === actor.pen);
-    if (!pen) return;
-    if (actor.mode !== "walk"){
-      if (now >= actor.until) retarget(actor, pen, now);
-    } else {
-      const dx = actor.tx - actor.x, dy = actor.ty - actor.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist < 0.35 || now >= actor.until){
-        actor.mode = "idle";
-        actor.until = now + 1.3 + (u32(actor.id + ":idle:" + actor.seed) % 1800) / 1000;
-        actor.seed = (actor.seed + 1) | 0;
-      } else {
-        const step = Math.min(dist, 4.2 * dt);
-        actor.x += dx / dist * step;
-        actor.y += dy / dist * step;
-        if (dx < -0.08) actor.face = -1;
-        else if (dx > 0.08) actor.face = 1;
-      }
+    if (now >= actor.until){
+      actor.face = actor.face < 0 ? 1 : -1;
+      actor.seed = (actor.seed + 1) | 0;
+      actor.until = now + 6 + (u32(actor.id + ":flip:" + actor.seed) % 8000) / 1000;
     }
     const el = penEls.get(actor.id);
     const spec = actor.spec;
@@ -2623,13 +2605,14 @@ function syncPens(){
       const chain = spriteChain(d);
       const chainSig = chain.map(s => s.bag + ":" + s.kind + ":" + s.file).join("|");
       let actor = penActors.get(id);
+      const slot = mates.indexOf(id);
       if (!actor){
-        actor = {id, pen: pen.id, key: spriteKey(d), chain, chainSig, step:0, spec: chain[0] ? chain[0].spec : null, kind:"load", x:0, y:0, tx:0, ty:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, dirty:true};
-        placeActor(actor, pen, mates.indexOf(id), mates.length);
+        actor = {id, pen: pen.id, key: spriteKey(d), chain, chainSig, step:0, spec: chain[0] ? chain[0].spec : null, kind:"load", x:0, y:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, slot:-1, count:0, dirty:true};
+        placeActor(actor, pen, slot, mates.length);
         penActors.set(id, actor);
-      } else if (actor.pen !== pen.id){
+      } else if (actor.pen !== pen.id || actor.slot !== slot || actor.count !== mates.length){
         actor.pen = pen.id;
-        placeActor(actor, pen, mates.indexOf(id), mates.length);
+        placeActor(actor, pen, slot, mates.length);
       }
       if (actor.chainSig !== chainSig){
         actor.chain = chain;
@@ -3140,14 +3123,12 @@ function renderStreak(){
   const streak = streakBag();
   const viewed = prepareHome(streak);
   if (viewed.fresh) save();
-  const day = viewed.day;
   const rest = viewed.weekday === restDayNum();
   const prize = streakPrize(streak.count);
   const blocked = !claimable(streak);
-  const note = rest ? `<p class="ks-note">${SABBATH_NOTE}</p>` : "";
   const label = rest ? "Sabbath rest" : (blocked ? "Claimed today" : "Claim " + fmt(prize) + " steps");
   el.hidden = false;
-  el.innerHTML = `<p class="ks-day">Day ${streak.count || 0}</p><p class="ks-best">Best ${streak.best || 0}</p>${note}<button type="button" class="btn" data-act="streak-claim"${rest || blocked || prize <= 0 ? " disabled" : ""}>${label}</button>`;
+  el.innerHTML = `<p class="ks-day">Day ${streak.count || 0}</p><p class="ks-best">Best ${streak.best || 0}</p><button type="button" class="btn" data-act="streak-claim"${rest || blocked || prize <= 0 ? " disabled" : ""}>${label}</button>`;
   syncKeepSpots({rest, blocked, prize});
 }
 /* The Forge glows when a dragon can be cared for. The Moon Pool glows when today's steps can be claimed. */
