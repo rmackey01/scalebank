@@ -298,5 +298,755 @@
     }
    ]
   }
+ },
+ "stormling": {
+  "moonlit": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b9a285"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b8a083"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#baa285"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#b09980"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "The moth wings double \u00b7 More wing eyes open \u00b7 The tail streams longer"
+    },
+    {
+     "key": "j2a",
+     "panelH": 640,
+     "change": "Swept horns appear \u00b7 The wings tower higher \u00b7 The neck lengthens"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A flowing white mane \u00b7 Massive and broad \u00b7 A carved runestone base"
+    }
+   ]
+  },
+  "obsidian": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b8a083"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b29678"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#a88767"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#573624"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "Wing feathers catch fire \u00b7 The beak sharpens \u00b7 Lava cracks spread"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "Flaming wings spread \u00b7 A burning crest \u00b7 Smoke rolls in"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "Huge and hunched \u00b7 A wall of fire behind \u00b7 The ground runs with lava"
+    }
+   ]
+  },
+  "gilded": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b79f81"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b4997b"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#b19678"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#9f856e"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "The jeweled wings widen \u00b7 The crown grows \u00b7 The tail streamers lengthen"
+    },
+    {
+     "key": "j2a",
+     "panelH": 640,
+     "change": "Taller and slimmer \u00b7 Rubies brighten on the wings \u00b7 A prouder pose"
+    },
+    {
+     "key": "a2e",
+     "panelH": 600,
+     "change": "Golden ram horns \u00b7 A larger crown \u00b7 A carved golden throne"
+    }
+   ]
+  },
+  "aurora": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b8a083"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b99f80"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#b89e7f"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#9e8e96"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The light streamers grow longer \u00b7 The fin ears widen"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "The streamers become a flowing gown \u00b7 The head sharpens"
+    },
+    {
+     "key": "a2e",
+     "panelH": 600,
+     "change": "Wings of light appear \u00b7 A spiked crest \u00b7 Coiled on a tall spire"
+    }
+   ]
+  }
+ },
+ "brine": {
+  "moonlit": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b1a795"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b2a796"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#b3a797"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#79746f"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The jelly bell grows \u00b7 The legs lengthen \u00b7 Trailing tendrils"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "A long swan neck \u00b7 The bell glows brighter \u00b7 A longer tail"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "Tendrils pour down like rain \u00b7 A coral spire base \u00b7 Water swirls below"
+    }
+   ]
+  },
+  "obsidian": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#ada28f"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#aa9d8a"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#6e5544"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#594234"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The fins flare like flames \u00b7 The coils thicken \u00b7 Steam rises"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "A giant serpent coil \u00b7 Rising tall \u00b7 The rock floods with lava"
+    },
+    {
+     "key": "a2e",
+     "panelH": 600,
+     "change": "A fiercer head \u00b7 Brighter magma seams \u00b7 Lava falls pour down"
+    }
+   ]
+  },
+  "gilded": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b1a694"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#aea28f"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#aa9e8c"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#9e9184"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "A taller pearl crown \u00b7 Pearl strands wrap the body \u00b7 The tail fin flares"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "A flowing mane \u00b7 The pearls double \u00b7 A larger clam shell"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A crowned elder \u00b7 Pearls spill everywhere \u00b7 Crystals ring the shell"
+    }
+   ]
+  },
+  "aurora": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b1a795"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#ada290"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#a69a8b"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#908681"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The lure lamp grows \u00b7 Purple fins spread \u00b7 Starry scales"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "The neck lengthens \u00b7 The fins grow fuller \u00b7 The lure brightens"
+    },
+    {
+     "key": "a2e",
+     "panelH": 600,
+     "change": "A spiked crest \u00b7 Glowing violet mist \u00b7 A dark crag base"
+    }
+   ]
+  }
+ },
+ "inferno": {
+  "moonlit": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#d0bb9d"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#ceb899"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#cab292"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#c8ad8d"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "Ice wings sprout \u00b7 The horns curl longer \u00b7 The frost tail-orb sharpens"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "Massive ram horns \u00b7 A heavy, bear-like body \u00b7 Frosty breath"
+    },
+    {
+     "key": "a2e",
+     "panelH": 600,
+     "change": "Broader and older \u00b7 Frost crystals spread \u00b7 A taller rock base"
+    }
+   ]
+  },
+  "obsidian": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#cbb698"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#c4ac8c"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#c0a684"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#997e63"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "Wings of lava unfold \u00b7 The volcano erupts higher \u00b7 Magma veins spread"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "The wings fold away \u00b7 Ram horns curl \u00b7 A spiked tail mace"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A hulking bulldog body \u00b7 The volcano roars \u00b7 Lava floods the rock"
+    }
+   ]
+  },
+  "gilded": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#ceb99a"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#cbb494"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#c6ad8d"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#ba9f7e"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The armor grows \u00b7 The war banner rises \u00b7 The helmet sharpens"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "Ram horns \u00b7 Gemmed armor plates \u00b7 A heavier stance"
+    },
+    {
+     "key": "a2e",
+     "panelH": 600,
+     "change": "Taller and battle-worn \u00b7 A larger banner \u00b7 A jagged lava crag"
+    }
+   ]
+  },
+  "aurora": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#ccb89b"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#cbb494"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#c8af8f"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#c3a887"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "Iridescent wings unfold \u00b7 The crystal crest brightens"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "The wings fold away \u00b7 Ram horns curl \u00b7 A heavier body"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "An older, broader face \u00b7 The crystal crest flares \u00b7 A taller rock base"
+    }
+   ]
+  }
+ },
+ "moss": {
+  "moonlit": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#e8d5b7"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#dec8a8"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#dbc4a3"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#d4b997"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "Antlers branch out \u00b7 Glowing mushrooms spread \u00b7 The rock turns mossy"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "Taller antlers \u00b7 Hanging moss beards \u00b7 A longer neck"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "Roots grip the stone \u00b7 Ancient bark scales \u00b7 Blue mushrooms everywhere"
+    }
+   ]
+  },
+  "obsidian": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#e9d6b6"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#e2cbab"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#d8bb95"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#c8a47b"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "Smoking antlers \u00b7 The ember leaves grow \u00b7 The body bulks up"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "A burning autumn crown \u00b7 Lava veins spread \u00b7 A heavier stance"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A blazing tree on the back \u00b7 The rock cracks with lava \u00b7 Older and broader"
+    }
+   ]
+  },
+  "gilded": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#e9d5b4"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#ecd8b6"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#e6cba0"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#dfbc88"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The fruit tree grows taller \u00b7 More golden fruit \u00b7 The shell widens"
+    },
+    {
+     "key": "j2a",
+     "panelH": 640,
+     "change": "A full golden canopy \u00b7 A heavier, armored body \u00b7 The coins pile up"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A great orchard crown \u00b7 A craggier face \u00b7 Gold leaves blanket the rock"
+    }
+   ]
+  },
+  "aurora": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#e9d6b7"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#e7d2b2"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#e6cdac"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#e3c7a3"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "The glowing vines grow longer \u00b7 Antlers sprout \u00b7 The legs lengthen"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "Taller antlers \u00b7 The vines drape like a mane \u00b7 A leaner body"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "An ancient elder \u00b7 Vines pour down to the roots \u00b7 A mossy stump base"
+    }
+   ]
+  }
+ },
+ "tempest": {
+  "moonlit": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#baa58a"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b5a086"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#af9b86"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#948579"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 640,
+     "change": "The antlers branch \u00b7 The wings grow fuller \u00b7 A crescent glows on the brow"
+    },
+    {
+     "key": "j2a",
+     "panelH": 640,
+     "change": "Taller and leaner \u00b7 Blue light veins appear \u00b7 The wings spread wide"
+    },
+    {
+     "key": "a2e",
+     "panelH": 600,
+     "change": "A broader chest \u00b7 The crescent brightens \u00b7 A crystal-lit crag"
+    }
+   ]
+  },
+  "obsidian": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b9a388"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b69e80"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#a78d71"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#9c7e5f"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The spikes lengthen \u00b7 Lava cracks spread \u00b7 The tail spines grow"
+    },
+    {
+     "key": "j2a",
+     "panelH": 640,
+     "change": "A heavier, wingless body \u00b7 The rock cracks with lava \u00b7 A taller crest"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "A hulking elder \u00b7 Molten seams glow hotter \u00b7 Lava pours from the rock"
+    }
+   ]
+  },
+  "gilded": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#b9a385"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#b69e7e"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#b49877"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#9a784c"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The wings unfold \u00b7 A sapphire collar \u00b7 A taller crest"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "The wings spread wide \u00b7 A longer neck \u00b7 The hoard grows"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "Armored and broad \u00b7 A gemmed chest plate \u00b7 A mountain of gold"
+    }
+   ]
+  },
+  "aurora": {
+   "stages": [
+    {
+     "key": "1_hatchling",
+     "edge": "#bea88c"
+    },
+    {
+     "key": "2_juvenile",
+     "edge": "#baa488"
+    },
+    {
+     "key": "3_adult",
+     "edge": "#b5a089"
+    },
+    {
+     "key": "4_elder",
+     "edge": "#8b8586"
+    }
+   ],
+   "reveals": [
+    {
+     "key": "h2j",
+     "panelH": 600,
+     "change": "The light wings widen \u00b7 Taller horns \u00b7 The streamers lengthen"
+    },
+    {
+     "key": "j2a",
+     "panelH": 600,
+     "change": "The wings tower higher \u00b7 A spiked crest \u00b7 The neck stretches up"
+    },
+    {
+     "key": "a2e",
+     "panelH": 640,
+     "change": "Massive glowing wings \u00b7 Light pours down \u00b7 A stone tower perch"
+    }
+   ]
+  }
  }
 }

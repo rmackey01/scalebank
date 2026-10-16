@@ -1,0 +1,226 @@
+{
+ "1_hatchling_moonlit": {
+  "mismatch": 13.2,
+  "method": "pingpong",
+  "seam_jump": 3.18,
+  "median_step": 4.5,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 334868,
+   ".webm": 303091,
+   "-poster.webp": 30126,
+   ".webp": 33052
+  }
+ },
+ "1_hatchling_obsidian": {
+  "mismatch": 8.4,
+  "method": "pingpong",
+  "seam_jump": 2.28,
+  "median_step": 5.56,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 429574,
+   ".webm": 400665,
+   "-poster.webp": 30068,
+   ".webp": 32602
+  }
+ },
+ "1_hatchling_gilded": {
+  "mismatch": 18.8,
+  "method": "pingpong",
+  "seam_jump": 2.62,
+  "median_step": 5.76,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 496350,
+   ".webm": 453990,
+   "-poster.webp": 47258,
+   ".webp": 51616
+  }
+ },
+ "1_hatchling_aurora": {
+  "mismatch": 8.2,
+  "method": "pingpong",
+  "seam_jump": 2.27,
+  "median_step": 3.71,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 316181,
+   ".webm": 269332,
+   "-poster.webp": 30006,
+   ".webp": 33454
+  }
+ },
+ "2_juvenile_moonlit": {
+  "mismatch": 20.1,
+  "method": "pingpong",
+  "seam_jump": 3.4,
+  "median_step": 6.39,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 457836,
+   ".webm": 423682,
+   "-poster.webp": 47516,
+   ".webp": 53466
+  }
+ },
+ "2_juvenile_obsidian": {
+  "mismatch": 35.9,
+  "method": "pingpong",
+  "seam_jump": 4.23,
+  "median_step": 6.03,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 621388,
+   ".webm": 615405,
+   "-poster.webp": 50990,
+   ".webp": 56984
+  }
+ },
+ "2_juvenile_gilded": {
+  "mismatch": 14.0,
+  "method": "pingpong",
+  "seam_jump": 4.54,
+  "median_step": 5.52,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 531286,
+   ".webm": 447543,
+   "-poster.webp": 62058,
+   ".webp": 68994
+  }
+ },
+ "2_juvenile_aurora": {
+  "mismatch": 13.9,
+  "method": "pingpong",
+  "seam_jump": 2.63,
+  "median_step": 6.07,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 444166,
+   ".webm": 413172,
+   "-poster.webp": 52616,
+   ".webp": 60290
+  }
+ },
+ "3_adult_moonlit": {
+  "mismatch": 16.0,
+  "method": "pingpong",
+  "seam_jump": 3.28,
+  "median_step": 5.29,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 432510,
+   ".webm": 384842,
+   "-poster.webp": 49332,
+   ".webp": 53024
+  }
+ },
+ "3_adult_obsidian": {
+  "mismatch": 16.6,
+  "method": "pingpong",
+  "seam_jump": 4.91,
+  "median_step": 9.71,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 893061,
+   ".webm": 878688,
+   "-poster.webp": 71564,
+   ".webp": 80700
+  }
+ },
+ "3_adult_gilded": {
+  "mismatch": 16.6,
+  "method": "pingpong",
+  "seam_jump": 3.48,
+  "median_step": 6.67,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 549065,
+   ".webm": 504264,
+   "-poster.webp": 69884,
+   ".webp": 77276
+  }
+ },
+ "3_adult_aurora": {
+  "mismatch": 17.5,
+  "method": "pingpong",
+  "seam_jump": 3.37,
+  "median_step": 4.91,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 519664,
+   ".webm": 447583,
+   "-poster.webp": 63864,
+   ".webp": 73128
+  }
+ },
+ "4_elder_moonlit": {
+  "mismatch": 20.6,
+  "method": "pingpong",
+  "seam_jump": 3.76,
+  "median_step": 6.65,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 590568,
+   ".webm": 514809,
+   "-poster.webp": 71364,
+   ".webp": 80932
+  }
+ },
+ "4_elder_obsidian": {
+  "mismatch": 24.2,
+  "method": "pingpong",
+  "seam_jump": 5.46,
+  "median_step": 8.59,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 912259,
+   ".webm": 843957,
+   "-poster.webp": 81732,
+   ".webp": 92622
+  }
+ },
+ "4_elder_gilded": {
+  "mismatch": 27.8,
+  "method": "pingpong",
+  "seam_jump": 6.32,
+  "median_step": 8.8,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 820302,
+   ".webm": 792823,
+   "-poster.webp": 91632,
+   ".webp": 104038
+  }
+ },
+ "4_elder_aurora": {
+  "mismatch": 24.2,
+  "method": "pingpong",
+  "seam_jump": 5.4,
+  "median_step": 6.76,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 634393,
+   ".webm": 572360,
+   "-poster.webp": 80322,
+   ".webp": 92404
+  }
+ }
+}
