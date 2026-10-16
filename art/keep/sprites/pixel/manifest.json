@@ -1,0 +1,258 @@
+{
+ "frames": 8,
+ "fps": 4,
+ "sprites": {
+  "cinder-hatchling": {
+   "file": "cinder-hatchling.webp",
+   "still": "cinder-hatchling-still.webp",
+   "frameWidth": 84,
+   "frameHeight": 74,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "cinder-juvenile": {
+   "file": "cinder-juvenile.webp",
+   "still": "cinder-juvenile-still.webp",
+   "frameWidth": 117,
+   "frameHeight": 99,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "cinder-adult": {
+   "file": "cinder-adult.webp",
+   "still": "cinder-adult-still.webp",
+   "frameWidth": 142,
+   "frameHeight": 124,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "cinder-elder": {
+   "file": "cinder-elder.webp",
+   "still": "cinder-elder-still.webp",
+   "frameWidth": 134,
+   "frameHeight": 149,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "inferno-hatchling": {
+   "file": "inferno-hatchling.webp",
+   "still": "inferno-hatchling-still.webp",
+   "frameWidth": 84,
+   "frameHeight": 74,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "inferno-juvenile": {
+   "file": "inferno-juvenile.webp",
+   "still": "inferno-juvenile-still.webp",
+   "frameWidth": 114,
+   "frameHeight": 99,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "inferno-adult": {
+   "file": "inferno-adult.webp",
+   "still": "inferno-adult-still.webp",
+   "frameWidth": 137,
+   "frameHeight": 124,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "inferno-elder": {
+   "file": "inferno-elder.webp",
+   "still": "inferno-elder-still.webp",
+   "frameWidth": 155,
+   "frameHeight": 149,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "brine-hatchling": {
+   "file": "brine-hatchling.webp",
+   "still": "brine-hatchling-still.webp",
+   "frameWidth": 91,
+   "frameHeight": 74,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "brine-juvenile": {
+   "file": "brine-juvenile.webp",
+   "still": "brine-juvenile-still.webp",
+   "frameWidth": 101,
+   "frameHeight": 99,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "brine-adult": {
+   "file": "brine-adult.webp",
+   "still": "brine-adult-still.webp",
+   "frameWidth": 115,
+   "frameHeight": 124,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "brine-elder": {
+   "file": "brine-elder.webp",
+   "still": "brine-elder-still.webp",
+   "frameWidth": 125,
+   "frameHeight": 149,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "voidling-hatchling": {
+   "file": "voidling-hatchling.webp",
+   "still": "voidling-hatchling-still.webp",
+   "frameWidth": 81,
+   "frameHeight": 74,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "voidling-juvenile": {
+   "file": "voidling-juvenile.webp",
+   "still": "voidling-juvenile-still.webp",
+   "frameWidth": 116,
+   "frameHeight": 99,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "voidling-adult": {
+   "file": "voidling-adult.webp",
+   "still": "voidling-adult-still.webp",
+   "frameWidth": 120,
+   "frameHeight": 124,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "voidling-elder": {
+   "file": "voidling-elder.webp",
+   "still": "voidling-elder-still.webp",
+   "frameWidth": 148,
+   "frameHeight": 149,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "stormling-hatchling": {
+   "file": "stormling-hatchling.webp",
+   "still": "stormling-hatchling-still.webp",
+   "frameWidth": 78,
+   "frameHeight": 74,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "stormling-juvenile": {
+   "file": "stormling-juvenile.webp",
+   "still": "stormling-juvenile-still.webp",
+   "frameWidth": 97,
+   "frameHeight": 99,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "stormling-adult": {
+   "file": "stormling-adult.webp",
+   "still": "stormling-adult-still.webp",
+   "frameWidth": 110,
+   "frameHeight": 124,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "stormling-elder": {
+   "file": "stormling-elder.webp",
+   "still": "stormling-elder-still.webp",
+   "frameWidth": 142,
+   "frameHeight": 149,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "moss-hatchling": {
+   "file": "moss-hatchling.webp",
+   "still": "moss-hatchling-still.webp",
+   "frameWidth": 96,
+   "frameHeight": 74,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "moss-juvenile": {
+   "file": "moss-juvenile.webp",
+   "still": "moss-juvenile-still.webp",
+   "frameWidth": 118,
+   "frameHeight": 99,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "moss-adult": {
+   "file": "moss-adult.webp",
+   "still": "moss-adult-still.webp",
+   "frameWidth": 146,
+   "frameHeight": 124,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "moss-elder": {
+   "file": "moss-elder.webp",
+   "still": "moss-elder-still.webp",
+   "frameWidth": 161,
+   "frameHeight": 149,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "tempest-hatchling": {
+   "file": "tempest-hatchling.webp",
+   "still": "tempest-hatchling-still.webp",
+   "frameWidth": 68,
+   "frameHeight": 74,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "tempest-juvenile": {
+   "file": "tempest-juvenile.webp",
+   "still": "tempest-juvenile-still.webp",
+   "frameWidth": 99,
+   "frameHeight": 99,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "tempest-adult": {
+   "file": "tempest-adult.webp",
+   "still": "tempest-adult-still.webp",
+   "frameWidth": 124,
+   "frameHeight": 124,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  },
+  "tempest-elder": {
+   "file": "tempest-elder.webp",
+   "still": "tempest-elder-still.webp",
+   "frameWidth": 161,
+   "frameHeight": 149,
+   "frames": 8,
+   "fps": 4,
+   "anchor": "bottom-center"
+  }
+ }
+}
