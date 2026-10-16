@@ -66,11 +66,31 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-hot{position:absolute;z-index:3;left:27%;top:70%;width:46%;height:14%;padding:0;border:0;background:transparent;color:var(--gold-hi)}
 .keep-hot span{position:absolute;left:50%;bottom:10%;transform:translateX(-50%);padding:5px 12px;border-radius:999px;background:rgba(12,16,21,.82);border:1px solid var(--gold-lo);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
 .keep-hot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:12px}
-.ledger{width:min(100%,380px);max-height:100%;display:flex;flex-direction:column;gap:12px}
-.ledger-sheet{min-height:280px;max-height:min(680px,calc(100vh - 180px));border:1px solid var(--gold-lo);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,#2a241c,#14110e)}
-.ledger-sheet img{display:block;width:100%;height:100%;min-height:280px;object-fit:contain}
-.ledger p{margin:0;text-align:center;color:var(--muted)}
-.ledger .btn{align-self:center;min-width:140px}
+.ledger{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:10px}
+.ledger-sheet{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--gold-lo);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,#2a241c,#14110e)}
+.ledger-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;pointer-events:none}
+.ledger-body{position:relative;z-index:1;flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;padding:14px 12px 10px;background:linear-gradient(180deg,rgba(20,17,14,.84),rgba(12,10,8,.62) 30%,rgba(12,10,8,.8))}
+.ledger-body h2{margin:0;text-align:center;font-family:var(--display);font-weight:600;font-size:26px;line-height:1.1;color:var(--gold-hi)}
+.ldg-swap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin:0;text-align:center;color:var(--gold-hi);font-size:13px}
+.ldg-swap .btn{min-width:0;padding:6px 10px;font-size:12px}
+.ldg-sec{min-width:0}
+.ldg-sec h3{margin:0 0 4px;font-family:var(--display);font-weight:600;font-size:16px;line-height:1.2;color:var(--fg)}
+.ldg-stables-sec{flex:1;min-height:0;display:flex;flex-direction:column}
+.ldg-stables{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.ldg-list{list-style:none;margin:0;padding:0}
+.ldg-empty{margin:0 0 6px;color:var(--muted);font-size:13px}
+.ldg-row{display:grid;grid-template-columns:40px minmax(0,1fr);column-gap:8px;row-gap:1px;align-items:center;padding:6px 2px;border-bottom:1px solid rgba(216,169,75,.22)}
+.ldg-row.is-pick{background:rgba(216,169,75,.2);border-radius:10px;box-shadow:inset 0 0 0 1px var(--gold)}
+.ldg-art{grid-column:1;grid-row:1 / span 3;width:40px;height:40px}
+.ldg-art .dart{width:40px;height:40px;aspect-ratio:auto;border-radius:8px}
+.ldg-name{grid-column:2;justify-self:start;max-width:100%;background:none;border:0;padding:0;font-family:var(--display);font-weight:600;font-size:17px;line-height:1.1;color:var(--gold-hi);text-align:left}
+.ldg-name:hover{text-decoration:underline}
+.ldg-meta{grid-column:2;font-size:12px;color:var(--muted)}
+.ldg-meta .r{font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:11px}
+.ldg-acts{grid-column:2;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ldg-acts .btn,.ldg-swap .btn{min-width:0;padding:5px 8px;border-radius:9px;font-size:12px;white-space:nowrap}
+.ldg-hint{margin:0 0 6px;color:var(--gold-hi);font-size:12px}
+.ledger > .btn{align-self:center;min-width:140px}
 
 /* ---------- shared bits ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
@@ -653,9 +673,11 @@ button.dexchip{cursor:pointer}
   <div class="overlay bst-journal" id="dexOv" hidden></div>
   <div class="overlay reveal-ov" id="revealOv" hidden></div>
   <div class="overlay" id="ledgerOv" hidden>
-    <div class="ledger" role="dialog" aria-modal="true" aria-label="Ledger">
-      <div class="ledger-sheet"><img class="keep-art" alt=""></div>
-      <p>Nothing written here yet.</p>
+    <div class="ledger" role="dialog" aria-modal="true" aria-label="Keeper's Ledger">
+      <div class="ledger-sheet">
+        <img class="ledger-bg keep-art" alt="">
+        <div class="ledger-body" id="ledgerBody"></div>
+      </div>
       <button type="button" class="btn" data-act="close-ledger">Close</button>
     </div>
   </div>
@@ -1733,6 +1755,7 @@ function render(){
   if (S.tab === "vendors") renderVendors();
   if (S.tab === "nest") renderNest();
   if (S.tab === "dragon"){ if (DSUB === "bestiary") renderBestiary(); else renderDragon(); }
+  if (document.documentElement.classList.contains("keep-on") && !$("#ledgerOv").hidden) renderLedger();
 }
 
 function dexRecord(d){
@@ -2067,6 +2090,12 @@ document.addEventListener("click", ev => {
   else if (a === "keep-build") toast("Coming soon");
   else if (a === "keep-ledger") openLedger();
   else if (a === "close-ledger") closeLedger();
+  else if (a === "ledger-dragon") openLedgerDragon(b.dataset.id);
+  else if (a === "ledger-rest"){ if (moveKeep("rest", b.dataset.id) && ledgerPick === b.dataset.id) ledgerPick = null; renderLedger(); }
+  else if (a === "ledger-send"){ if (moveKeep("send", b.dataset.id)) renderLedger(); }
+  else if (a === "ledger-swap"){ if (ledgerPick === b.dataset.id) ledgerPick = null; else ledgerPick = b.dataset.id; renderLedger(); }
+  else if (a === "ledger-swap-do"){ if (moveKeep("swap", ledgerPick, b.dataset.id)) ledgerPick = null; renderLedger(); }
+  else if (a === "ledger-swap-cancel"){ ledgerPick = null; renderLedger(); }
   else if (a === "dex-replay"){ const d = S.dragons.find(x => x.id === b.dataset.id); closeDex(); if (d) replayReveal(d); }
   else if (a === "share") openShare();
   else if (a === "close-share"){ $("#shareOv").hidden = true; $("#shareOv").innerHTML = ""; autoHatch(); }
@@ -2122,10 +2151,46 @@ function mountKeepArt(){
   keepArt($(".tab-keep .ti.off"), "art/keep/icon_keep_inactive.png");
   keepArt($(".tab-keep .ti.on"), "art/keep/icon_keep_active.png");
 }
+let ledgerPick = null;
+function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || null; }
+function ledgerRow(id, kind){
+  const d = ledgerDragon(id); if (!d) return "";
+  const picked = ledgerPick === id;
+  const full = S.keep.roaming.length >= 6;
+  let acts;
+  if (kind === "roam"){
+    acts = `<button type="button" class="btn ghost" data-act="ledger-rest" data-id="${esc(id)}">Rest</button><button type="button" class="btn ghost" data-act="ledger-swap" data-id="${esc(id)}" aria-pressed="${picked ? "true" : "false"}">Swap</button>`;
+  } else {
+    const send = `<button type="button" class="btn" data-act="ledger-send" data-id="${esc(id)}"${full ? ` disabled aria-describedby="ldgFull"` : ""}>Send to Keep</button>`;
+    const swap = ledgerPick ? `<button type="button" class="btn" data-act="ledger-swap-do" data-id="${esc(id)}">Swap</button>` : "";
+    acts = send + swap;
+  }
+  return `<li class="ldg-row${picked ? " is-pick" : ""}"><div class="ldg-art">${dragonArt(d)}</div><button type="button" class="ldg-name" data-act="ledger-dragon" data-id="${esc(id)}">${esc(d.name || d.species)}</button><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div><div class="ldg-acts">${acts}</div></li>`;
+}
+function renderLedger(){
+  const body = $("#ledgerBody");
+  if (!body || !document.documentElement.classList.contains("keep-on")) return;
+  const keep = normKeep(S.keep);
+  if (ledgerPick && keep.roaming.indexOf(ledgerPick) < 0) ledgerPick = null;
+  const pick = ledgerPick && ledgerDragon(ledgerPick);
+  const full = keep.roaming.length >= 6;
+  const roamRows = keep.roaming.map(id => ledgerRow(id, "roam")).join("");
+  const stabRows = keep.stables.map(id => ledgerRow(id, "stab")).join("");
+  body.innerHTML = `<h2>Keeper's Ledger</h2>
+    ${pick ? `<p class="ldg-swap" role="status">Pick a dragon in the stables to swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
+    <section class="ldg-sec"><h3>Roaming in the Keep (${keep.roaming.length}/6)</h3>${roamRows ? `<ul class="ldg-list">${roamRows}</ul>` : `<p class="ldg-empty">No one is roaming.</p>`}</section>
+    <section class="ldg-sec ldg-stables-sec"><h3>Resting in the Stables (${keep.stables.length})</h3>${full ? `<p class="ldg-hint" id="ldgFull">Keep is full, swap instead</p>` : ""}<div class="ldg-stables">${stabRows ? `<ul class="ldg-list">${stabRows}</ul>` : `<p class="ldg-empty">The stables are empty.</p>`}</div></section>`;
+}
+function openLedgerDragon(id){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  const d = ledgerDragon(id); if (!d) return;
+  S.prize = d.id; ledgerPick = null; setTab("dragon");
+}
 function openLedger(){
   if (!document.documentElement.classList.contains("keep-on")) return;
   const ov = $("#ledgerOv");
-  keepArt(ov.querySelector(".ledger-sheet img"), "art/keep/ledger-v3.webp");
+  keepArt(ov.querySelector(".ledger-bg"), "art/keep/ledger-v3.webp");
+  renderLedger();
   ov.hidden = false;
   const b = ov.querySelector("[data-act=close-ledger]");
   if (b) b.focus();
@@ -2133,6 +2198,7 @@ function openLedger(){
 function closeLedger(){
   const ov = $("#ledgerOv");
   if (!ov || ov.hidden) return;
+  ledgerPick = null;
   ov.hidden = true;
   const hot = $(".keep-hot");
   if (hot && !$("#keep").hidden) hot.focus();
@@ -2325,6 +2391,28 @@ function reconcileKeep(){
     if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
   }
 }
+/* One write for a keep move. save() reconciles, so the two lists stay a partition of owned ids, roaming at most 6. */
+function moveKeep(op, id, other){
+  const a = idKey(id), b = idKey(other);
+  const keep = normKeep(S.keep);
+  const roaming = keep.roaming.slice(), stables = keep.stables.slice();
+  const owned = new Set();
+  asList(S.dragons).forEach(d => { const k = dragonKey(d); if (k != null) owned.add(k); });
+  const has = (list, k) => k != null && list.indexOf(k) >= 0;
+  let nextR = roaming, nextS = stables, ok = false;
+  if (op === "send" && has(stables, a) && !has(roaming, a) && owned.has(a) && roaming.length < 6){
+    nextS = stables.filter(k => k !== a); nextR = roaming.concat(a); ok = true;
+  } else if (op === "rest" && has(roaming, a) && !has(stables, a) && owned.has(a)){
+    nextR = roaming.filter(k => k !== a); nextS = stables.concat(a); ok = true;
+  } else if (op === "swap" && a !== b && has(roaming, a) && !has(stables, a) && has(stables, b) && !has(roaming, b) && owned.has(a) && owned.has(b)){
+    nextR = roaming.map(k => k === a ? b : k); nextS = stables.map(k => k === b ? a : k); ok = true;
+  }
+  if (!ok) return false;
+  keep.roaming = nextR; keep.stables = nextS; S.keep = keep;
+  save();
+  return true;
+}
+try { window.__moveKeep = moveKeep; } catch(e){}
 function start(data){
   let raw = null;
   try { raw = localStorage.getItem(KEY); } catch(e){}
