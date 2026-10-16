@@ -58,6 +58,7 @@ html.keep-on #keep{position:relative;overflow:hidden;background:var(--ink)}
 html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;right:0;top:0;bottom:var(--keep-tab,16px);overflow:hidden}
 html.keep-open .tabs{position:relative;z-index:2}
 .keep-fit{position:absolute;pointer-events:none}
+.keep-fill{position:absolute;left:0;right:0;pointer-events:none;background:linear-gradient(180deg,#070708 0%,#10141a 100%)}
 .keep-bg{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
 /* Slim one-line pill in the sky band under the painted header. It does not grow over the castle. */
 .keep-streak{position:absolute;z-index:5;display:flex;flex-flow:row nowrap;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;overflow:hidden;padding:0 8px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);pointer-events:auto}
@@ -92,9 +93,9 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-wing{position:absolute;z-index:3;pointer-events:none}
 .keep-wing.is-open{display:none}
 .pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto;transition:none}
-.pen-dragon::before{content:"";position:absolute;z-index:0;left:50%;bottom:0;width:60%;aspect-ratio:5/2;height:auto;transform:translate(-50%,40%);border-radius:50%;background:rgba(0,0,0,.45);filter:blur(5px);pointer-events:none}
+.pen-shadow{position:absolute;z-index:1;left:50%;bottom:0;border-radius:50%;background:rgba(0,0,0,.5);filter:blur(3px);pointer-events:none;transform:translate(-50%,45%)}
 .pen-dragon:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:10px}
-.pen-sprite{position:relative;z-index:1;display:block;background-repeat:no-repeat;background-position:left center}
+.pen-sprite{position:relative;z-index:2;display:block;background-repeat:no-repeat;background-position:left center}
 .pen-sprite svg{display:none;width:100%;height:100%}
 .pen-sprite.is-ph svg{display:block}
 .ledger{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
@@ -700,6 +701,7 @@ button.dexchip{cursor:pointer}
 
   <main id="keep" class="screen" aria-label="Keep" hidden>
     <div class="keep-stage">
+      <div class="keep-fill" id="keepFill"></div>
       <div class="keep-fit" id="keepFit">
         <img class="keep-bg keep-art" alt="" draggable="false">
         <div class="keep-world" id="keepWorld"></div>
@@ -2291,7 +2293,7 @@ const KEEP_STREAK = {x:18, y:4.12, w:60, h:2.35};
 /* Cleared stone where the painted lock was. Snow art sits 8px lower. */
 const KEEP_WING = {x:68.5, y:60.9, w:31.2, h:20.3};
 const KEEP_WING_SNOW_Y = 61.4;
-let spriteBook = null, spriteAsked = false;
+let spriteBook = null, spriteAsked = false, spotBook = null;
 const spriteMode = new Map();
 const penActors = new Map();
 const penEls = new Map();
@@ -2365,7 +2367,11 @@ function loadSpriteBook(){
   if (!keepOn() || spriteAsked) return;
   spriteAsked = true;
   const read = url => fetch(url).then(r => r.ok ? r.json() : null).catch(() => null);
-  Promise.all([read("art/keep/sprites/manifest.json"), read("art/keep/sprites/pixel/manifest.json")]).then(([oldM, pixM]) => {
+  Promise.all([
+    read("art/keep/sprites/manifest.json"),
+    read("art/keep/sprites/pixel/manifest.json"),
+    read("art/keep/pen-spots.json")
+  ]).then(([oldM, pixM, spots]) => {
     const old = oldM && oldM.sprites ? oldM : {frames:8, sprites:{}};
     spriteBook = {
       frames: old.frames || 8,
@@ -2374,23 +2380,30 @@ function loadSpriteBook(){
       mutations: old.mutations && typeof old.mutations === "object" && !Array.isArray(old.mutations) ? old.mutations : {},
       pixel: pixM && pixM.sprites ? pixM.sprites : {}
     };
+    const readSpots = readSpotBook(spots);
+    if (readSpots) spotBook = readSpots;
     penSig = "";
     syncPens();
   });
 }
-/* Painted pixel size on the fit, with a stage floor. A full pen overlaps a little instead of shrinking. */
-const STAGE_FLOOR = [40, 50, 62, 74];
-function spritePx(d, spec){
+/* Hatchling through elder. The back row of a pen is a little smaller than this. */
+const STAGE_MUL = [0.52, 0.68, 0.84, 1];
+function spritePx(d, spec, actor){
   const rw = penMetrics.rw || penMetrics.cw || 390;
   const stage = Math.max(0, Math.min(3, stageIdx(d)));
-  const fw = spec && spec.frameWidth > 0 ? spec.frameWidth : 0;
-  const fh = spec && spec.frameHeight > 0 ? spec.frameHeight : 0;
-  const aspect = fw && fh ? fw / fh : 1.15;
-  const fit = Math.max(0.84, Math.min(1.15, rw / 460));
-  let h = fh ? fh * rw / KEEP_W : STAGE_FLOOR[stage] * fit;
-  const floor = STAGE_FLOOR[stage] * fit;
-  if (h < floor) h = floor;
-  return {w: h * aspect, h};
+  const fw = spec && spec.frameWidth > 0 ? spec.frameWidth : 84;
+  const fh = spec && spec.frameHeight > 0 ? spec.frameHeight : 74;
+  const aspect = fw / fh;
+  const penId = actor && actor.pen;
+  const gap = penId ? penGap(penId) : null;
+  let maxW = fw * rw / KEEP_W;
+  if (gap){
+    const maxH = gap.dy * 0.9 * rw / KEEP_W;
+    maxW = Math.min(gap.pitch * 0.88 * rw / KEEP_W, maxH * aspect);
+  }
+  let w = Math.max(12, maxW * STAGE_MUL[stage]);
+  if (actor && actor.slot < 3) w *= 0.86;
+  return {w, h: w / aspect};
 }
 function spriteCacheKey(step){ return step.bag + "\0" + step.key + "\0" + step.kind; }
 function settleSprite(ck){
@@ -2470,6 +2483,12 @@ function paintEl(el, actor){
   sp.style.height = px.h + "px";
   el.style.width = px.w + "px";
   el.style.height = px.h + "px";
+  const shadow = el.querySelector(".pen-shadow");
+  if (shadow){
+    const sw = Math.max(10, px.w * 0.6);
+    shadow.style.width = sw + "px";
+    shadow.style.height = Math.max(6, sw * 0.42) + "px";
+  }
 }
 function markPenReady(){
   const world = $("#keepWorld");
@@ -2490,65 +2509,29 @@ function placeKeepBox(el, box){
   el.style.right = "auto";
   el.style.bottom = "auto";
 }
-function artRect(box){
-  return {
-    x0: box.x / 100 * KEEP_W,
-    y0: box.y / 100 * KEEP_H,
-    x1: (box.x + box.w) / 100 * KEEP_W,
-    y1: (box.y + box.h) / 100 * KEEP_H
-  };
-}
-/* Cover the stage with the 1008×1792 painting. Pan so every pen and the Build sign stay in view, above the painted tab strip. */
-function keepFrame(availW, availH){
-  const pens = PENS.map(artRect);
-  const build = artRect(KEEP_BUILD);
-  const wing = artRect(wingBox());
-  /* 1570 stays under the ponds and above the painted tab icons baked into the art. */
-  const floor = Math.min(1570, Math.max(...pens.map(r => r.y1), build.y1) + 12);
-  const cover = Math.max(availW / KEEP_W, availH / KEEP_H);
-  const scale = Math.max(cover, availH / floor);
-  const viewW = availW / scale;
-  const viewH = availH / scale;
-  let x0 = build.x0, x1 = build.x1;
-  pens.forEach((r, i) => {
-    const stand = PEN_STAND[PENS[i].id];
-    const sx0 = r.x0 + (r.x1 - r.x0) * stand.x0;
-    const sx1 = r.x0 + (r.x1 - r.x0) * stand.x1;
-    x0 = Math.min(x0, sx0);
-    x1 = Math.max(x1, sx1);
-  });
-  x0 -= 12;
-  x1 += 8;
-  const preferX0 = Math.min(x0, ...pens.map(r => r.x0)) - 4;
-  const preferX1 = Math.max(x1, wing.x1 + 2);
-  let left;
-  if (preferX1 - preferX0 <= viewW) left = preferX0 + (preferX1 - preferX0) / 2 - viewW / 2;
-  else if (x1 - x0 <= viewW) left = x0 - (viewW - (x1 - x0)) * 0.45;
-  else left = x1 - viewW;
-  left = Math.max(0, Math.min(left, Math.max(0, KEEP_W - viewW)));
-  const y0 = Math.min(...pens.map(r => r.y0));
-  let top = floor <= viewH ? 0 : floor - viewH;
-  if (top > y0 && floor - y0 <= viewH) top = y0;
-  if (top + viewH < floor) top = Math.max(0, floor - viewH);
-  top = Math.max(0, Math.min(top, Math.max(0, KEEP_H - viewH)));
-  return {scale, x: left, y: top};
-}
 function measureKeepWorld(){
   const stage = $(".keep-stage"), fit = $("#keepFit"), world = $("#keepWorld");
   if (!stage || !fit || !world) return false;
   const availW = stage.clientWidth, availH = stage.clientHeight;
   if (availW < 20 || availH < 20) return false;
-  const view = keepFrame(availW, availH);
-  const rw = KEEP_W * view.scale, rh = KEEP_H * view.scale;
+  /* Width fit: the whole painting stays on screen across, and extra height below it is ground. */
+  const scale = availW / KEEP_W;
+  const rw = availW, rh = KEEP_H * scale;
   fit.style.width = rw + "px";
   fit.style.height = rh + "px";
-  fit.style.left = (-view.x * view.scale) + "px";
-  fit.style.top = (-view.y * view.scale) + "px";
+  fit.style.left = "0px";
+  fit.style.top = "0px";
+  const fill = $("#keepFill");
+  if (fill){
+    const gap = Math.max(0, availH - rh);
+    fill.style.top = Math.min(rh, availH) + "px";
+    fill.style.height = gap + "px";
+  }
   world.style.left = "0";
   world.style.top = "0";
   world.style.width = "100%";
   world.style.height = "100%";
-  penMetrics = {rw, rh, cw: availW, ch: availH, scale: view.scale};
+  penMetrics = {rw, rh, cw: availW, ch: availH, scale};
   placeKeepBox($(".keep-ledger"), KEEP_LEDGER);
   placeKeepBox($(".keep-build"), KEEP_BUILD);
   placeKeepBox($(".keep-forge"), KEEP_FORGE);
@@ -2574,49 +2557,74 @@ function penLimits(pen){
   const dy = penSnow() ? 8 * 100 / KEEP_H : 0;
   return {x0: pen.x, x1: pen.x + pen.w, y0: pen.y + dy, y1: pen.y + pen.h + dy};
 }
-/* Walkable ground inside each pen, as fractions of that pen's box. Red stays right of the keeper. */
-const PEN_STAND = {
-  red:{x0:0.40, x1:0.94, y0:0.58, y1:0.94},
-  purple:{x0:0.04, x1:0.55, y0:0.38, y1:0.88},
-  blue:{x0:0.05, x1:0.50, y0:0.28, y1:0.86},
-  green:{x0:0.12, x1:0.58, y0:0.02, y1:0.14},
-  hoard:{x0:0.05, x1:0.42, y0:0.22, y1:0.74}
+/* Six feet spots per pen, art pixels of the 1008×1792 painting. Back row, then front row. */
+const PEN_SPOTS = {
+  red:[
+    {x:398, y:1146}, {x:476, y:1146}, {x:552, y:1146},
+    {x:398, y:1228}, {x:476, y:1228}, {x:552, y:1228}
+  ],
+  purple:[
+    {x:492, y:1272}, {x:552, y:1272}, {x:612, y:1272},
+    {x:492, y:1362}, {x:552, y:1362}, {x:612, y:1362}
+  ],
+  blue:[
+    {x:448, y:1386}, {x:528, y:1386}, {x:608, y:1386},
+    {x:448, y:1482}, {x:528, y:1482}, {x:608, y:1482}
+  ],
+  green:[
+    {x:488, y:1504}, {x:548, y:1504}, {x:608, y:1504},
+    {x:488, y:1556}, {x:548, y:1556}, {x:608, y:1556}
+  ],
+  hoard:[
+    {x:548, y:448}, {x:618, y:448}, {x:688, y:448},
+    {x:548, y:518}, {x:618, y:518}, {x:688, y:518}
+  ]
 };
-function standBox(pen){
-  const box = penLimits(pen);
-  const s = PEN_STAND[pen.id] || {x0:0.15, x1:0.85, y0:0.4, y1:0.85};
-  const w = box.x1 - box.x0, h = box.y1 - box.y0;
-  return {x0: box.x0 + w * s.x0, x1: box.x0 + w * s.x1, y0: box.y0 + h * s.y0, y1: box.y0 + h * s.y1, box};
+function spotPoint(raw){
+  if (Array.isArray(raw)) return {x:+raw[0], y:+raw[1]};
+  if (raw && typeof raw === "object") return {x:+raw.x, y:+raw.y};
+  return {x:NaN, y:NaN};
 }
-function actorHalfPct(actor){
-  const el = penEls.get(actor.id);
-  const px = el && el._px;
-  const rw = penMetrics.rw || 1;
-  const w = px && px.w > 0 ? px.w : STAGE_FLOOR[0];
-  return (w / 2) / rw * 100;
+/* pen-spots.json replaces a pen when that pen lists six points. Missing pens keep PEN_SPOTS. */
+function readSpotBook(json){
+  if (!json || typeof json !== "object") return null;
+  const src = json.spots && typeof json.spots === "object" ? json.spots : json;
+  const next = {};
+  let n = 0;
+  PENS.forEach(p => {
+    const arr = src[p.id];
+    if (!Array.isArray(arr) || arr.length < 6) return;
+    const pts = [];
+    for (let i = 0; i < 6; i++){
+      const pt = spotPoint(arr[i]);
+      if (!isFinite(pt.x) || !isFinite(pt.y)) return;
+      pts.push(pt);
+    }
+    next[p.id] = pts;
+    n++;
+  });
+  return n ? next : null;
 }
-/* Feet on the pen ground, at most two rows, overlapping rather than leaving the box or the keeper. */
+function penSpots(id){
+  const src = (spotBook && spotBook[id]) || PEN_SPOTS[id] || PEN_SPOTS.red;
+  const dy = penSnow() ? 8 : 0;
+  return src.map(s => ({x:s.x, y:s.y + dy}));
+}
+function penGap(id){
+  const spots = penSpots(id);
+  const rowPitch = row => {
+    const xs = [0, 1, 2].map(i => spots[row * 3 + i].x).sort((a, b) => a - b);
+    return Math.min(xs[1] - xs[0], xs[2] - xs[1]);
+  };
+  const dy = Math.min(spots[3].y - spots[0].y, spots[4].y - spots[1].y, spots[5].y - spots[2].y);
+  return {pitch: Math.min(rowPitch(0), rowPitch(1)), dy: Math.max(24, dy)};
+}
 function seatActor(actor){
-  const pen = PENS.find(p => p.id === actor.pen);
-  if (!pen) return;
-  const stand = standBox(pen);
-  const n = Math.max(1, actor.count || 1);
-  const slot = Math.max(0, actor.slot || 0);
-  const rows = n > 3 ? 2 : 1;
-  const back = rows === 2 ? Math.ceil(n / 2) : n;
-  const row = slot < back ? 0 : 1;
-  const i = row === 0 ? slot : slot - back;
-  const cols = Math.max(1, row === 0 ? back : n - back);
-  const ySpan = stand.y1 - stand.y0;
-  let y = rows === 1 ? stand.y0 + ySpan * 0.62 : (row === 0 ? stand.y0 + ySpan * 0.22 : stand.y0 + ySpan * 0.78);
-  const half = actorHalfPct(actor);
-  let minX = stand.x0 + half * 0.15;
-  let maxX = stand.x1 - half * 0.15;
-  if (pen.id === "red") minX = Math.max(minX, 35.6 + half);
-  let x;
-  if (minX > maxX) x = (stand.x0 + stand.x1) / 2;
-  else x = cols === 1 ? (minX + maxX) / 2 : minX + (maxX - minX) * (i + 0.5) / cols;
-  y = Math.max(stand.box.y0 + 0.6, Math.min(stand.box.y1 - 0.3, y));
+  const spots = penSpots(actor.pen);
+  const slot = Math.max(0, Math.min(5, actor.slot || 0));
+  const spot = spots[slot];
+  const x = spot.x / KEEP_W * 100;
+  const y = spot.y / KEEP_H * 100;
   if (Math.abs(actor.x - x) > 0.01 || Math.abs(actor.y - y) > 0.01){
     actor.x = x;
     actor.y = y;
@@ -2765,7 +2773,7 @@ function syncPens(){
         el.className = "pen-dragon";
         el.dataset.act = "pen-dragon";
         el.dataset.id = id;
-        el.innerHTML = '<span class="pen-sprite is-ph"><svg viewBox="0 0 72 48" aria-hidden="true"><path fill="#e8bd5f" d="M2 31c5-2 9 0 13 2 0 5 5 9 12 9 9 0 16-6 20-11 2 2 6 3 9 1 2-2 2-5 0-7 4-1 7-4 7-8 0-5-5-8-9-7-1-5-7-8-12-6-2 1-4 3-5 6-6-6-16-6-20-1-1 2-1 5 0 7-6 1-12 4-14 10-4 1-7 0-9-1z"/><path fill="#c4923a" d="M22 22c7-12 18-9 17 3-7 1-13-1-17-3z"/><path fill="#f6e2a8" d="M44 24c3-7 10-9 14-6 2 2 3 4 2 6-5 2-11 2-16 0z"/><path fill="#b8862e" d="M56 20l14 3-14 3zM22 38l-2 8h6zM34 38l-2 8h6z"/></svg></span>';
+        el.innerHTML = '<span class="pen-shadow"></span><span class="pen-sprite is-ph"><svg viewBox="0 0 72 48" aria-hidden="true"><path fill="#e8bd5f" d="M2 31c5-2 9 0 13 2 0 5 5 9 12 9 9 0 16-6 20-11 2 2 6 3 9 1 2-2 2-5 0-7 4-1 7-4 7-8 0-5-5-8-9-7-1-5-7-8-12-6-2 1-4 3-5 6-6-6-16-6-20-1-1 2-1 5 0 7-6 1-12 4-14 10-4 1-7 0-9-1z"/><path fill="#c4923a" d="M22 22c7-12 18-9 17 3-7 1-13-1-17-3z"/><path fill="#f6e2a8" d="M44 24c3-7 10-9 14-6 2 2 3 4 2 6-5 2-11 2-16 0z"/><path fill="#b8862e" d="M56 20l14 3-14 3zM22 38l-2 8h6zM34 38l-2 8h6z"/></svg></span>';
         world.appendChild(el);
         penEls.set(id, el);
       }
