@@ -142,35 +142,37 @@ html.keep-open .tabs{position:relative;z-index:2}
 .ledger-body{position:absolute;z-index:1;left:calc(235 / 1008 * 100%);top:calc(140 / 1792 * 100%);width:calc(597 / 1008 * 100%);height:calc(1150 / 1792 * 100%);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:3px;padding:0 1px 2px;background:transparent;color:#2a160c}
 /* Wooden board y1425–1545. Left and width are the visible sheet, set in layoutLedger. */
 .ledger-board{position:absolute;z-index:2;top:calc(1425 / 1792 * 100%);height:calc(120 / 1792 * 100%);display:flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;pointer-events:none}
-.ldg-cross{width:15px;height:15px;flex:none;filter:drop-shadow(0 1px 0 #3a2412)}
-.ledger-board .btn{pointer-events:auto;flex:0 1 auto;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:4px 8px;border-radius:8px;border:1px solid #1a0e08;background:linear-gradient(180deg,#6a4424,#3a2414 55%,#24160c);color:#f0d59a;font-family:var(--display);font-weight:700;font-size:12px;line-height:1;letter-spacing:.01em;white-space:nowrap;text-shadow:0 1px 0 #1a0e08;box-shadow:inset 0 1px 0 rgba(240,210,150,.4),inset 0 -2px 0 #140c06,0 1px 1px rgba(0,0,0,.5)}
-.ledger-board .btn svg{width:11px;height:11px;flex:none}
-.ledger-board .btn[disabled]{background:linear-gradient(180deg,#5a3a1e,#322014 55%,#24160c);color:#d4b56a;border-color:#1a0e08;box-shadow:inset 0 1px 0 rgba(240,210,150,.25),inset 0 -2px 0 #140c06}
+.ldg-cross{width:18px;height:auto;flex:none;filter:drop-shadow(0 1px 0 #3a2412)}
+.ledger-board .btn{pointer-events:auto;flex:0 1 auto;min-width:0;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:4px;background:none;color:#f0d59a;box-shadow:none}
+.ledger-board .btn img{display:block;height:32px;width:auto}
+.ledger-board .btn[disabled]{background:none;opacity:.78;box-shadow:none}
 .ldg-seal{width:13px;height:13px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#e2583e,#7a1e14);box-shadow:inset 0 1px 0 rgba(255,200,180,.45),0 0 0 1px #4a140e}
 .ldg-seal svg{width:8px;height:8px}
-.ldg-title{margin:0;text-align:center;font-family:var(--display);font-weight:700;font-size:26px;line-height:1;letter-spacing:-.01em;color:#ffe9a8;-webkit-text-stroke:.8px #3a1c08;paint-order:stroke fill;text-shadow:0 1px 0 #5a3010,0 2px 0 #3a1c08,0 3px 1px #1a0c04,1px 1px 0 #2a1408,-1px 1px 0 #2a1408}
-.ldg-sub{margin:0;text-align:center;font-family:var(--display);font-style:italic;font-weight:600;font-size:10px;line-height:1.1;color:#3a2412}
+.ldg-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.ldg-title{position:relative;margin:0;text-align:center}
+.ldg-title img{display:block;width:100%;height:auto}
+.ldg-sub{margin:0}
 .ldg-verse{margin:0;padding:2px 4px;border-radius:4px;border:1px solid #6e4a22;background:linear-gradient(180deg,#f6e2b8,#e4c07a);color:#2a160c;font-family:var(--display);font-style:italic;font-size:10px;line-height:1.2;text-align:center}
-.ldg-rule{display:flex;align-items:center;gap:5px;margin:1px 0}
-.ldg-rule::before,.ldg-rule::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#7a5420 12%,#e8bd5f,#7a5420 88%,transparent)}
-.ldg-rule i{width:5px;height:5px;flex:none;background:#e8bd5f;transform:rotate(45deg);box-shadow:0 0 0 1px #6b3e12}
-.ldg-rule span{font-family:var(--display);font-weight:700;font-size:12px;line-height:1;color:#2a160c;white-space:nowrap}
+.ldg-rule{position:relative;display:flex;align-items:center;justify-content:center;min-height:16px;margin:1px 0}
+.ldg-rule img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none}
+.ldg-rule span{position:relative;z-index:1;font-family:var(--display);font-weight:700;font-size:11px;line-height:1;color:#2a160c;white-space:nowrap}
 .ldg-roam-h{display:flex;align-items:center;gap:4px;margin:0;font-family:var(--display);font-weight:700;font-size:12px;line-height:1;color:#2a160c}
-.ldg-drop{flex:none;font-family:var(--display);font-weight:700;font-size:26px;line-height:.72;color:#ffe9a8;-webkit-text-stroke:.6px #3a1c08;text-shadow:0 1px 0 #5a3010,0 2px 0 #3a1c08}
+.ldg-drop{flex:none;display:flex;width:18px}
+.ldg-drop img{display:block;width:100%;height:auto}
 .ldg-grid{display:grid;gap:3px;margin:0;padding:0;list-style:none}
 .ldg-roam-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .ldg-stall-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.ldg-pcard,.ldg-stall{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;width:100%;min-width:0;margin:0;padding:2px 2px 2px;cursor:pointer;font:inherit;line-height:1}
-.ldg-pcard{min-height:52px;border:1px solid #4a2c10;border-radius:6px;background:linear-gradient(180deg,#f8e4b4,#e8c27a 58%,#d7a85c);color:#2a160c;box-shadow:inset 0 0 0 1px rgba(74,40,12,.28)}
-.ldg-stall{position:relative;min-height:62px;border:1px solid #140c08;border-radius:32px 32px 4px 4px;background:linear-gradient(180deg,#6b4630 0%,#3a2416 46%,#1c100a);color:#f3e0b8;box-shadow:inset 0 0 0 1px #8a6240,inset 0 -10px 0 rgba(0,0,0,.35)}
-.ldg-pcard.is-on,.ldg-stall.is-on{box-shadow:0 0 0 2px #f4d78f,0 0 12px 2px rgba(244,215,143,.95)}
-.ldg-slot{border:1px dashed #6b4420;border-radius:6px;background:rgba(255,236,190,.12)}
-.ldg-pcard .dart,.ldg-stall .dart{width:62%;height:30px;aspect-ratio:auto;border-radius:2px;background:transparent;box-shadow:none}
+.ldg-pcard,.ldg-stall{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;width:100%;min-width:0;margin:0;padding:2px 2px 1px;cursor:pointer;font:inherit;line-height:1;border:0;background-color:transparent;background-repeat:no-repeat;background-size:100% 100%;box-shadow:none}
+.ldg-pcard{height:72px;border-radius:5px;background-image:url("art/keep/ledger-ui/card-frame.webp");color:#2a160c}
+.ldg-stall{position:relative;height:68px;border-radius:18px 18px 3px 3px;background-image:url("art/keep/ledger-ui/stall-frame.webp");color:#f0e4c8}
+.ldg-pcard.is-on,.ldg-stall.is-on{box-shadow:0 0 0 2px #f4d78f,0 0 10px 2px rgba(244,215,143,.95)}
+.ldg-slot{border:0;border-radius:5px;background:url("art/keep/ledger-ui/card-empty.webp") center / 100% 100% no-repeat}
+.ldg-pcard .dart,.ldg-stall .dart{width:58%;height:28px;aspect-ratio:auto;border-radius:2px;background:transparent;box-shadow:none}
 .ldg-pcard .dart::after,.ldg-stall .dart::after{box-shadow:none}
 .ldg-pcard .dart > img,.ldg-stall .dart > img{object-fit:contain;-webkit-mask:none;mask:none}
 .ldg-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--display);font-weight:700;font-size:9px;line-height:1.05;text-align:center;color:inherit}
-.ldg-stall .ldg-name{width:100%;margin-top:1px;font-size:7px;padding:2px 1px 1px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55))}
-.ldg-star{width:8px;height:8px;display:block;flex:none}
+.ldg-stall .ldg-name{width:100%;margin-top:0;font-size:7px;padding:0 1px;color:#f0e4c8;text-shadow:0 1px 0 #1a0e08}
+.ldg-star{width:9px;height:9px;display:block;flex:none}
 .ldg-gem{position:absolute;top:3px;right:2px;width:7px;height:7px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.6),inset 0 -1px 1px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.4)}
 .ldg-swap{margin:0;text-align:center;color:#3a2412;font-family:var(--display);font-size:10px;line-height:1.2}
 .ldg-swap .btn{min-width:0;padding:1px 5px;font-size:10px}
@@ -3636,7 +3638,8 @@ function trapTab(ev, root){
   return true;
 }
 function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || null; }
-const LEDGER_STAR = `<svg class="ldg-star" viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" stroke="#6b3e12" stroke-width=".5" d="M6 .7 7.5 4.2l3.8.3-2.9 2.4.9 3.6L6 8.6 2.7 10.5l.9-3.6L.7 4.5l3.8-.3z"/></svg>`;
+const LEDGER_UI = "art/keep/ledger-ui";
+const LEDGER_STAR = `<img class="ldg-star" src="${LEDGER_UI}/star.webp" alt="">`;
 const BREED_GEM = {cinder:"#c23b2e", inferno:"#d3541a", brine:"#2f6fbf", moss:"#3d8a45", stormling:"#3a62c4", voidling:"#6a3d9a", tempest:"#7a4ea3"};
 function ledgerCard(id, kind){
   const d = ledgerDragon(id); if (!d) return "";
@@ -3669,13 +3672,13 @@ function renderLedger(){
   const opt = (act, label, on) => `<button type="button" class="ldg-opt" data-act="${act}" role="switch" aria-pressed="${on ? "true" : "false"}"><span>${label}</span><i aria-hidden="true"></i></button>`;
   if (ledgerFocus && keep.roaming.indexOf(ledgerFocus) < 0 && keep.stables.indexOf(ledgerFocus) < 0) ledgerFocus = null;
   renderLedgerBoard(keep);
-  body.innerHTML = `<h2 class="ldg-title">The Keeper's Ledger</h2>
-    <p class="ldg-sub">Stewards of every creature entrusted to us</p>
+  body.innerHTML = `<h2 class="ldg-title"><img src="${LEDGER_UI}/title.webp" alt="" draggable="false"><span class="ldg-sr">The Keeper's Ledger</span></h2>
+    <p class="ldg-sub ldg-sr">Stewards of every creature entrusted to us</p>
     <div class="ldg-opts">${opt("ledger-verse", "Morning Blessing", verseOn())}${opt("ledger-weather", "Live weather", weatherOn())}</div>
     ${ledgerVerseCard()}
     ${pick ? `<p class="ldg-swap" role="status">Swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
-    <section class="ldg-sec ldg-roam"><h3 class="ldg-roam-h"><span class="ldg-drop" aria-hidden="true">T</span><span>Roaming in the Keep (${keep.roaming.length}/${keepCap()})</span></h3><div class="ldg-grid ldg-roam-grid">${roamRows}${emptySlots}</div></section>
-    <h3 class="ldg-rule"><span>Resting in the Stables</span></h3>
+    <section class="ldg-sec ldg-roam"><h3 class="ldg-roam-h"><span class="ldg-drop" aria-hidden="true"><img src="${LEDGER_UI}/capital-T.webp" alt=""></span><span>Roaming in the Keep (${keep.roaming.length}/${keepCap()})</span></h3><div class="ldg-grid ldg-roam-grid">${roamRows}${emptySlots}</div></section>
+    <h3 class="ldg-rule"><img src="${LEDGER_UI}/divider.webp" alt=""><span>Resting in the Stables</span></h3>
     <section class="ldg-sec ldg-stables-sec">${noRoom ? `<p class="ldg-hint" id="ldgFull">Keep is full</p>` : ""}<div class="ldg-grid ldg-stall-grid ldg-stables">${stabRows}</div></section>`;
   layoutLedger();
   syncPens();
@@ -3691,10 +3694,8 @@ function renderLedgerBoard(keep){
   const canSend = stable && !keepFullFor(keep, id);
   const swapAct = stable && armed ? "ledger-swap-do" : "ledger-swap";
   const swapId = stable && armed ? id : (roaming ? id : ledgerPick || "");
-  const quill = `<svg viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" d="M2 10.2 3.2 7C6.2 3.2 9.2 1.2 11 1c-.2 1.8-2.2 4.8-6 7.8L1.8 10l.2.2z"/></svg>`;
-  const crown = `<span class="ldg-seal"><svg viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" d="M1.2 8.2 2.2 3.6l2.6 2.2L6 2.2l1.2 3.6 2.6-2.2 1 4.6z"/></svg></span>`;
-  const cross = `<svg class="ldg-cross" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="#e8bd5f" stroke-width="1.7" stroke-linecap="square" d="M8 2.2v11.6M3.2 6.2h9.6"/></svg>`;
-  board.innerHTML = `${cross}<button type="button" class="btn" data-act="${swapAct}" data-id="${esc(swapId)}"${canSwap ? "" : " disabled"} aria-pressed="${armed && ledgerPick === id ? "true" : "false"}">${quill}Swap</button><button type="button" class="btn" data-act="ledger-send" data-id="${esc(stable ? id : "")}"${canSend ? "" : " disabled"}${!canSend && stable ? ` aria-describedby="ldgFull"` : ""}>${crown}Send to Keep</button>`;
+  const cross = `<img class="ldg-cross" src="${LEDGER_UI}/cross.webp" alt="">`;
+  board.innerHTML = `${cross}<button type="button" class="btn" data-act="${swapAct}" data-id="${esc(swapId)}"${canSwap ? "" : " disabled"} aria-pressed="${armed && ledgerPick === id ? "true" : "false"}"><img src="${LEDGER_UI}/btn-swap.webp" alt="" draggable="false"><span class="ldg-sr">Swap</span></button><button type="button" class="btn" data-act="ledger-send" data-id="${esc(stable ? id : "")}"${canSend ? "" : " disabled"}${!canSend && stable ? ` aria-describedby="ldgFull"` : ""}><img src="${LEDGER_UI}/btn-send.webp" alt="" draggable="false"><span class="ldg-sr">Send to Keep</span></button>`;
 }
 /* Same width fit as the Keep painting: scale to the sheet width, and grow to its height when that would leave the page short. */
 function layoutLedger(){
