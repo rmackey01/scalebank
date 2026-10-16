@@ -1,4 +1,4 @@
-<!doctype html><html lang="en" class="keep-on"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<!doctype html><html lang="en" class="keep-on"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="data:,"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 </head><body>
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,25 +55,27 @@ html.keep-on .tab-keep .ti{object-fit:contain}
 .keep-art.is-ok{visibility:visible}
 html.keep-on #keep{position:relative;overflow:hidden;background:var(--ink)}
 /* The scene scrolls inside the keep, above the one real tab bar. Art and every overlay share .keep-fit. */
-html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;right:0;top:0;bottom:var(--keep-tab,16px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background:#070708}
+html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;right:0;top:var(--keep-head,0px);bottom:var(--keep-tab,16px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background:#070708}
 html.keep-open .tabs{position:relative;z-index:2}
 .keep-scroll{position:relative;width:100%}
 .keep-clip{position:relative;width:100%;overflow:hidden}
 .keep-fit{position:absolute;left:0;top:0;pointer-events:none}
 .keep-bg{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
-/* Slim one-line pill in the sky band under the painted header. It does not grow over the castle. */
-.keep-streak{position:absolute;z-index:5;display:flex;flex-flow:row nowrap;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;overflow:hidden;padding:0 8px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);pointer-events:auto}
+/* Streak pill sits in the Keep header, under the title. */
+.keep-streak{position:relative;z-index:1;display:flex;flex-flow:row nowrap;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;width:auto;max-width:100%;height:auto;overflow:visible;padding:4px 8px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);pointer-events:auto}
 .keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:12px;line-height:1;color:var(--gold-hi);white-space:nowrap}
 .keep-streak .ks-best{margin:0;font-size:11px;line-height:1;letter-spacing:.02em;color:var(--muted);white-space:nowrap}
 .keep-streak .ks-note{display:none}
 .keep-streak .btn{min-width:0;width:auto;height:auto;margin:0;padding:0 7px;border-radius:999px;box-shadow:none;font-size:11px;line-height:1;white-space:nowrap}
 /* Invisible taps on the painted lectern. A ring shows for keyboard focus only. */
 .keep-spot{position:absolute;z-index:4;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;font-size:0;line-height:0;cursor:pointer;pointer-events:auto}
-/* The painting no longer includes a header or a Build sign. Both sit in the same fit as the art. */
-.keep-head{position:absolute;z-index:6;left:2%;right:2%;top:.4%;height:3.4%;display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:none;color:#f4d78f;text-shadow:0 1px 2px #000,0 0 6px rgba(0,0,0,.75)}
-.keep-head h1{margin:0;min-width:0;font-family:var(--display);font-weight:700;font-size:calc(var(--ks,.39)*36px);letter-spacing:.16em;text-transform:uppercase;line-height:1;white-space:nowrap}
-.keep-head .kh-steps{position:absolute;left:0;margin:0;font-weight:700;font-variant-numeric:tabular-nums;font-size:calc(var(--ks,.39)*30px);letter-spacing:.02em;line-height:1;white-space:nowrap}
-.keep-build{position:absolute;z-index:6;display:flex;align-items:center;justify-content:center;margin:0;padding:0 2px;border:1.5px solid #5a3810;border-radius:8px;color:#3a2412;background:linear-gradient(180deg,rgba(255,244,214,.55),rgba(255,244,214,0) 42%),linear-gradient(180deg,#f0d59a 0%,#c8923e 48%,#8a5a1c 100%);box-shadow:inset 0 1px 0 rgba(255,248,220,.85),inset 0 -2px 0 rgba(74,40,8,.28),0 2px 3px rgba(0,0,0,.45);font-family:var(--display);font-weight:700;font-size:calc(var(--ks,.39)*20px);letter-spacing:.08em;line-height:1;text-transform:uppercase;cursor:pointer;pointer-events:auto}
+/* Header and Build are the app's own chrome. Build stays fixed above the tab bar. */
+.keep-head{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;box-sizing:border-box;padding:8px 12px 6px;pointer-events:none;color:#f4d78f}
+.keep-head .kh-row{position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-height:22px}
+.keep-head h1{margin:0;min-width:0;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:.14em;text-transform:uppercase;line-height:1;white-space:nowrap}
+.keep-head .kh-coins{position:absolute;right:0;top:50%;display:inline-flex;align-items:center;gap:4px;margin:0;transform:translateY(-50%);font-weight:700;font-variant-numeric:tabular-nums;font-size:13px;line-height:1;color:var(--gold-hi);white-space:nowrap}
+.keep-head .kh-coin{width:14px;height:14px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 32%,#fff6d0,#f4d78f 42%,#c4923a 70%,#7b5517);box-shadow:inset 0 0 0 1px #6a4a12,0 1px 1px rgba(0,0,0,.45)}
+.keep-build{position:absolute;z-index:5;right:12px;bottom:calc(var(--keep-tab,16px) + 8px);left:auto;top:auto;display:flex;align-items:center;justify-content:center;width:auto;min-width:76px;height:32px;margin:0;padding:0 12px;border:1.5px solid #5a3810;border-radius:8px;color:#3a2412;background:linear-gradient(180deg,rgba(255,244,214,.55),rgba(255,244,214,0) 42%),linear-gradient(180deg,#f0d59a 0%,#c8923e 48%,#8a5a1c 100%);box-shadow:inset 0 1px 0 rgba(255,248,220,.85),inset 0 -2px 0 rgba(74,40,8,.28),0 2px 3px rgba(0,0,0,.45);font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.12em;line-height:1;text-transform:uppercase;cursor:pointer;pointer-events:auto}
 .keep-build:focus{outline:none}
 .keep-build:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
 .keep-filters{position:absolute;width:0;height:0;overflow:hidden}
@@ -710,25 +712,30 @@ button.dexchip{cursor:pointer}
   </main>
 
   <main id="keep" class="screen" aria-label="Keep" hidden>
+    <header class="keep-head">
+      <div class="kh-row">
+        <h1>Dragon Keep</h1>
+        <p class="kh-coins" id="keepCoins"><i class="kh-coin" aria-hidden="true"></i><span id="keepCoinN">0</span></p>
+      </div>
+      <div class="keep-streak" id="keepStreak" hidden></div>
+    </header>
     <div class="keep-stage">
       <div class="keep-scroll" id="keepScroll">
       <div class="keep-clip" id="keepClip">
       <div class="keep-fit" id="keepFit">
         <img class="keep-bg keep-art" alt="" draggable="false">
         <svg class="keep-filters" aria-hidden="true" focusable="false"><filter id="keepSlotTint" color-interpolation-filters="sRGB"><feColorMatrix id="keepSlotMatrix" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/></filter></svg>
-        <header class="keep-head"><p class="kh-steps" id="keepSteps">0 steps</p><h1>Dragon Keep</h1></header>
         <div class="keep-world" id="keepWorld"></div>
         <div class="keep-plates" id="keepPlates"></div>
         <div class="keep-wing" id="keepWing"><p class="wing-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span></p></div>
         <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
         <button type="button" class="keep-spot keep-pool" data-act="keep-pool" aria-label="Moon Pool" hidden></button>
-        <button type="button" class="keep-build" data-act="keep-build">Build</button>
-        <div class="keep-streak" id="keepStreak" hidden></div>
         <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"></button>
       </div>
       </div>
       </div>
     </div>
+    <button type="button" class="keep-build" data-act="keep-build">Build</button>
   </main>
 
   <main id="bestiary" class="screen bst-journal" aria-label="Bestiary" hidden>
@@ -1875,8 +1882,11 @@ function render(){
   renderKeepChrome();
 }
 function renderKeepChrome(){
-  const el = $("#keepSteps");
-  if (el) el.textContent = fmt(S && S.bank || 0) + " steps";
+  const el = $("#keepCoinN");
+  const coins = $("#keepCoins");
+  const n = fmt(S && S.bank || 0);
+  if (el) el.textContent = n;
+  if (coins) coins.setAttribute("aria-label", n + " coins");
 }
 
 function dexRecord(d){
@@ -2630,33 +2640,35 @@ function placeKeepBox(el, box){
 }
 function measureKeepWorld(){
   const stage = $(".keep-stage"), fit = $("#keepFit"), world = $("#keepWorld");
-  const scroll = $("#keepScroll"), clip = $("#keepClip");
-  if (!stage || !fit || !world || !scroll || !clip) return false;
+  const scroll = $("#keepScroll"), clip = $("#keepClip"), keep = $("#keep");
+  if (!stage || !fit || !world || !scroll || !clip || !keep) return false;
+  const head = $(".keep-head");
+  const headH = head ? head.offsetHeight : 0;
+  keep.style.setProperty("--keep-head", headH + "px");
   const availW = stage.clientWidth, availH = stage.clientHeight;
   if (availW < 20 || availH < 20) return false;
-  /* Width fit of the whole painting. Header, slots, fences, and Build share this scale. */
-  const scale = availW / KEEP_W;
-  const rw = availW, rh = KEEP_H * scale;
-  const pad = keepScrollPad();
+  /* Width fit. When that is shorter than the stage, grow it so the painting ends at the tab bar. */
+  let scale = availW / KEEP_W;
+  if (KEEP_H * scale < availH - 0.5) scale = availH / KEEP_H;
+  const rw = KEEP_W * scale, rh = KEEP_H * scale;
   fit.style.width = rw + "px";
   fit.style.height = rh + "px";
-  fit.style.left = "0px";
+  fit.style.left = ((availW - rw) / 2) + "px";
   fit.style.top = "0px";
   fit.style.setProperty("--ks", String(scale));
   clip.style.height = rh + "px";
-  scroll.style.height = (rh + pad) + "px";
-  scroll.style.paddingBottom = pad + "px";
+  scroll.style.height = rh + "px";
+  scroll.style.paddingBottom = "0px";
   world.style.left = "0";
   world.style.top = "0";
   world.style.width = "100%";
   world.style.height = "100%";
   penMetrics = {rw, rh, cw: availW, ch: availH, scale};
   placeKeepBox($(".keep-ledger"), KEEP_LEDGER);
-  placeKeepBox($(".keep-build"), KEEP_BUILD);
   placeKeepBox($(".keep-forge"), KEEP_FORGE);
   placeKeepBox($(".keep-pool"), KEEP_POOL);
-  placeKeepBox($("#keepStreak"), KEEP_STREAK);
   placeKeepBox($("#keepWing"), KEEP_WING);
+  trackKeepScroll();
   return true;
 }
 /* The wing is not a pen. It stays locked, and the plaque hides if that ever changes. */
@@ -2758,19 +2770,39 @@ function settleWing(host, fit){
   if (!wing || !lock || wing.classList.contains("is-open")) return;
   lock.style.left = "";
   lock.style.top = "";
-    const home = wing.getBoundingClientRect();
-  for (let pass = 0; pass < 6; pass++){
+  const home = wing.getBoundingClientRect();
+  const build = $(".keep-build");
+  for (let pass = 0; pass < 8; pass++){
     const wr = lock.getBoundingClientRect();
-    const hit = [...host.querySelectorAll(".pen-lock")].find(el => plaqueOverlap(wr, el.getBoundingClientRect(), 6));
+    const obstacles = host ? [...host.querySelectorAll(".pen-lock")] : [];
+    if (build) obstacles.push(build);
+    const hit = obstacles.find(el => plaqueOverlap(wr, el.getBoundingClientRect(), 6));
     if (!hit) return;
     const hr = hit.getBoundingClientRect();
-    const dx = wr.left < hr.right && wr.right > hr.left ? (wr.left + wr.width / 2 < hr.left + hr.width / 2 ? -1 : 1) * (Math.min(wr.right, hr.right) - Math.max(wr.left, hr.left) + 8) : 0;
-    const dy = wr.top < hr.bottom && wr.bottom > hr.top ? (wr.top < hr.top ? -1 : 1) * (Math.min(wr.bottom, hr.bottom) - Math.max(wr.top, hr.top) + 8) : 0;
+    const fixed = hit === build;
+    const dx = !fixed && wr.left < hr.right && wr.right > hr.left ? (wr.left + wr.width / 2 < hr.left + hr.width / 2 ? -1 : 1) * (Math.min(wr.right, hr.right) - Math.max(wr.left, hr.left) + 8) : 0;
+    const overlapY = Math.min(wr.bottom, hr.bottom) - Math.max(wr.top, hr.top) + 8;
+    const dy = fixed ? -overlapY : (wr.top < hr.bottom && wr.bottom > hr.top ? (wr.top < hr.top ? -1 : 1) * overlapY : 0);
     const left = (parseFloat(lock.style.left) || 50) + (home.width ? dx / home.width * 100 : 0);
     const top = (parseFloat(lock.style.top) || 50) + (home.height ? dy / home.height * 100 : 0);
     lock.style.left = Math.max(8, Math.min(92, left)).toFixed(3) + "%";
-    lock.style.top = Math.max(8, Math.min(92, top)).toFixed(3) + "%";
+    lock.style.top = Math.max(-20, Math.min(92, top)).toFixed(3) + "%";
   }
+}
+let wingScroll = 0;
+function trackKeepScroll(){
+  const stage = $(".keep-stage");
+  if (!stage || stage.dataset.wingScroll) return;
+  stage.dataset.wingScroll = "1";
+  stage.addEventListener("scroll", () => {
+    if (wingScroll) return;
+    wingScroll = requestAnimationFrame(() => {
+      wingScroll = 0;
+      const host = $("#penPlaques");
+      const fit = $("#keepFit");
+      if (fit) settleWing(host, fit);
+    });
+  }, {passive:true});
 }
 /* Animator names in pen-spots.json, in pen order. */
 const PEN_NAME = {ember:"red", violet:"purple", azure:"blue", pond:"green", red:"red", purple:"purple", blue:"blue", green:"green"};
@@ -2975,17 +3007,38 @@ function penFenceZ(name){
   if (!rows.length) return null;
   return Math.max.apply(null, rows.map(row => row.slot.drawOrder * 2)) + 1;
 }
-function slotCandidates(d){
-  if (!d || !d.line) return [];
-  const line = d.line;
+/* Hatchling through elder, feet anchored on the one slot sprite until the map names a stage file. */
+const SLOT_STAGE = [0.55, 0.72, 0.87, 1];
+function slotPath(file){
+  if (typeof file !== "string" || !file) return "";
+  if (file.indexOf("/") >= 0) return file;
+  return "art/keep/sprites/slot/" + file.replace(/^\/+/, "");
+}
+/* A stage file is used only when slot-map.json names one. Nothing else is requested. */
+function stageSlotUrl(slot, d){
+  if (!slot || !d) return "";
   const stage = STAGES[stageIdx(d)].name.toLowerCase();
   const mut = d.mut && MUTATIONS[d.mut] ? d.mut : "";
-  const urls = [];
-  if (mut) urls.push("art/keep/sprites/slot/" + line + "-" + mut + "-" + stage + ".webp");
-  urls.push("art/keep/sprites/slot/" + line + "-" + stage + ".webp");
-  if (mut) urls.push("art/keep/sprites/slot/" + line + "-" + mut + ".webp");
-  urls.push("art/keep/sprites/slot/" + line + ".webp");
-  return urls;
+  const named = [];
+  const push = v => { if (typeof v === "string" && v) named.push(v); };
+  const stages = slot.stages;
+  if (stages && typeof stages === "object" && !Array.isArray(stages)){
+    const row = stages[stage];
+    if (typeof row === "string") push(row);
+    else if (row && typeof row === "object"){
+      if (mut) push(row[mut]);
+      push(row.file);
+    }
+  }
+  const files = slot.files;
+  if (files && typeof files === "object" && !Array.isArray(files)){
+    if (mut) push(files[mut + "-" + stage]);
+    push(files[stage]);
+  }
+  return named.length ? slotPath(named[0]) : "";
+}
+function breedSlotUrl(line){
+  return "art/keep/sprites/slot/" + line + ".webp";
 }
 const slotFile = new Map();
 function askSlot(url){
@@ -3001,18 +3054,40 @@ function askSlot(url){
     if (keepOn() && S && S.tab === "keep") syncPens();
   });
 }
-/* null means every candidate missed. "pend" means a file is still being checked. */
-function slotSrc(d){
-  const urls = slotCandidates(d);
-  for (let i = 0; i < urls.length; i++){
-    const hit = slotFile.get(urls[i]);
-    if (hit && hit !== "miss" && hit !== "pend") return hit;
-    if (hit === "pend") return "pend";
-    if (hit === "miss") continue;
-    askSlot(urls[i]);
-    return "pend";
+/* null means the file missed. "pend" means it is still being checked. fitted is the single sprite, scaled by stage. */
+function slotSrc(line, d){
+  const slot = slotMap && slotMap.slots && slotMap.slots[line];
+  const specific = stageSlotUrl(slot, d);
+  const url = specific || breedSlotUrl(line);
+  const fitted = !specific;
+  const hit = slotFile.get(url);
+  if (hit && hit !== "miss" && hit !== "pend") return {src: hit, fitted};
+  if (hit === "pend") return {src: "pend", fitted};
+  if (hit === "miss"){
+    if (!specific) return null;
+    const base = breedSlotUrl(line);
+    const back = slotFile.get(base);
+    if (back && back !== "miss" && back !== "pend") return {src: back, fitted: true};
+    if (back === "pend") return {src: "pend", fitted: true};
+    if (back === "miss") return null;
+    askSlot(base);
+    return {src: "pend", fitted: true};
   }
-  return null;
+  askSlot(url);
+  return {src: "pend", fitted};
+}
+function placeSlot(el, slot, d, fitted){
+  const grow = fitted ? (SLOT_STAGE[stageIdx(d)] || 1) : 1;
+  const w = slot.w * grow;
+  const h = slot.h * grow;
+  const feet = Number.isFinite(+slot.feetY) ? +slot.feetY : slot.y + slot.h;
+  const x = slot.x + (slot.w - w) / 2;
+  const y = feet - h;
+  el.style.left = (x / KEEP_W * 100) + "%";
+  el.style.top = (y / KEEP_H * 100) + "%";
+  el.style.width = (w / KEEP_W * 100) + "%";
+  el.style.height = (h / KEEP_H * 100) + "%";
+  el.dataset.scale = String(grow);
 }
 function applySlotTint(variant){
   const row = slotMap && slotMap.tint && slotMap.tint[variant];
@@ -3123,17 +3198,14 @@ function syncSlotDragons(world){
     el.dataset.id = id;
     el.setAttribute("aria-label", (d.name || d.species || row.line) + ", " + STAGES[stageIdx(d)].name);
     const slot = row.slot;
-    el.style.left = (slot.x / KEEP_W * 100) + "%";
-    el.style.top = (slot.y / KEEP_H * 100) + "%";
-    el.style.width = (slot.w / KEEP_W * 100) + "%";
-    el.style.height = (slot.h / KEEP_H * 100) + "%";
     el.style.zIndex = String(slot.drawOrder * 2);
-    const src = slotSrc(d);
+    const got = slotSrc(row.line, d);
+    placeSlot(el, slot, d, got ? got.fitted : true);
     const img = el.querySelector("img");
-    if (src && src !== "pend"){
-      if (img.getAttribute("src") !== src) img.src = src;
+    if (got && got.src && got.src !== "pend"){
+      if (img.getAttribute("src") !== got.src) img.src = got.src;
       el.hidden = false;
-    } else if (src === "pend"){
+    } else if (got && got.src === "pend"){
       el.hidden = true;
     } else {
       el.remove();
