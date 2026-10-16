@@ -331,6 +331,62 @@ add("dst", t => {
   t.equal(g.claimStreak(), 0, "that day pays only once");
 });
 
+add("zone-continue", t => {
+  const CHI = 300, TYO = -540;
+  let off = CHI;
+  let clock = Date.UTC(2026, 9, 21, 1, 0, 0);
+  const east = boot(save({last: "2026-10-19", count: 3, best: 3, claimed: "2026-10-19", tz: CHI}));
+  east.setCareClock(() => clock);
+  east.setZoneOffset(() => off);
+  t.equal(east.visitKeep().count, 4, "Chicago Tuesday continues");
+  t.equal(east.snapshot().keep.streak.last, "2026-10-20", "Chicago records Oct 20");
+  off = TYO;
+  t.equal(east.visitKeep().fresh, false, "the same instant in Tokyo is not a new day");
+  clock = Date.UTC(2026, 9, 22, 1, 0, 0);
+  const next = east.visitKeep();
+  t.equal(next.count, 5, "the next Tokyo day continues the streak");
+  t.equal(next.fresh, true, "that Tokyo day is a visit");
+  t.equal(east.snapshot().keep.streak.last, "2026-10-22", "Tokyo records Oct 22");
+  t.equal(east.snapshot().keep.streak.best, 5, "best follows the continued streak");
+  t.equal(east.claimStreak(), 30, "the continued 5-day streak pays 30");
+
+  off = TYO;
+  clock = Date.UTC(2026, 9, 20, 1, 0, 0);
+  const west = boot(save({last: "2026-10-19", count: 3, best: 3, claimed: "2026-10-19", tz: TYO}));
+  west.setCareClock(() => clock);
+  west.setZoneOffset(() => off);
+  t.equal(west.visitKeep().count, 4, "Tokyo Tuesday continues");
+  off = CHI;
+  clock = Date.UTC(2026, 9, 22, 1, 0, 0);
+  const back = west.visitKeep();
+  t.equal(back.count, 5, "the next Chicago day continues the streak");
+  t.equal(west.snapshot().keep.streak.last, "2026-10-21", "Chicago records Oct 21");
+  t.equal(west.claimStreak(), 30, "the continued streak pays 30");
+});
+
+add("missed-weekday", t => {
+  let clock = stamp(2026, 10, 20);
+  const g = boot(save({last: key(2026, 10, 20), count: 4, best: 4, claimed: key(2026, 10, 20)}));
+  g.setCareClock(() => clock);
+  clock = stamp(2026, 10, 22);
+  const missed = g.visitKeep();
+  t.equal(missed.count, 1, "skipping Wednesday resets the streak");
+  t.equal(g.snapshot().keep.streak.best, 4, "best keeps the longer run");
+  t.equal(g.snapshot().keep.streak.last, key(2026, 10, 22), "Thursday is the new start");
+  t.equal(g.claimStreak(), 10, "a reset streak pays the first-day gift");
+});
+
+add("sunday-still-skipped", t => {
+  let clock = stamp(2026, 10, 17);
+  const g = boot(save({last: key(2026, 10, 17), count: 4, best: 4, claimed: key(2026, 10, 17)}));
+  g.setCareClock(() => clock);
+  clock = stamp(2026, 10, 19);
+  const mon = g.visitKeep();
+  t.equal(mon.count, 5, "skipping only Sunday continues the streak");
+  t.equal(g.snapshot().keep.streak.last, key(2026, 10, 19), "Monday is recorded");
+  t.equal(g.claimStreak(), 30, "Monday pays the continued tier");
+});
+
 add("old-save-offset", t => {
   let clock = stamp(2026, 10, 16, 15);
   const g = boot(save({last: key(2026, 10, 15), count: 2, best: 2}));
