@@ -86,8 +86,9 @@ html.keep-open .tabs{position:relative;z-index:2}
 .wing-lock span{display:block;margin-top:2px;font-size:11px;font-weight:700}
 .keep-wing.is-open{display:none}
 .pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto;transition:none}
+.pen-dragon::before{content:"";position:absolute;z-index:0;left:50%;bottom:0;width:72%;height:28%;transform:translate(-50%,42%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(6,8,12,.35), rgba(6,8,12,0) 70%);filter:blur(2px);pointer-events:none}
 .pen-dragon:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:10px}
-.pen-sprite{position:relative;display:block;background-repeat:no-repeat;background-position:left center}
+.pen-sprite{position:relative;z-index:1;display:block;background-repeat:no-repeat;background-position:left center}
 .pen-sprite svg{display:none;width:100%;height:100%}
 .pen-sprite.is-ph svg{display:block}
 .ledger{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
@@ -2262,11 +2263,13 @@ function mountKeepArt(){
   keepArt($(".tab-keep .ti.on"), "art/keep/icon_keep_active.png");
   loadSpriteBook();
 }
-/* Three pens on keep-v6.webp (1008×1792). x/y/w/h are the painted yard; floor is where feet may stand. */
+/* Feet boxes on the 1008×1792 painting. Snow drops every box 8px. */
 const PENS = [
-  {id:"court", x:22, y:16.6, w:48, h:8.2, at:1, floor:[22, 40, 27.4, 29.2]},
-  {id:"west", x:5, y:52.4, w:34, h:8.4, at:3, floor:[28, 44, 60.4, 62.6]},
-  {id:"east", x:8, y:70.4, w:58, h:8.4, at:5, floor:[48, 66, 74.2, 76.6]}
+  {id:"red", x:22.32, y:56.47, w:33.73, h:12.56, at:1},
+  {id:"purple", x:45.83, y:66.63, w:27.28, h:10.49, at:3},
+  {id:"blue", x:39.98, y:75.06, w:41.37, h:8.93, at:5},
+  {id:"green", x:45.14, y:83.15, w:26.79, h:8.37, at:5},
+  {id:"hoard", x:51.29, y:22.99, w:36.21, h:7.53, at:5}
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
@@ -2295,6 +2298,13 @@ function pensOpen(n){
   if (c >= 1) return 1;
   return 0;
 }
+/* The third breed gate opens the green pen and the hoard along with the blue pen. */
+function yardsOpen(n){
+  const open = pensOpen(n);
+  if (open >= 3) return PENS.length;
+  return open;
+}
+function penSnow(){ return typeof skyKind === "string" && skyKind === "snow"; }
 function breedCount(){
   const lines = new Set();
   asList(S && S.dragons).forEach(d => { if (d && d.line) lines.add(d.line); });
@@ -2317,23 +2327,25 @@ function bookSpec(book, bag, key){
   if (!spec.file && !spec.still) return null;
   return spec;
 }
-/* Mutation strip, mutation still, then the base breed-stage strip and still. */
+function pushArt(chain, bag, key, spec){
+  if (!spec) return;
+  if (spec.file) chain.push({bag, key, spec, kind:"strip", file:spec.file});
+  if (spec.still) chain.push({bag, key, spec, kind:"still", file:spec.still});
+}
+/* Mutations first when that art exists. Then the pixel strip and still, then the old sprites, then the silhouette. */
 function spriteChain(d, book){
   const src = book === undefined ? spriteBook : book;
   const chain = [];
   const mk = mutSpriteKey(d);
-  const mut = bookSpec(src, "mutations", mk);
-  if (mut){
-    if (mut.file) chain.push({bag:"mutations", key:mk, spec:mut, kind:"strip", file:mut.file});
-    if (mut.still) chain.push({bag:"mutations", key:mk, spec:mut, kind:"still", file:mut.still});
-  }
+  pushArt(chain, "mutations", mk, bookSpec(src, "mutations", mk));
   const bk = spriteKey(d);
-  const base = bookSpec(src, "sprites", bk);
-  if (base){
-    if (base.file) chain.push({bag:"sprites", key:bk, spec:base, kind:"strip", file:base.file});
-    if (base.still) chain.push({bag:"sprites", key:bk, spec:base, kind:"still", file:base.still});
-  }
+  pushArt(chain, "pixel", bk, bookSpec(src, "pixel", bk));
+  pushArt(chain, "sprites", bk, bookSpec(src, "sprites", bk));
   return chain;
+}
+function spriteUrl(bag, file){
+  if (!file) return "";
+  return (bag === "pixel" ? "art/keep/sprites/pixel/" : "art/keep/sprites/") + file;
 }
 function u32(s){
   let h = 2166136261;
@@ -2343,20 +2355,39 @@ function u32(s){
 function loadSpriteBook(){
   if (!keepOn() || spriteAsked) return;
   spriteAsked = true;
-  fetch("art/keep/sprites/manifest.json").then(r => r.ok ? r.json() : Promise.reject(new Error("manifest"))).then(m => {
-    spriteBook = m && m.sprites ? m : {frames:8, sprites:{}};
+  const read = url => fetch(url).then(r => r.ok ? r.json() : null).catch(() => null);
+  Promise.all([read("art/keep/sprites/manifest.json"), read("art/keep/sprites/pixel/manifest.json")]).then(([oldM, pixM]) => {
+    const old = oldM && oldM.sprites ? oldM : {frames:8, sprites:{}};
+    spriteBook = {
+      frames: old.frames || 8,
+      fps: pixM && pixM.fps > 0 ? pixM.fps : 4,
+      sprites: old.sprites || {},
+      mutations: old.mutations && typeof old.mutations === "object" && !Array.isArray(old.mutations) ? old.mutations : {},
+      pixel: pixM && pixM.sprites ? pixM.sprites : {}
+    };
     penSig = "";
     syncPens();
-  }).catch(() => { spriteBook = {frames:8, sprites:{}}; penSig = ""; syncPens(); });
+  });
 }
-function spritePx(d, spec){
-  const cw = penMetrics.cw || 390;
-  const base = PEN_TALL[stageIdx(d)] || 48;
-  const h = Math.max(30, Math.min(48, base * cw / 390));
+/* Pixel frames keep their painted size on the 1008-wide keep, then shrink so pen-mates do not overlap. */
+function spritePx(d, spec, actor){
+  const rw = penMetrics.rw || penMetrics.cw || 390;
   const fw = spec && spec.frameWidth > 0 ? spec.frameWidth : 0;
   const fh = spec && spec.frameHeight > 0 ? spec.frameHeight : 0;
   const aspect = fw && fh ? fw / fh : 1.2;
-  return {w: h * aspect, h};
+  let h = fh ? fh * rw / KEEP_W * 0.78 : Math.max(28, Math.min(48, (PEN_TALL[stageIdx(d)] || 40) * rw / 390));
+  let w = h * aspect;
+  const pen = actor && PENS.find(p => p.id === actor.pen);
+  const n = Math.max(1, (actor && actor.count) || 1);
+  if (pen && w > 0 && h > 0){
+    const slotW = rw * (pen.w / n) / 100 * 0.9;
+    const rh = penMetrics.rh || rw * KEEP_H / KEEP_W;
+    const boxH = rh * pen.h / 100 * 0.95;
+    const scale = Math.min(1, slotW / w, boxH / h);
+    w *= scale;
+    h *= scale;
+  }
+  return {w, h};
 }
 function spriteCacheKey(step){ return step.bag + "\0" + step.key + "\0" + step.kind; }
 function settleSprite(ck){
@@ -2382,7 +2413,7 @@ function probeActor(id){
     actor.kind = "ph";
     actor.spec = null;
     actor.key = d ? spriteKey(d) : "";
-    if (el && d) el._px = spritePx(d, null);
+    if (el && d) el._px = spritePx(d, null, actor);
     if (el) paintEl(el, actor);
     markPenReady();
     return;
@@ -2399,7 +2430,8 @@ function probeActor(id){
   }
   if (hit === "ok"){
     actor.kind = step.kind;
-    if (el && d) el._px = spritePx(d, step.spec);
+    actor.bag = step.bag;
+    if (el && d) el._px = spritePx(d, step.spec, actor);
     if (el) paintEl(el, actor);
     markPenReady();
     return;
@@ -2412,7 +2444,7 @@ function probeActor(id){
   const img = new Image();
   img.onload = () => { if (!keepOn()) return; spriteMode.set(ck, "ok"); settleSprite(ck); };
   img.onerror = () => { spriteMode.set(ck, "fail"); settleSprite(ck); };
-  img.src = "art/keep/sprites/" + step.file;
+  img.src = spriteUrl(step.bag, step.file);
 }
 function paintEl(el, actor){
   if (!keepOn()) return;
@@ -2425,10 +2457,10 @@ function paintEl(el, actor){
   sp.classList.toggle("is-still", kind === "still");
   if (kind === "strip" && spec && spec.file){
     const frames = spec.frames > 0 ? spec.frames : 8;
-    sp.style.backgroundImage = 'url("art/keep/sprites/' + spec.file + '")';
+    sp.style.backgroundImage = 'url("' + spriteUrl(actor.bag, spec.file) + '")';
     sp.style.backgroundSize = (px.w * frames) + "px " + px.h + "px";
   } else if (kind === "still" && spec && spec.still){
-    sp.style.backgroundImage = 'url("art/keep/sprites/' + spec.still + '")';
+    sp.style.backgroundImage = 'url("' + spriteUrl(actor.bag, spec.still) + '")';
     sp.style.backgroundSize = px.w + "px " + px.h + "px";
   } else sp.style.backgroundImage = "";
   sp.style.width = px.w + "px";
@@ -2485,13 +2517,10 @@ function mountPenShell(){
   world.innerHTML = PENS.map(p => `<div class="keep-pen" data-pen="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%"><i class="keep-ground"></i><p class="pen-lock">Unlocks with a new dragon</p></div>`).join("");
 }
 function penLimits(pen){
-  const f = pen.floor;
-  if (f) return {x0:f[0], x1:f[1], y0:f[2], y1:f[3]};
-  const rw = penMetrics.rw || 480;
-  const mx = Math.min(pen.w * 0.28, (28 / rw) * 100);
-  return {x0: pen.x + mx, x1: pen.x + pen.w - mx, y0: pen.y + pen.h * 0.62, y1: pen.y + pen.h * 0.92};
+  const dy = penSnow() ? 8 * 100 / KEEP_H : 0;
+  return {x0: pen.x, x1: pen.x + pen.w, y0: pen.y + dy, y1: pen.y + pen.h + dy};
 }
-/* One fixed spot per dragon. Feet stay on the pen floor. Nothing walks or slides. */
+/* Bottom-center of the sprite sits on the feet. Mates share the box in even slices. */
 function placeActor(actor, pen, slot, count){
   const box = penLimits(pen);
   const n = Math.max(1, count || 1);
@@ -2499,7 +2528,11 @@ function placeActor(actor, pen, slot, count){
   const h = u32(actor.id + ":home");
   const i = Math.max(0, slot || 0);
   actor.x = box.x0 + span * (i + 0.5);
-  actor.y = box.y0 + (box.y1 - box.y0) * 0.72;
+  const frameBottom = 1572 * 100 / KEEP_H;
+  const low = box.y0 + (box.y1 - box.y0) * 0.72;
+  let feet = Math.min(low, frameBottom - 2.6);
+  if (feet < box.y0) feet = box.y0 + (box.y1 - box.y0) * 0.55;
+  actor.y = feet;
   actor.mode = "idle";
   actor.face = (h & 1) ? -1 : 1;
   actor.until = penNow() / 1000 + 6 + (h % 8000) / 1000;
@@ -2536,7 +2569,7 @@ function stepActors(dt, now){
     if (el && spec && actor.kind === "strip" && el._px){
       const sp = el.querySelector(".pen-sprite");
       actor.acc += dt;
-      const hop = 1 / (spec.fps > 0 ? spec.fps : 8);
+      const hop = 1 / (spec.fps > 0 ? spec.fps : 4);
       let guard = 0;
       while (actor.acc >= hop && guard++ < 3){
         actor.acc -= hop;
@@ -2575,15 +2608,21 @@ function syncPens(){
   const world = $("#keepWorld");
   if (!world || !measureKeepWorld()) return;
   mountPenShell();
-  const open = pensOpen(breedCount());
+  const open = yardsOpen(breedCount());
   PENS.forEach((p, i) => {
     const el = world.querySelector('.keep-pen[data-pen="' + p.id + '"]');
-    if (el) el.classList.toggle("is-open", i < open);
+    if (!el) return;
+    const box = penLimits(p);
+    el.style.left = box.x0 + "%";
+    el.style.top = box.y0 + "%";
+    el.style.width = (box.x1 - box.x0) + "%";
+    el.style.height = (box.y1 - box.y0) + "%";
+    el.classList.toggle("is-open", i < open);
   });
   const wing = $("#keepWing");
   if (wing) wing.classList.toggle("is-open", !wingLocked());
   const roaming = normKeep(S.keep).roaming;
-  const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
+  const sig = open + "|" + (penSnow() ? "snow" : "") + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
     + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
   if (sig !== penSig){
     penSig = sig;
@@ -2636,7 +2675,7 @@ function syncPens(){
       }
       const stageName = STAGES[stageIdx(d)].name;
       el.setAttribute("aria-label", (d.name || d.species || "Dragon") + ", " + stageName);
-      el._px = spritePx(d, actor.spec);
+      el._px = spritePx(d, actor.spec, actor);
       probeActor(id);
       paintEl(el, actor);
       drawActor(actor);
