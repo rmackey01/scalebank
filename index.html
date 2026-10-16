@@ -3877,6 +3877,59 @@ function prepareHome(streak){
   return {day, weekday: dt ? dt.getDay() : new Date(ms).getDay(), fresh};
 }
 const SABBATH_NOTE = "Sabbath rest. No chores required.";
+/* Public-domain KJV. The morning blessing is chosen from the home-zone date, with no network. */
+const BLESSINGS = [
+  ["This is the day which the LORD hath made; we will rejoice and be glad in it.", "Psalm 118:24"],
+  ["My voice shalt thou hear in the morning, O LORD; in the morning will I direct my prayer unto thee, and will look up.", "Psalm 5:3"],
+  ["O satisfy us early with thy mercy; that we may rejoice and be glad all our days.", "Psalm 90:14"],
+  ["It is of the LORD's mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness.", "Lamentations 3:22-23"],
+  ["For his anger endureth but a moment; in his favour is life: weeping may endure for a night, but joy cometh in the morning.", "Psalm 30:5"],
+  ["Cause me to hear thy lovingkindness in the morning; for in thee do I trust: cause me to know the way wherein I should walk; for I lift up my soul unto thee.", "Psalm 143:8"],
+  ["The LORD bless thee, and keep thee.", "Numbers 6:24"],
+  ["The LORD make his face shine upon thee, and be gracious unto thee.", "Numbers 6:25"],
+  ["The LORD lift up his countenance upon thee, and give thee peace.", "Numbers 6:26"],
+  ["The LORD is my shepherd; I shall not want.", "Psalm 23:1"],
+  ["The LORD is my light and my salvation; whom shall I fear? the LORD is the strength of my life; of whom shall I be afraid?", "Psalm 27:1"],
+  ["God is our refuge and strength, a very present help in trouble.", "Psalm 46:1"],
+  ["What time I am afraid, I will trust in thee.", "Psalm 56:3"],
+  ["For the LORD is good; his mercy is everlasting; and his truth endureth to all generations.", "Psalm 100:5"],
+  ["O give thanks unto the LORD, for he is good: for his mercy endureth for ever.", "Psalm 107:1"],
+  ["Thy word is a lamp unto my feet, and a light unto my path.", "Psalm 119:105"],
+  ["My help cometh from the LORD, which made heaven and earth.", "Psalm 121:2"],
+  ["The LORD shall preserve thy going out and thy coming in from this time forth, and even for evermore.", "Psalm 121:8"],
+  ["I have set the LORD always before me: because he is at my right hand, I shall not be moved.", "Psalm 16:8"],
+  ["O taste and see that the LORD is good: blessed is the man that trusteth in him.", "Psalm 34:8"],
+  ["Commit thy way unto the LORD; trust also in him; and he shall bring it to pass.", "Psalm 37:5"],
+  ["Cast thy burden upon the LORD, and he shall sustain thee: he shall never suffer the righteous to be moved.", "Psalm 55:22"],
+  ["Trust in him at all times; ye people, pour out your heart before him: God is a refuge for us. Selah.", "Psalm 62:8"],
+  ["For the LORD God is a sun and shield: the LORD will give grace and glory: no good thing will he withhold from them that walk uprightly.", "Psalm 84:11"],
+  ["The LORD is good to all: and his tender mercies are over all his works.", "Psalm 145:9"],
+  ["Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.", "Proverbs 3:5-6"],
+  ["Commit thy works unto the LORD, and thy thoughts shall be established.", "Proverbs 16:3"],
+  ["Thou wilt keep him in perfect peace, whose mind is stayed on thee: because he trusteth in thee.", "Isaiah 26:3"],
+  ["For I the LORD thy God will hold thy right hand, saying unto thee, Fear not; I will help thee.", "Isaiah 41:13"],
+  ["The LORD is good, a strong hold in the day of trouble; and he knoweth them that trust in him.", "Nahum 1:7"],
+  ["Come unto me, all ye that labour and are heavy laden, and I will give you rest.", "Matthew 11:28"],
+  ["Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid.", "John 14:27"],
+  ["Rejoice in the Lord alway: and again I say, Rejoice.", "Philippians 4:4"],
+  ["I can do all things through Christ which strengtheneth me.", "Philippians 4:13"],
+  ["Casting all your care upon him; for he careth for you.", "1 Peter 5:7"],
+  ["And the LORD, he it is that doth go before thee; he will be with thee, he will not fail thee, neither forsake thee: fear not, neither be dismayed.", "Deuteronomy 31:8"],
+  ["Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.", "Joshua 1:9"],
+  ["I will both lay me down in peace, and sleep: for thou, LORD, only makest me dwell in safety.", "Psalm 4:8"],
+  ["Jesus Christ the same yesterday, and to day, and for ever.", "Hebrews 13:8"],
+  ["For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.", "2 Timothy 1:7"]
+];
+function morningVerse(day){
+  const dt = isoDay(typeof day === "string" ? day : "");
+  const n = dt ? Math.floor(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate()) / 86400000) : 0;
+  const i = ((n % BLESSINGS.length) + BLESSINGS.length) % BLESSINGS.length;
+  return BLESSINGS[i][0] + " (" + BLESSINGS[i][1] + ")";
+}
+function blessingLine(rest, day){
+  const verse = morningVerse(day);
+  return rest ? SABBATH_NOTE + " " + verse : verse;
+}
 const STREAK_PRIZES = [{at:30, steps:300}, {at:14, steps:140}, {at:7, steps:70}, {at:3, steps:30}, {at:1, steps:10}];
 function isoDay(s){
   if (typeof s !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
@@ -3926,7 +3979,8 @@ function visitKeep(){
   const day = home.day;
   const rest = home.weekday === restDayNum();
   const note = rest ? SABBATH_NOTE : "";
-  const held = {fresh:false, clamped:false, rest, note, blessing:false, day, count:streak.count, best:streak.best};
+  const verse = morningVerse(day);
+  const held = {fresh:false, clamped:false, rest, note, verse, blessing:false, day, count:streak.count, best:streak.best};
   const keepHome = () => { if (home.fresh) save(); };
   if (dayAfter(streak.last, day)){ keepHome(); return Object.assign(held, {clamped:true}); }
   if (rest){
@@ -3943,7 +3997,7 @@ function visitKeep(){
   streak.count = count;
   streak.best = best;
   save();
-  return {fresh:true, clamped:false, rest, note, blessing:true, day, count, best};
+  return {fresh:true, clamped:false, rest, note, verse, blessing:true, day, count, best};
 }
 function claimedDayOf(streak){
   if (isoDay(streak && streak.claimedDay)) return streak.claimedDay;
@@ -3973,7 +4027,7 @@ function claimStreak(){
 function noteDailyVisit(){
   if (!keepOn()) return null;
   const v = visitKeep();
-  if (v.fresh) toast(v.rest ? SABBATH_NOTE : "A blessing for this day.");
+  if (v.fresh) toast(blessingLine(v.rest, v.day));
   return v;
 }
 function renderStreak(){

@@ -82,6 +82,8 @@ export function boot(raw, opts){
     if (typeof claimStreak === "function") __api.claimStreak = claimStreak;
     if (typeof streakPrize === "function") __api.streakPrize = streakPrize;
     if (typeof noteDailyVisit === "function") __api.noteDailyVisit = noteDailyVisit;
+    if (typeof morningVerse === "function") __api.morningVerse = morningVerse;
+    if (typeof blessingLine === "function") __api.blessingLine = blessingLine;
     if (typeof start === "function") __api.start = start;
     if (typeof weatherKind === "function") __api.weatherKind = weatherKind;
     if (typeof roundWeatherCoord === "function") __api.roundWeatherCoord = roundWeatherCoord;
