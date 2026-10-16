@@ -1,4 +1,6 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<script>try{var kq=new URLSearchParams(location.search);if(kq.get("keep")==="1")sessionStorage.setItem("scalebank.keep","1");if(kq.get("keep")==="1"||sessionStorage.getItem("scalebank.keep")==="1")document.documentElement.classList.add("keep-on");}catch(e){}</script>
+</head><body>
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,6 +46,31 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .tab-ul{position:absolute;z-index:1;top:-4.2px;left:calc((var(--ti,0) + .5) * 25%);width:50px;height:12px;margin-left:-25px;pointer-events:none;background:url(art/nest/nav_active_underline.webp) center/100% 100% no-repeat;transition:left .25s cubic-bezier(.65,0,.35,1)}
 .tab .dot{position:absolute;top:-2px;left:calc(50% + 5px);width:20px;height:20px;animation:dotpulse 1.6s ease-in-out infinite}
 @keyframes dotpulse{0%,100%{opacity:.7}50%{opacity:1}}
+/* Keep is off unless html.keep-on (?keep=1, remembered in sessionStorage). */
+.tab-keep{display:none!important}
+html.keep-on .tabs{grid-template-columns:repeat(5,1fr)}
+html.keep-on .tab-ul{left:calc((var(--ti,0) + .5) * 20%)}
+html.keep-on .tab-keep{display:flex!important}
+html.keep-on .tab-keep .ti{object-fit:contain}
+/* Missing Keep art stays invisible until the file loads. The paths are real. */
+img[src^="art/keep/"]{visibility:hidden}
+img[src^="art/keep/"].is-ok{visibility:visible}
+html.keep-on #keep{position:relative;overflow:visible;background:var(--ink)}
+html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;top:0;right:0;height:calc(100% + var(--keep-cover,96px))}
+html.keep-open #app::before{content:"";position:absolute;z-index:1;left:0;right:0;bottom:0;height:var(--keep-cover,96px);background:var(--ink);pointer-events:none}
+html.keep-open .tabs{position:relative;z-index:2}
+.keep-bg{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
+.keep-build{position:absolute;z-index:3;top:12px;right:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206;font-size:12px;font-weight:700;letter-spacing:.06em;box-shadow:inset 0 1px 0 rgba(255,240,200,.5),0 2px 0 #5c3d0c}
+.keep-build:active{transform:translateY(1px)}
+/* Lectern hotspot, fractions of the full painting (1008×1792, tab strip included). */
+.keep-hot{position:absolute;z-index:3;left:27%;top:70%;width:46%;height:14%;padding:0;border:0;background:transparent;color:var(--gold-hi)}
+.keep-hot span{position:absolute;left:50%;bottom:10%;transform:translateX(-50%);padding:5px 12px;border-radius:999px;background:rgba(12,16,21,.82);border:1px solid var(--gold-lo);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.keep-hot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:12px}
+.ledger{width:min(100%,380px);max-height:100%;display:flex;flex-direction:column;gap:12px}
+.ledger-sheet{min-height:280px;max-height:min(680px,calc(100vh - 180px));border:1px solid var(--gold-lo);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,#2a241c,#14110e)}
+.ledger-sheet img{display:block;width:100%;height:100%;min-height:280px;object-fit:contain}
+.ledger p{margin:0;text-align:center;color:var(--muted)}
+.ledger .btn{align-self:center;min-width:140px}
 
 /* ---------- shared bits ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
@@ -588,6 +615,14 @@ button.dexchip{cursor:pointer}
     <div id="dragonBody"></div>
   </main>
 
+  <main id="keep" class="screen" aria-label="Keep" hidden>
+    <div class="keep-stage">
+      <img class="keep-bg" src="art/keep/keep-v6.webp" alt="" draggable="false">
+      <button type="button" class="keep-build" data-act="keep-build">Build</button>
+      <button type="button" class="keep-hot" data-act="keep-ledger" aria-label="Ledger"><span>Ledger</span></button>
+    </div>
+  </main>
+
   <main id="bestiary" class="screen bst-journal" aria-label="Bestiary" hidden>
     <div class="bst-scroll">
       <div class="bst-frame">
@@ -609,6 +644,7 @@ button.dexchip{cursor:pointer}
     <button class="tab" data-tab="vendors"><img class="ti off" src="art/nest/icon_vendors_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_vendors_active.webp" alt="">Vendors</button>
     <button class="tab" data-tab="nest"><img class="ti off" src="art/nest/icon_nest_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_nest_active.webp" alt="">Nest<img class="dot" id="readyDot" src="art/nest/nav_notification_dot.webp" alt="" hidden></button>
     <button class="tab" data-tab="dragon"><img class="ti off" src="art/nest/icon_dragon_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_dragon_active.webp" alt="">Dragon</button>
+    <button class="tab tab-keep" data-tab="keep"><img class="ti off" src="art/keep/icon_keep_inactive.png" alt=""><img class="ti on" src="art/keep/icon_keep_active.png" alt="">Keep</button>
     <i class="tab-ul" aria-hidden="true"></i>
   </nav>
 
@@ -616,6 +652,13 @@ button.dexchip{cursor:pointer}
   <div class="overlay" id="shareOv" hidden></div>
   <div class="overlay bst-journal" id="dexOv" hidden></div>
   <div class="overlay reveal-ov" id="revealOv" hidden></div>
+  <div class="overlay" id="ledgerOv" hidden>
+    <div class="ledger" role="dialog" aria-modal="true" aria-label="Ledger">
+      <div class="ledger-sheet"><img src="art/keep/ledger-v3.webp" alt=""></div>
+      <p>Nothing written here yet.</p>
+      <button type="button" class="btn" data-act="close-ledger">Close</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1302,10 +1345,14 @@ function artRoostVideo(){ return sceneVideo("roost", "A hooded stranger crouches
 
 /* ================= screens ================= */
 function setTab(t, sub){
+  if (t === "keep" && !document.documentElement.classList.contains("keep-on")) t = "bank";
+  document.documentElement.classList.toggle("keep-open", t === "keep");
   S.tab = t;
   DSUB = t === "dragon" && sub === "bestiary" ? "bestiary" : null;
-  for (const id of ["bank","vendors","nest","dragon"]) document.getElementById(id).hidden = id !== t || (id === "dragon" && DSUB === "bestiary");
+  for (const id of ["bank","vendors","nest","dragon","keep"]) document.getElementById(id).hidden = id !== t || (id === "dragon" && DSUB === "bestiary");
   $("#bestiary").hidden = DSUB !== "bestiary";
+  if (t !== "keep") closeLedger();
+  else requestAnimationFrame(syncKeepCover);
   document.querySelectorAll(".tab").forEach((b, i) => { if (b.dataset.tab === t){ b.setAttribute("aria-current","page"); $(".tabs").style.setProperty("--ti", i); } else b.removeAttribute("aria-current"); });
   if (t === "vendors") requestAnimationFrame(() => scrollToScene(S.scene, false));
   syncVideos();
@@ -1977,6 +2024,7 @@ document.addEventListener("click", ev => {
   }
   const tab = ev.target.closest(".tab");
   if (tab){ setTab(tab.dataset.tab); return; }
+  if (ev.target.id === "ledgerOv"){ closeLedger(); return; }
   const b = ev.target.closest("[data-act]");
   if (!b) return;
   const a = b.dataset.act;
@@ -2015,6 +2063,9 @@ document.addEventListener("click", ev => {
     });
   }
   else if (a === "close-dex") closeDex();
+  else if (a === "keep-build") toast("Coming soon");
+  else if (a === "keep-ledger") openLedger();
+  else if (a === "close-ledger") closeLedger();
   else if (a === "dex-replay"){ const d = S.dragons.find(x => x.id === b.dataset.id); closeDex(); if (d) replayReveal(d); }
   else if (a === "share") openShare();
   else if (a === "close-share"){ $("#shareOv").hidden = true; $("#shareOv").innerHTML = ""; autoHatch(); }
@@ -2041,6 +2092,7 @@ document.addEventListener("keydown", ev => {
     return;
   }
   if (ev.key !== "Escape") return;
+  if (!$("#ledgerOv").hidden){ closeLedger(); return; }
   /* Reveal overlay: Escape skips (if allowed) or closes (if payoff ready) */
   if (!$("#revealOv").hidden && revealActive){
     if (revealActive.payoffReady){ closeReveal(); return; }
@@ -2051,7 +2103,34 @@ document.addEventListener("keydown", ev => {
   if (!$("#shareOv").hidden){ $("#shareOv").hidden = true; }
   else if (!$("#hatchOv").hidden && $("#hafter")?.classList.contains("show")) closeHatch();
 });
-window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); });
+function syncKeepCover(){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  const tabs = $(".tabs"), app = $("#app");
+  if (!tabs || !app) return;
+  const cover = app.getBoundingClientRect().bottom - tabs.getBoundingClientRect().top;
+  if (cover > 0) app.style.setProperty("--keep-cover", Math.ceil(cover) + "px");
+}
+function openLedger(){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  const ov = $("#ledgerOv");
+  ov.hidden = false;
+  const b = ov.querySelector("[data-act=close-ledger]");
+  if (b) b.focus();
+}
+function closeLedger(){
+  const ov = $("#ledgerOv");
+  if (!ov || ov.hidden) return;
+  ov.hidden = true;
+  const hot = $(".keep-hot");
+  if (hot && !$("#keep").hidden) hot.focus();
+}
+window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncKeepCover);
+document.querySelectorAll('img[src^="art/keep/"]').forEach(img => {
+  const ok = () => { if (img.naturalWidth) img.classList.add("is-ok"); };
+  img.addEventListener("load", ok);
+  if (img.complete) ok();
+});
 
 /* ================= debug panel ================= */
 /* For testing late-game states without thousands of taps. Only shown with ?debug=1 or #debug. */
@@ -2212,6 +2291,7 @@ function start(data){
   if (migrating) save();
   ITEMS.forEach(it => { if (S.owned[it.id]) for (let k = 1; k <= it.scene; k++) S.opened[k] = true; });
   applyDebugParams();
+  syncKeepCover();
   shown = S.bank;
   $("#balance").textContent = fmt(S.bank);
   buildScenes();
