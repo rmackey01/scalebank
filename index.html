@@ -88,18 +88,26 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-filters{position:absolute;width:0;height:0;overflow:hidden}
 .keep-slot{position:absolute;margin:0;padding:0;border:0;background:transparent;line-height:0;pointer-events:auto}
 .keep-slot img{width:100%;height:100%;display:block;object-fit:fill;pointer-events:none}
-.keep-ledger{z-index:5;border-radius:999px;background:transparent;overflow:visible}
-.keep-ledger img{width:100%;height:100%;display:block;object-fit:fill;pointer-events:none}
+.keep-ledger{z-index:5;display:flex;align-items:flex-end;justify-content:center;border-radius:0;background:transparent;color:#f0d59a}
+.keep-ledger span{display:flex;align-items:center;justify-content:center;gap:4px;width:88%;height:46%;margin-bottom:8%;border-radius:999px;border:1.5px solid #c9a15a;background:#140e0a;box-shadow:inset 0 0 0 1px rgba(240,213,154,.25);font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.12em;line-height:1;text-transform:uppercase;color:#f0d59a;pointer-events:none}
+.keep-ledger svg{width:12px;height:12px;flex:none}
+.keep-ledger img{display:none;width:100%;height:100%;object-fit:fill;pointer-events:none}
+.keep-ledger.is-art{border-radius:999px}
+.keep-ledger.is-art span{display:none}
+.keep-ledger.is-art img{display:block}
 .keep-spot:focus{outline:none}
 .keep-spot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
 .keep-spot.is-live::before{content:"";position:absolute;inset:-35%;border-radius:50%;pointer-events:none;mix-blend-mode:screen}
 .keep-forge.is-live::before{background:radial-gradient(ellipse at 50% 42%, rgba(255,226,160,.95), rgba(255,150,40,.5) 42%, transparent 72%)}
 .keep-pool.is-live::before{background:radial-gradient(ellipse at 50% 55%, rgba(220,248,255,.95), rgba(90,190,255,.55) 46%, transparent 74%)}
-/* Weather sits on the stage, above the tab bar, and does not pan with the painting. */
-.keep-weather{position:absolute;z-index:6;left:8px;bottom:calc(var(--keep-tab,16px) + 8px);max-width:calc(100% - 108px);padding:6px 10px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.9);color:var(--gold-hi);font-size:12px;font-weight:700;letter-spacing:.02em;pointer-events:auto}
-.keep-weather[aria-pressed="true"]{border-color:var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206}
-.keep-weather:active{transform:translateY(1px)}
-.keep-credit{position:absolute;z-index:6;left:8px;bottom:calc(var(--keep-tab,16px) + 42px);margin:0;font-size:10px;line-height:1.2;letter-spacing:.04em;color:var(--muted);text-decoration:none;pointer-events:auto}
+.keep-credit{position:absolute;z-index:6;left:8px;bottom:calc(var(--keep-tab,16px) + 8px);margin:0;max-width:calc(100% - 108px);font-size:10px;line-height:1.2;letter-spacing:.04em;color:var(--muted);text-decoration:none;pointer-events:auto}
+.ldg-opts{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:0}
+.ldg-opt{display:inline-flex;align-items:center;gap:6px;margin:0;padding:3px 4px 3px 8px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.55);color:var(--gold-hi);font-size:11px;font-weight:700;letter-spacing:.01em;line-height:1.2;cursor:pointer}
+.ldg-opt i{position:relative;width:22px;height:12px;border-radius:999px;background:#2a241c;border:1px solid var(--gold-lo);flex:none}
+.ldg-opt i::after{content:"";position:absolute;top:1px;left:1px;width:8px;height:8px;border-radius:50%;background:#8a8070}
+.ldg-opt[aria-pressed="true"]{border-color:var(--gold);background:rgba(216,169,75,.16)}
+.ldg-opt[aria-pressed="true"] i{background:linear-gradient(180deg,#e8bd5f,#b9862e);border-color:#8a5a1c}
+.ldg-opt[aria-pressed="true"] i::after{transform:translateX(10px);background:#1b1206}
 /* Pens are percentages of the full 1008×1792 painting, inside the same fit as the art. */
 .keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .keep-fence{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
@@ -748,12 +756,11 @@ button.dexchip{cursor:pointer}
         <div class="keep-wing" id="keepWing"><p class="wing-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span></p></div>
         <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
         <button type="button" class="keep-spot keep-pool" data-act="keep-pool" aria-label="Moon Pool" hidden></button>
-        <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"><img alt="" draggable="false" src="art/keep/ledger-plaque.webp"></button>
+        <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"><span><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M3 2.5h4.2c.7 0 1.3.2 1.8.6.5-.4 1.1-.6 1.8-.6H15v10.2h-4.2c-.7 0-1.3.2-1.8.6-.5-.4-1.1-.6-1.8-.6H3V2.5zm1.2 1.1v7.8h2.6c.6 0 1.1.1 1.5.4V4.2c-.4-.2-.9-.4-1.5-.4H4.2zm6.5 0c-.6 0-1.1.2-1.5.4v7.6c.4-.3.9-.4 1.5-.4h2.6V3.6h-2.6z"/></svg>Ledger</span><img alt="" draggable="false"></button>
       </div>
       </div>
       </div>
     </div>
-    <button type="button" class="keep-weather" data-act="keep-weather" aria-pressed="false">Show my weather</button>
     <a class="keep-credit" id="keepCredit" href="https://open-meteo.com/" hidden>Weather by Open-Meteo</a>
     <button type="button" class="keep-build" data-act="keep-build">Build</button>
   </main>
@@ -1016,6 +1023,7 @@ function normKeep(k){
     if (typeof s.homeZone === "string" && s.homeZone) base.streak.homeZone = s.homeZone;
   }
   if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
+  if (k.verse === false) base.verse = false;
   base.shown = {};
   const shown = k.shown;
   if (shown && typeof shown === "object" && !Array.isArray(shown)){
@@ -2268,7 +2276,8 @@ document.addEventListener("click", ev => {
   else if (a === "keep-build") toast("Coming soon");
   else if (a === "keep-forge"){ if (b.dataset.id) openCare(b.dataset.id); }
   else if (a === "keep-pool"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
-  else if (a === "keep-weather") toggleWeather();
+  else if (a === "ledger-weather") toggleWeather();
+  else if (a === "ledger-verse"){ toggleVerse(); if (!$("#ledgerOv").hidden) renderLedger(); }
   else if (a === "streak-claim"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "keep-ledger") openLedger();
   else if (a === "close-ledger") closeLedger();
@@ -2453,14 +2462,11 @@ function storeWeather(w){
 }
 function weatherOn(){ return !!(S && S.keep && S.keep.weather && S.keep.weather.on === true); }
 function syncWeatherChrome(){
-  const btn = $(".keep-weather");
   const credit = $("#keepCredit");
   const on = !!(keepOn() && weatherOn());
-  if (btn){
-    btn.setAttribute("aria-pressed", on ? "true" : "false");
-    btn.textContent = on ? "Hide my weather" : "Show my weather";
-  }
   if (credit) credit.hidden = !on;
+  const btn = document.querySelector("[data-act=ledger-weather]");
+  if (btn) btn.setAttribute("aria-pressed", on ? "true" : "false");
 }
 function setSkyKind(kind){
   const next = kind || "";
@@ -2509,6 +2515,7 @@ function toggleWeather(){
     save();
     setSkyKind("");
     syncWeatherChrome();
+    if (!$("#ledgerOv").hidden) renderLedger();
     return;
   }
   const prev = S.keep.weather && typeof S.keep.weather === "object" ? S.keep.weather : {};
@@ -2516,6 +2523,7 @@ function toggleWeather(){
   save();
   syncWeatherChrome();
   refreshWeather();
+  if (!$("#ledgerOv").hidden) renderLedger();
 }
 function refreshWeather(){
   if (!keepOn() || !weatherOn()) return;
@@ -2663,9 +2671,8 @@ const PENS = [
   {id:"green", x:45.14, y:83.15, w:26.79, h:8.37, at:5}
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
-/* Plaque art, pixels on the 1008×1792 painting. slot-map ledgerPlaque replaces this once loaded. */
-const LEDGER_PLAQUE = {file:"ledger-plaque.webp", x:653, y:836, w:166, h:49};
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
+const KEEP_LEDGER = {x:62.6, y:42.5, w:19.2, h:7.8};
 const KEEP_BUILD = {x:70, y:88.2, w:26, h:3.6};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
 const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
@@ -2876,21 +2883,40 @@ function markPenReady(){
   });
   world.dataset.ready = ok ? "1" : "0";
 }
+let ledgerArt = "";
 function placeLedgerPlaque(){
   const el = $(".keep-ledger");
-  const row = (slotMap && slotMap.ledgerPlaque) || LEDGER_PLAQUE;
-  if (!el || !row) return;
-  placeKeepBox(el, {
-    x: row.x / KEEP_W * 100,
-    y: row.y / KEEP_H * 100,
-    w: row.w / KEEP_W * 100,
-    h: row.h / KEEP_H * 100
-  });
+  if (!el) return;
+  const row = slotMap && slotMap.ledgerPlaque;
+  const file = row && typeof row.file === "string" ? row.file.split("/").pop() : "";
+  const url = file ? "art/keep/" + file : "";
   const img = el.querySelector("img");
-  if (img && row.file){
-    const url = "art/keep/" + String(row.file).split("/").pop();
-    if (img.getAttribute("src") !== url) img.src = url;
-  }
+  const paint = art => {
+    el.classList.toggle("is-art", art);
+    if (img) img.hidden = !art;
+    if (art && row){
+      placeKeepBox(el, {x: row.x / KEEP_W * 100, y: row.y / KEEP_H * 100, w: row.w / KEEP_W * 100, h: row.h / KEEP_H * 100});
+    } else placeKeepBox(el, KEEP_LEDGER);
+  };
+  if (!url || ledgerArt === "miss"){ paint(false); return; }
+  if (ledgerArt === "ok"){ paint(true); return; }
+  paint(false);
+  if (!img || img.dataset.ask === url) return;
+  img.dataset.ask = url;
+  img.onload = () => {
+    if (!img.naturalWidth){ ledgerArt = "miss"; placeLedgerPlaque(); return; }
+    ledgerArt = "ok";
+    placeLedgerPlaque();
+  };
+  img.onerror = () => {
+    ledgerArt = "miss";
+    img.onload = null;
+    img.onerror = null;
+    img.removeAttribute("src");
+    placeLedgerPlaque();
+  };
+  img.src = url;
+  if (img.complete && img.naturalWidth){ ledgerArt = "ok"; paint(true); }
 }
 function placeKeepBox(el, box){
   if (!el || !box) return;
@@ -3597,7 +3623,9 @@ function renderLedger(){
   const full = keep.roaming.length >= 6;
   const roamRows = keep.roaming.map(id => ledgerRow(id, "roam")).join("");
   const stabRows = keep.stables.map(id => ledgerRow(id, "stab")).join("");
+  const opt = (act, label, on) => `<button type="button" class="ldg-opt" data-act="${act}" role="switch" aria-pressed="${on ? "true" : "false"}"><span>${label}</span><i aria-hidden="true"></i></button>`;
   body.innerHTML = `<h2>Keeper's Ledger</h2>
+    <div class="ldg-opts">${opt("ledger-verse", "Morning Blessing", verseOn())}${opt("ledger-weather", "Live weather", weatherOn())}</div>
     ${pick ? `<p class="ldg-swap" role="status">Pick a dragon in the stables to swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
     <section class="ldg-sec ldg-roam"><h3>Roaming in the Keep (${keep.roaming.length}/6)</h3>${roamRows ? `<ul class="ldg-list">${roamRows}</ul>` : `<p class="ldg-empty">No one is roaming.</p>`}</section>
     <section class="ldg-sec ldg-stables-sec"><h3>Resting in the Stables (${keep.stables.length})</h3>${full ? `<p class="ldg-hint" id="ldgFull">Keep is full, swap instead</p>` : ""}<div class="ldg-stables">${stabRows ? `<ul class="ldg-list">${stabRows}</ul>` : `<p class="ldg-empty">The stables are empty.</p>`}</div></section>`;
@@ -4058,10 +4086,18 @@ function claimStreak(){
   save();
   return steps;
 }
+function verseOn(){ return !(S && S.keep && S.keep.verse === false); }
+function toggleVerse(){
+  if (!keepOn() || !S) return;
+  if (!S.keep || typeof S.keep !== "object") S.keep = freshKeep();
+  if (verseOn()) S.keep.verse = false;
+  else delete S.keep.verse;
+  save();
+}
 function noteDailyVisit(){
   if (!keepOn()) return null;
   const v = visitKeep();
-  if (v.fresh) toast(blessingLine(v.rest, v.day));
+  if (v.fresh && verseOn()) toast(blessingLine(v.rest, v.day));
   return v;
 }
 function renderStreak(){
