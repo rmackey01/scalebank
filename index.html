@@ -946,6 +946,7 @@ function normKeep(k){
     base.streak.count = Number.isFinite(+s.count) ? +s.count : 0;
     base.streak.best = Number.isFinite(+s.best) ? +s.best : 0;
     if (typeof s.claimed === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.claimed)) base.streak.claimed = s.claimed;
+    if (typeof s.seen === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.seen)) base.streak.seen = s.seen;
   }
   if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
   return base;
@@ -1438,8 +1439,7 @@ function setTab(t, sub){
   if (t !== "keep"){ closeLedger({restore:false}); stopPenLoop(); }
   else {
     requestAnimationFrame(() => { syncKeepCover(); syncPens(); startPenLoop(); });
-    const v = visitKeep();
-    if (v.fresh) toast(v.rest ? "Sabbath rest. No chores required." : "A blessing for this day.");
+    noteDailyVisit();
     renderStreak();
   }
   document.querySelectorAll(".tab").forEach((b, i) => { if (b.dataset.tab === t){ b.setAttribute("aria-current","page"); $(".tabs").style.setProperty("--ti", i); } else b.removeAttribute("aria-current"); });
@@ -2242,7 +2242,13 @@ const penActors = new Map();
 const penEls = new Map();
 let penMetrics = {rw:0, rh:0, cw:0};
 let penSig = "", penRaf = 0, penLast = 0, penFrames = 0;
-function keepOn(){ return document.documentElement.classList.contains("keep-on"); }
+function keepOn(){
+  try {
+    if (new URLSearchParams(location.search).get("keep") === "1") return true;
+    if (sessionStorage.getItem("scalebank.keep") === "1") return true;
+  } catch (e) {}
+  return document.documentElement.classList.contains("keep-on");
+}
 function penStill(){ return matchMedia("(prefers-reduced-motion: reduce)").matches; }
 function penNow(){ return typeof performance !== "undefined" ? performance.now() : Date.now(); }
 function pensOpen(n){
@@ -2952,34 +2958,38 @@ function streakBag(){
   S.keep = keep;
   return keep.streak;
 }
-/* Record today's visit. A saved day ahead of now is clamped to today and pays nothing. */
+/* A day counts only when its local date string is strictly later than last. last never moves backward. */
 function visitKeep(){
   const day = today();
   const streak = streakBag();
   const rest = isRestDay(day);
   const note = rest ? SABBATH_NOTE : "";
-  if (dayAfter(streak.last, day) || dayAfter(streak.claimed, day)){
-    if (dayAfter(streak.last, day)) streak.last = day;
-    streak.claimed = day;
+  const held = {fresh:false, clamped:false, rest, note, blessing:false, count:streak.count, best:streak.best};
+  if (dayAfter(streak.last, day)) return Object.assign(held, {clamped:true});
+  if (rest){
+    if (dayAfter(streak.seen, day)) return held;
+    if (streak.seen === day) return held;
+    streak.seen = day;
     save();
-    return {fresh:false, clamped:true, rest, note, blessing:false, count:streak.count, best:streak.best};
+    return Object.assign(held, {fresh:true});
   }
-  if (streak.last === day) return {fresh:false, clamped:false, rest, note, blessing:false, count:streak.count, best:streak.best};
+  if (isoDay(streak.last) && !dayAfter(day, streak.last)) return held;
   const count = !isoDay(streak.last) || streakBroken(streak.last, day) ? 1 : Math.max(0, Math.round(+streak.count || 0)) + 1;
   const best = Math.max(Math.round(+streak.best || 0), count);
   streak.last = day;
   streak.count = count;
   streak.best = best;
   save();
-  return {fresh:true, clamped:false, rest, note, blessing:!rest, count, best};
+  return {fresh:true, clamped:false, rest, note, blessing:true, count, best};
 }
-/* One prize per local day, sized by the current streak. A clamped day does not pay. */
+/* Pay the current tier once per later local date. Sunday and a day that is not past claimed pay nothing. */
 function claimStreak(){
   const v = visitKeep();
-  if (v.clamped) return 0;
+  if (v.clamped || v.rest) return 0;
   const day = today();
   const streak = streakBag();
-  if (streak.claimed === day) return 0;
+  if (isoDay(streak.claimed) && !(day > streak.claimed)) return 0;
+  if (streak.last !== day) return 0;
   const steps = streakPrize(streak.count);
   if (steps <= 0) return 0;
   S.bank += steps;
@@ -2987,18 +2997,25 @@ function claimStreak(){
   save();
   return steps;
 }
+function noteDailyVisit(){
+  if (!keepOn()) return null;
+  const v = visitKeep();
+  if (v.fresh) toast(v.rest ? SABBATH_NOTE : "A blessing for this day.");
+  return v;
+}
 function renderStreak(){
   const el = $("#keepStreak");
   if (!el) return;
-  if (!document.documentElement.classList.contains("keep-on")){ el.hidden = true; return; }
+  if (!keepOn()){ el.hidden = true; return; }
   const streak = streakBag();
   const day = today();
   const rest = isRestDay(day);
   const prize = streakPrize(streak.count);
-  const claimed = streak.claimed === day;
+  const blocked = isoDay(streak.claimed) && !(day > streak.claimed);
   const note = rest ? `<p class="ks-note">${SABBATH_NOTE}</p>` : "";
+  const label = rest ? "Sabbath rest" : (blocked ? "Claimed today" : "Claim " + fmt(prize) + " steps");
   el.hidden = false;
-  el.innerHTML = `<p class="ks-day">Day ${streak.count || 0}</p><p class="ks-best">Best ${streak.best || 0}</p>${note}<button type="button" class="btn" data-act="streak-claim"${claimed || prize <= 0 ? " disabled" : ""}>${claimed ? "Claimed today" : "Claim " + fmt(prize) + " steps"}</button>`;
+  el.innerHTML = `<p class="ks-day">Day ${streak.count || 0}</p><p class="ks-best">Best ${streak.best || 0}</p>${note}<button type="button" class="btn" data-act="streak-claim"${rest || blocked || prize <= 0 ? " disabled" : ""}>${label}</button>`;
 }
 const CARE_ACTS = {
   feed:  {key:"fed", ms:4 * 60 * 60 * 1000, label:"Feed"},
@@ -3179,6 +3196,7 @@ function start(data){
   if (migrating) save();
   ITEMS.forEach(it => { if (S.owned[it.id]) for (let k = 1; k <= it.scene; k++) S.opened[k] = true; });
   applyDebugParams();
+  noteDailyVisit();
   syncKeepCover();
   shown = S.bank;
   $("#balance").textContent = fmt(S.bank);

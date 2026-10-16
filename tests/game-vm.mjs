@@ -42,7 +42,9 @@ function element(){
   return el;
 }
 
-export function boot(raw){
+export function boot(raw, opts){
+  const search = opts && opts.search ? String(opts.search) : "";
+  const session = new Map(Object.entries(opts && opts.session || {}));
   const html = readFileSync(join(root, "index.html"), "utf8");
   const open = html.lastIndexOf("<script>");
   const close = html.lastIndexOf("</script>");
@@ -75,6 +77,8 @@ export function boot(raw){
     if (typeof visitKeep === "function") __api.visitKeep = visitKeep;
     if (typeof claimStreak === "function") __api.claimStreak = claimStreak;
     if (typeof streakPrize === "function") __api.streakPrize = streakPrize;
+    if (typeof noteDailyVisit === "function") __api.noteDailyVisit = noteDailyVisit;
+    if (typeof start === "function") __api.start = start;
     return __api;
   `;
 
@@ -100,6 +104,7 @@ export function boot(raw){
   };
   const sandbox = {
     console, setTimeout, clearTimeout, setInterval, clearInterval,
+    performance: { now: () => Date.now() },
     requestAnimationFrame: (fn) => setTimeout(fn, 16),
     cancelAnimationFrame: (id) => clearTimeout(id),
     Date, Math, JSON, Object, Array, Set, Map, Number, String, Boolean, RegExp, Error,
@@ -109,8 +114,12 @@ export function boot(raw){
     matchMedia: () => ({ matches: false, addEventListener(){}, removeEventListener(){} }),
     document,
     localStorage,
-    sessionStorage: { getItem(){ return null; }, setItem(){}, removeItem(){} },
-    location: { search: "", hash: "", href: "http://localhost/index.html" },
+    sessionStorage: {
+      getItem(k){ return session.has(k) ? session.get(k) : null; },
+      setItem(k, v){ session.set(k, String(v)); },
+      removeItem(k){ session.delete(k); }
+    },
+    location: { search, hash: "", href: "http://localhost/index.html" + search },
     navigator: { userAgent: "node" }
   };
   sandbox.window = sandbox;
