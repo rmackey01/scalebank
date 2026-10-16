@@ -239,6 +239,105 @@ add("timezone", t => {
   t.equal(ahead.snapshot().keep.streak.claimed, key(2026, 10, 20), "a later claimed date is not moved backward");
   t.equal(ahead.snapshot().keep.streak.count, 4, "the strictly later day still counts");
   t.equal(ahead.snapshot().bank, 100, "a claimed-ahead day pays nothing");
+  t.equal(g.snapshot().keep.streak.tz, new Date(stamp(2026, 10, 16, 23, 50)).getTimezoneOffset(), "the counted day stores the offset");
+});
+
+add("chicago-tokyo", t => {
+  const CHI = 300, TYO = -540;
+  let off = CHI;
+  let clock = Date.UTC(2026, 9, 17, 1, 0, 0);
+  const g = boot(save());
+  g.setCareClock(() => clock);
+  g.setZoneOffset(() => off);
+  t.equal(g.claimStreak(), 10, "Chicago at 8 PM pays the first day");
+  t.equal(g.snapshot().keep.streak.count, 1, "Chicago starts at day 1");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-16", "Chicago's date is Oct 16");
+  t.equal(g.snapshot().keep.streak.tz, CHI, "the saved offset is Chicago");
+  const bank = g.snapshot().bank;
+  const writes = g.writes();
+  off = TYO;
+  const moved = g.visitKeep();
+  t.equal(moved.fresh, false, "Tokyo the same instant is not a new day");
+  t.equal(moved.count, 1, "Tokyo does not make day 2");
+  t.equal(g.claimStreak(), 0, "Tokyo does not pay another 10");
+  t.equal(g.writes(), writes, "the zone change is not saved");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-16", "last stays the Chicago day");
+  t.equal(g.snapshot().keep.streak.tz, CHI, "the saved offset stays Chicago");
+  t.equal(g.snapshot().bank, bank, "the bank stays put");
+  off = CHI;
+  clock = Date.UTC(2026, 9, 18, 1, 0, 0);
+  t.equal(g.claimStreak(), 10, "the next day in both offsets pays once");
+  t.equal(g.snapshot().keep.streak.count, 2, "that day adds one");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-17", "Saturday is the new day");
+  t.equal(g.claimStreak(), 0, "Saturday does not pay twice");
+});
+
+add("tokyo-chicago", t => {
+  const CHI = 300, TYO = -540;
+  let off = TYO;
+  let clock = Date.UTC(2026, 9, 16, 1, 0, 0);
+  const g = boot(save());
+  g.setCareClock(() => clock);
+  g.setZoneOffset(() => off);
+  t.equal(g.claimStreak(), 10, "Tokyo morning pays the first day");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-16", "Tokyo's date is Oct 16");
+  t.equal(g.snapshot().keep.streak.tz, TYO, "the saved offset is Tokyo");
+  const bank = g.snapshot().bank;
+  const writes = g.writes();
+  off = CHI;
+  clock = Date.UTC(2026, 9, 17, 1, 0, 0);
+  const moved = g.visitKeep();
+  t.equal(moved.fresh, false, "Chicago still on Oct 16 is not a new day");
+  t.equal(moved.count, 1, "Chicago does not add a day while Tokyo has already turned");
+  t.equal(g.claimStreak(), 0, "Chicago does not pay");
+  t.equal(g.writes(), writes, "the westward change is not saved");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-16", "last stays the Tokyo day");
+  t.equal(g.snapshot().keep.streak.tz, TYO, "the saved offset stays Tokyo");
+  t.equal(g.snapshot().bank, bank, "no steps are added");
+  clock = Date.UTC(2026, 9, 18, 1, 0, 0);
+  t.equal(g.claimStreak(), 10, "the later day in both offsets pays once");
+  t.equal(g.snapshot().keep.streak.count, 2, "Chicago Saturday adds one");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-17", "the counted date is Chicago's");
+  t.equal(g.snapshot().keep.streak.tz, CHI, "the offset updates when the day counts");
+});
+
+add("dst", t => {
+  let off = 360;
+  let clock = Date.UTC(2026, 9, 17, 2, 0, 0);
+  const g = boot(save());
+  g.setCareClock(() => clock);
+  g.setZoneOffset(() => off);
+  t.equal(g.claimStreak(), 10, "the day before the shift pays");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-16", "standard time records Oct 16");
+  t.equal(g.snapshot().keep.streak.tz, 360, "standard offset is saved");
+  const bank = g.snapshot().bank;
+  const writes = g.writes();
+  off = 300;
+  const shifted = g.visitKeep();
+  t.equal(shifted.fresh, false, "a one-hour shift on the same date is not a new day");
+  t.equal(g.claimStreak(), 0, "daylight time does not pay again");
+  t.equal(g.writes(), writes, "the daylight shift is not saved");
+  t.equal(g.snapshot().keep.streak.count, 1, "the streak stays on day 1");
+  clock = Date.UTC(2026, 9, 17, 5, 30, 0);
+  t.equal(g.visitKeep().fresh, false, "the new offset's next date still waits for the saved offset");
+  t.equal(g.claimStreak(), 0, "one offset rolling forward does not pay");
+  t.equal(g.snapshot().keep.streak.count, 1, "daylight time alone does not add a day");
+  t.equal(g.snapshot().bank, bank, "no daylight gift");
+  clock = Date.UTC(2026, 9, 17, 6, 30, 0);
+  t.equal(g.claimStreak(), 10, "the day counts once both offsets have turned");
+  t.equal(g.snapshot().keep.streak.count, 2, "the next date adds one");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-17", "Saturday is recorded");
+  t.equal(g.snapshot().keep.streak.tz, 300, "the new offset is saved with the day");
+  t.equal(g.claimStreak(), 0, "that day pays only once");
+});
+
+add("old-save-offset", t => {
+  let clock = stamp(2026, 10, 16, 15);
+  const g = boot(save({last: key(2026, 10, 15), count: 2, best: 2}));
+  g.setCareClock(() => clock);
+  const v = g.visitKeep();
+  t.equal(v.count, 3, "a save with no offset still counts the next local day");
+  t.equal(g.snapshot().keep.streak.tz, new Date(clock).getTimezoneOffset(), "the new day stores the current offset");
 });
 
 let failed = 0;
