@@ -2358,7 +2358,7 @@ function mountKeepArt(){
   loadSpriteBook();
   syncPenFences(bg ? bg.getAttribute("src") : "");
 }
-/* Feet boxes on the 1008×1792 painting. Snow drops every box 8px. Ember, violet, azure, pond. */
+/* Feet boxes on the 1008×1792 painting. Ember, violet, azure, pond. */
 const PENS = [
   {id:"red", x:22.32, y:56.47, w:33.73, h:12.56, at:1},
   {id:"purple", x:45.83, y:66.63, w:27.28, h:10.49, at:3},
@@ -2372,9 +2372,8 @@ const KEEP_BUILD = {x:88.6, y:81.4, w:8.8, h:5.2};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
 const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
 const KEEP_STREAK = {x:18, y:4.12, w:60, h:2.35};
-/* Cleared stone where the painted lock was. Snow art sits 8px lower. */
+/* Cleared stone where the painted lock was. */
 const KEEP_WING = {x:68.5, y:60.9, w:31.2, h:20.3};
-const KEEP_WING_SNOW_Y = 61.4;
 let spriteBook = null, spriteAsked = false, spotBook = null;
 const spriteMode = new Map();
 const penActors = new Map();
@@ -2397,7 +2396,6 @@ function yardsOpen(n){
   if (open >= 3) return PENS.length;
   return open;
 }
-function penSnow(){ return typeof skyKind === "string" && skyKind === "snow"; }
 function breedCount(){
   const lines = new Set();
   asList(S && S.dragons).forEach(d => { if (d && d.line) lines.add(d.line); });
@@ -2614,12 +2612,8 @@ function measureKeepWorld(){
   placeKeepBox($(".keep-forge"), KEEP_FORGE);
   placeKeepBox($(".keep-pool"), KEEP_POOL);
   placeKeepBox($("#keepStreak"), KEEP_STREAK);
-  placeKeepBox($("#keepWing"), wingBox());
+  placeKeepBox($("#keepWing"), KEEP_WING);
   return true;
-}
-function wingBox(){
-  const snow = typeof skyKind === "string" && skyKind === "snow";
-  return {x:KEEP_WING.x, y:snow ? KEEP_WING_SNOW_Y : KEEP_WING.y, w:KEEP_WING.w, h:KEEP_WING.h};
 }
 /* The wing is not a pen. It stays locked, and the plaque hides if that ever changes. */
 function wingLocked(){ return true; }
@@ -2631,8 +2625,7 @@ function mountPenShell(){
   plates.innerHTML = PENS.map(p => `<div class="keep-pen" data-pen="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%"><i class="keep-ground"></i><p class="pen-lock">${PEN_LOCK}</p></div>`).join("");
 }
 function penLimits(pen){
-  const dy = penSnow() ? 8 * 100 / KEEP_H : 0;
-  return {x0: pen.x, x1: pen.x + pen.w, y0: pen.y + dy, y1: pen.y + pen.h + dy};
+  return {x0: pen.x, x1: pen.x + pen.w, y0: pen.y, y1: pen.y + pen.h};
 }
 /* Animator names in pen-spots.json, in pen order. */
 const PEN_NAME = {ember:"red", violet:"purple", azure:"blue", pond:"green", red:"red", purple:"purple", blue:"blue", green:"green"};
@@ -2676,15 +2669,11 @@ function readSpotBook(json){
     n++;
   });
   if (!n) return null;
-  const snow = json.snow_variant_y_offset;
-  next.snowY = isFinite(+snow) ? +snow : 8;
   return next;
 }
 function penSpots(id){
   const src = spotBook && spotBook[id];
-  if (!src) return [];
-  const dy = penSnow() ? (isFinite(+spotBook.snowY) ? +spotBook.snowY : 8) : 0;
-  return src.map(s => ({x:s.x, y:s.y + dy, maxStage:s.maxStage, main:s.main, id:s.id}));
+  return src || [];
 }
 /* Biggest stages take main spots they fit, then any spot they fit. A leftover takes the largest free spot. */
 function assignSpots(dragons, spots){
@@ -2818,7 +2807,7 @@ function syncPens(){
   const wing = $("#keepWing");
   if (wing) wing.classList.toggle("is-open", !wingLocked());
   const roaming = normKeep(S.keep).roaming;
-  const sig = open + "|" + (penSnow() ? "snow" : "") + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
+  const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
     + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
   if (sig !== penSig){
     penSig = sig;
