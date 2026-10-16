@@ -98,6 +98,30 @@ html.keep-open .tabs{position:relative;z-index:2}
 .ldg-roam .ldg-acts{grid-column:3;grid-row:1}
 .ldg-hint{margin:0 0 2px;color:var(--gold-hi);font-size:11px;line-height:1.2}
 .ledger > .btn{align-self:center;min-width:140px;padding:8px 16px}
+.care{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
+.care-ov{z-index:24}
+.care-sheet{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;border:1px solid var(--gold-lo);border-radius:16px;background:linear-gradient(180deg,#2a241c,#14110e);padding:12px 12px 14px}
+.care-top{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:center}
+.care-top .dart{width:72px;border-radius:10px}
+.care-name{margin:0;font-family:var(--display);font-weight:600;font-size:24px;line-height:1.05;color:var(--gold-hi)}
+.care-top .bond{margin-top:8px}
+.bond{height:10px;border-radius:999px;background:#1b160f;border:1px solid var(--gold-lo);overflow:hidden}
+.bond i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi))}
+.bond-n{margin-top:3px;font-size:11px;letter-spacing:.08em;color:var(--gold-hi)}
+.wax-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.wax{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;position:relative;font-family:var(--display);font-weight:700;font-size:14px;color:#2a160c;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.55),transparent 42%),radial-gradient(circle at 70% 78%,rgba(0,0,0,.2),transparent 46%),var(--mut-acc,var(--gold));box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.45),0 1px 1px rgba(0,0,0,.35);border:2px solid rgba(70,28,10,.4)}
+.wax::after{content:"";position:absolute;inset:3px;border-radius:50%;border:1px dashed rgba(60,20,8,.4);pointer-events:none}
+.care-pleased{margin:8px 0 0;text-align:center;color:var(--gold-hi);font-size:13px}
+.care-acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+.care-acts .btn{min-width:0;padding:8px 4px;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.1}
+.care-acts .btn small{font-weight:600;font-size:10px;letter-spacing:.04em}
+.care-sheet h3{margin:14px 0 6px;font-family:var(--display);font-weight:600;font-size:18px;color:var(--fg)}
+.care-note{margin:0 0 8px;font-size:13px;line-height:1.35;color:var(--fg)}
+.care-note.locked{color:var(--muted);font-style:italic}
+.care > .btn{align-self:center;min-width:140px;padding:8px 16px}
+@keyframes careHop{0%{transform:translateY(0)}35%{transform:translateY(-10px)}70%{transform:translateY(0)}85%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+.care-top.is-happy .dart{animation:careHop .7s ease}
+@media (prefers-reduced-motion:reduce){.care-top.is-happy .dart{animation:none}}
 
 /* ---------- shared bits ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
@@ -686,6 +710,12 @@ button.dexchip{cursor:pointer}
         <div class="ledger-body" id="ledgerBody"></div>
       </div>
       <button type="button" class="btn" data-act="close-ledger">Close</button>
+    </div>
+  </div>
+  <div class="overlay care-ov" id="careOv" hidden>
+    <div class="care" role="dialog" aria-modal="true" aria-label="Care">
+      <div class="care-sheet" id="careBody"></div>
+      <button type="button" class="btn" data-act="close-care">Close</button>
     </div>
   </div>
 </div>
@@ -1376,6 +1406,7 @@ function artRoostVideo(){ return sceneVideo("roost", "A hooded stranger crouches
 /* ================= screens ================= */
 function setTab(t, sub){
   if (t === "keep" && !document.documentElement.classList.contains("keep-on")) t = "bank";
+  closeCare({restore:false});
   document.documentElement.classList.toggle("keep-open", t === "keep");
   S.tab = t;
   DSUB = t === "dragon" && sub === "bestiary" ? "bestiary" : null;
@@ -1712,6 +1743,7 @@ function renderDragon(){
         <div class="growth"><div class="growth-head"><span class="stage-pill">${st.name}</span><span class="growth-note">Steps you add while it\u2019s your prize grow it</span></div>${growth}${replayKey ? `<button class="reset replay-reveal" data-act="replay-reveal" data-id="${p.id}" hidden>Watch it grow again</button>` : ""}</div>
       </div>
       <button class="btn share-btn" data-act="share">Make share card</button>
+      ${document.documentElement.classList.contains("keep-on") ? `<button class="btn ghost" data-act="care" data-id="${esc(p.id)}">Care</button>` : ""}
       ${bstEntry()}
       <div class="section"><h2>Customize</h2>
         <div class="custom">
@@ -2055,6 +2087,7 @@ document.addEventListener("click", ev => {
   }
   const tab = ev.target.closest(".tab");
   if (tab){ setTab(tab.dataset.tab); return; }
+  if (ev.target.id === "careOv"){ closeCare(); return; }
   if (ev.target.id === "ledgerOv"){ closeLedger(); return; }
   const b = ev.target.closest("[data-act]");
   if (!b) return;
@@ -2103,6 +2136,9 @@ document.addEventListener("click", ev => {
   else if (a === "ledger-swap"){ if (ledgerPick === b.dataset.id) ledgerPick = null; else ledgerPick = b.dataset.id; renderLedger(); }
   else if (a === "ledger-swap-do"){ if (moveKeep("swap", ledgerPick, b.dataset.id)) ledgerPick = null; renderLedger(); }
   else if (a === "ledger-swap-cancel"){ ledgerPick = null; renderLedger(); }
+  else if (a === "care" || a === "ledger-care") openCare(b.dataset.id);
+  else if (a === "close-care") closeCare();
+  else if (a === "care-do"){ if (careAct(careFor, b.dataset.kind)) renderCare(true); }
   else if (a === "dex-replay"){ const d = S.dragons.find(x => x.id === b.dataset.id); closeDex(); if (d) replayReveal(d); }
   else if (a === "share") openShare();
   else if (a === "close-share"){ $("#shareOv").hidden = true; $("#shareOv").innerHTML = ""; autoHatch(); }
@@ -2121,6 +2157,7 @@ document.addEventListener("click", ev => {
   }
 });
 document.addEventListener("keydown", ev => {
+  if (!$("#careOv").hidden && trapTab(ev, $("#careOv"))) return;
   if (!$("#ledgerOv").hidden && trapTab(ev, $("#ledgerOv"))) return;
   if (S.tab === "vendors" && (ev.key === "ArrowLeft" || ev.key === "ArrowRight") && $("#shareOv").hidden && $("#hatchOv").hidden && $("#revealOv").hidden
       && !(ev.target.closest && ev.target.closest("input,textarea,.fchips"))){
@@ -2130,6 +2167,7 @@ document.addEventListener("keydown", ev => {
     return;
   }
   if (ev.key !== "Escape") return;
+  if (!$("#careOv").hidden){ closeCare(); return; }
   if (!$("#ledgerOv").hidden){ closeLedger(); return; }
   /* Reveal overlay: Escape skips (if allowed) or closes (if payoff ready) */
   if (!$("#revealOv").hidden && revealActive){
@@ -2183,12 +2221,13 @@ function ledgerRow(id, kind){
   const picked = ledgerPick === id;
   const full = S.keep.roaming.length >= 6;
   let acts;
+  const care = `<button type="button" class="btn ghost" data-act="ledger-care" data-id="${esc(id)}">Care</button>`;
   if (kind === "roam"){
-    acts = `<button type="button" class="btn ghost" data-act="ledger-rest" data-id="${esc(id)}">Rest</button><button type="button" class="btn ghost" data-act="ledger-swap" data-id="${esc(id)}" aria-pressed="${picked ? "true" : "false"}">Swap</button>`;
+    acts = `<button type="button" class="btn ghost" data-act="ledger-rest" data-id="${esc(id)}">Rest</button><button type="button" class="btn ghost" data-act="ledger-swap" data-id="${esc(id)}" aria-pressed="${picked ? "true" : "false"}">Swap</button>${care}`;
   } else {
     const send = `<button type="button" class="btn" data-act="ledger-send" data-id="${esc(id)}"${full ? ` disabled aria-describedby="ldgFull"` : ""}>Send to Keep</button>`;
     const swap = ledgerPick ? `<button type="button" class="btn" data-act="ledger-swap-do" data-id="${esc(id)}">Swap</button>` : "";
-    acts = send + swap;
+    acts = send + swap + care;
   }
   return `<li class="ldg-row${picked ? " is-pick" : ""}"><div class="ldg-art">${dragonArt(d)}</div><div class="ldg-who"><button type="button" class="ldg-name" data-act="ledger-dragon" data-id="${esc(id)}">${esc(d.name || d.species)}</button><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div></div><div class="ldg-acts">${acts}</div></li>`;
 }
@@ -2441,6 +2480,148 @@ function moveKeep(op, id, other){
   keep.roaming = nextR; keep.stables = nextS; S.keep = keep;
   save();
   return true;
+}
+/* One clock for care. Tests replace it with setCareClock; today() and now() both read it. */
+let careClock = null;
+function setCareClock(fn){ careClock = typeof fn === "function" ? fn : null; }
+function now(){ return careClock ? careClock() : Date.now(); }
+function today(){
+  const d = new Date(now()), p = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+const CARE_ACTS = {
+  feed:  {key:"fed", ms:4 * 60 * 60 * 1000, label:"Feed"},
+  groom: {key:"groomed", ms:8 * 60 * 60 * 1000, label:"Groom"},
+  pet:   {key:"petted", ms:1 * 60 * 60 * 1000, label:"Pet"}
+};
+const NOTE_AT = [10, 30, 60, 100];
+const KEEPER_NOTES = {
+  cinder: [
+    "It settles on the warmest stone and folds its frill down to keep the heat in.",
+    "After eating it breathes more slowly, and the glow along its belly stays even.",
+    "It turns toward footsteps it knows and lets the others pass.",
+    "On a cold morning it leans in and shares its warmth, then goes back to sleep."
+  ],
+  brine: [
+    "It rests with its fins folded and likes a damp cloth left nearby.",
+    "When the room is dry it drinks in small sips and grows restless until it does.",
+    "A finger drawn along the floor will lead it, the way water finds a low path.",
+    "Rain on the glass holds it longer than any noise in the room."
+  ],
+  moss: [
+    "It naps in a square of sunlight and wakes with a little dust on its shoulders.",
+    "The new growth there is soft. It stands quiet while you brush it clean.",
+    "It sniffs leaves and seems content just to smell them.",
+    "In a still corner it stops startling at birdsong outside the window."
+  ],
+  inferno: [
+    "The plates on its back are hot after a walk and cool once it has sat a while.",
+    "It prefers its food a little dry, and it eats without hurry.",
+    "A familiar voice brings its head down. The horns are heavy, and it moves them carefully.",
+    "Each evening it picks the same stone and stays until the room is dark."
+  ],
+  stormling: [
+    "A breeze at the window lifts its streamers, and it watches them with interest.",
+    "It eats a little, often, then shakes its wings out and lies down.",
+    "Before the weather turns it walks the room once and settles.",
+    "In a quiet room it folds close and takes up less space than you expect."
+  ],
+  voidling: [
+    "It keeps to the shaded side of the room and squints in a bright window.",
+    "The pale speckles on its hide show clearer after a grooming.",
+    "It learns a still hand and will rest its chin there.",
+    "After dark it stays near, awake and easy, as if this were simply its hour."
+  ],
+  tempest: [
+    "It folds its long legs carefully when it lies down, and it is patient about it.",
+    "Rain beads on its hide and runs off. It likes a draft.",
+    "A low voice reaches it better than a loud one.",
+    "When it trusts you it lowers its head to yours and waits."
+  ]
+};
+function careStamp(v){
+  if (v == null || v === "") return null;
+  const n = +v;
+  return Number.isFinite(n) ? n : null;
+}
+function careRecord(id){
+  const bag = S.keep && S.keep.care;
+  const c = bag && typeof bag === "object" ? bag[id] : null;
+  const bond = c && Number.isFinite(+c.bond) ? Math.max(0, Math.min(100, Math.round(+c.bond))) : 0;
+  return {fed: careStamp(c && c.fed), groomed: careStamp(c && c.groomed), petted: careStamp(c && c.petted), bond};
+}
+function careLeft(ms){
+  if (ms <= 0) return "Ready";
+  const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+  if (h && m) return h + "h " + m + "m";
+  if (h) return h + "h";
+  if (m) return m + "m";
+  return Math.max(1, Math.ceil(ms / 1000)) + "s";
+}
+function keeperNotes(id){
+  const d = id && typeof id === "object" ? id : S.dragons.find(x => dragonKey(x) === id);
+  const list = (d && KEEPER_NOTES[d.line]) || [];
+  const bond = careRecord(d ? dragonKey(d) : id).bond;
+  return NOTE_AT.map((at, i) => ({at, open: bond >= at && !!list[i], text: bond >= at && list[i] ? list[i] : "Keep caring to learn more"}));
+}
+/* One save for a care action. Bond rises by one, capped at 100. A cooldown writes nothing. */
+function careAct(id, kind){
+  const spec = CARE_ACTS[kind];
+  const key = idKey(id);
+  if (!spec || key == null || !S.dragons.some(d => dragonKey(d) === key)) return false;
+  if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
+  if (!S.keep.care || typeof S.keep.care !== "object" || Array.isArray(S.keep.care)) S.keep.care = {};
+  const cur = careRecord(key);
+  const t = now();
+  const last = cur[spec.key];
+  if (last != null && t < last + spec.ms) return false;
+  const next = {fed: cur.fed, groomed: cur.groomed, petted: cur.petted, bond: Math.min(100, cur.bond + 1)};
+  next[spec.key] = t;
+  S.keep.care[key] = next;
+  save();
+  return true;
+}
+let careFor = null, careReturn = null;
+function openCare(id){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  const d = S.dragons.find(x => dragonKey(x) === idKey(id));
+  if (!d) return;
+  careFor = dragonKey(d);
+  const prev = document.activeElement;
+  careReturn = prev && prev !== document.body ? prev : null;
+  renderCare(false);
+  const ov = $("#careOv");
+  ov.hidden = false;
+  const first = focusables(ov)[0];
+  if (first) first.focus();
+}
+function closeCare(opts){
+  const ov = $("#careOv");
+  if (!ov || ov.hidden) return;
+  ov.hidden = true;
+  const back = careReturn;
+  careReturn = null;
+  careFor = null;
+  if (opts && opts.restore === false) return;
+  if (back && back.isConnected) back.focus();
+}
+function renderCare(hop){
+  const body = $("#careBody");
+  const d = S.dragons.find(x => dragonKey(x) === careFor);
+  if (!body || !d) return;
+  const rec = careRecord(d.id);
+  const t = now();
+  const acts = Object.keys(CARE_ACTS).map(kind => {
+    const spec = CARE_ACTS[kind];
+    const last = rec[spec.key];
+    const left = last == null ? 0 : Math.max(0, last + spec.ms - t);
+    const ready = left <= 0;
+    return `<button type="button" class="btn${ready ? "" : " ghost"}" data-act="care-do" data-kind="${kind}"${ready ? "" : " disabled"}>${spec.label}<small>${ready ? "Ready" : careLeft(left)}</small></button>`;
+  }).join("");
+  const seals = MUT_KEYS.filter(m => S.dragons.some(x => x && x.line === d.line && x.mut === m)).map(m =>
+    `<span class="wax acc-${m}" role="img" aria-label="${esc(MUTATIONS[m].name)} mutation">${esc(MUTATIONS[m].name.slice(0, 1))}</span>`).join("");
+  const notes = keeperNotes(d).map(n => `<p class="care-note${n.open ? "" : " locked"}">${esc(n.text)}</p>`).join("");
+  body.innerHTML = `<div class="care-top${hop ? " is-happy" : ""}"><div>${dragonArt(d)}</div><div><p class="care-name">${esc(d.name || d.species)}</p><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div><div class="bond" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${rec.bond}" aria-label="Bond ${rec.bond} of 100"><i style="width:${rec.bond}%"></i></div><div class="bond-n">Bond ${rec.bond} / 100</div></div></div>${seals ? `<div class="wax-row">${seals}</div>` : ""}${hop ? `<p class="care-pleased" role="status">It looks pleased.</p>` : ""}<div class="care-acts">${acts}</div><h3>Keeper's Notes</h3>${notes}`;
 }
 function start(data){
   let raw = null;
