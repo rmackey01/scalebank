@@ -60,31 +60,25 @@ html.keep-open .tabs{position:relative;z-index:2}
 /* Full painting width stays on screen (the locked wing is at the right edge). The frame clips the baked tab strip. */
 .keep-frame{position:absolute;left:0;top:0;width:100%;aspect-ratio:1008/1572;overflow:hidden;pointer-events:none}
 .keep-bg{position:absolute;left:0;top:0;width:100%;height:calc(100% * 1792 / 1572);max-width:none;object-fit:fill;object-position:center top}
-.keep-build{position:absolute;z-index:4;right:12px;bottom:calc(var(--keep-cover,96px) + 12px);padding:6px 12px;border-radius:999px;border:1px solid var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206;font-size:12px;font-weight:700;letter-spacing:.06em;box-shadow:inset 0 1px 0 rgba(255,240,200,.5),0 2px 0 #5c3d0c}
 .keep-streak{position:absolute;z-index:5;left:20%;top:5%;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;width:54%;padding:2px 6px 2px 10px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);pointer-events:auto}
 .keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.1;color:var(--gold-hi);white-space:nowrap}
 .keep-streak .ks-best{margin:0;font-size:11px;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
 .keep-streak .ks-note{flex:1 0 100%;margin:0;font-size:11px;line-height:1.25;color:var(--gold-hi)}
 .keep-streak .btn{min-width:0;width:auto;margin:0 0 0 auto;padding:3px 8px;font-size:11px;line-height:1.2;white-space:nowrap}
-.keep-build:active{transform:translateY(1px)}
-/* Lectern hotspot. The painting already says LEDGER; the pill shows only before the art loads. */
-.keep-hot{position:absolute;z-index:4;left:64%;top:46%;width:17%;height:5%;padding:0;border:0;background:transparent;color:var(--gold-hi)}
-.keep-hot span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:5px 12px;border-radius:999px;background:rgba(12,16,21,.82);border:1px solid var(--gold-lo);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
-.keep-hot:focus-visible,.keep-build:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
-/* Once the painting is up, use its keeper, its ledger label, and its hammer. */
-.keep-stage:has(.keep-bg.is-ok) .keep-keeper,.keep-stage:has(.keep-bg.is-ok) .keep-ground{display:none}
-.keep-stage:has(.keep-bg.is-ok) .keep-hot span{display:none}
-.keep-stage:has(.keep-bg.is-ok) .keep-build{right:auto;bottom:auto;padding:0;border:0;background:transparent;color:transparent;box-shadow:none;font-size:0;border-radius:50%}
+/* Invisible taps on the painted lectern and Build sign. A ring shows for keyboard focus only. */
+.keep-spot{position:absolute;z-index:4;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;font-size:0;line-height:0;cursor:pointer}
+.keep-spot:focus{outline:none}
+.keep-spot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.keep-spot.is-live::before{content:"";position:absolute;inset:-35%;border-radius:50%;pointer-events:none;mix-blend-mode:screen}
+.keep-forge.is-live::before{background:radial-gradient(ellipse at 50% 42%, rgba(255,226,160,.95), rgba(255,150,40,.5) 42%, transparent 72%)}
+.keep-pool.is-live::before{background:radial-gradient(ellipse at 50% 55%, rgba(220,248,255,.95), rgba(90,190,255,.55) 46%, transparent 74%)}
 /* Pens are percentages of the full 1008×1792 painting. The world box matches that image. */
 .keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:calc(100% * 1792 / 1572);pointer-events:none}
 .keep-pen{position:absolute}
 .keep-ground{position:absolute;left:6%;right:6%;bottom:0;height:36%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(216,169,75,.2),rgba(216,169,75,0) 72%)}
+.keep-stage:has(.keep-bg.is-ok) .keep-ground{display:none}
 .pen-lock{position:absolute;left:50%;top:50%;width:88%;transform:translate(-50%,-50%);margin:0;padding:4px 6px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.86);color:var(--gold-hi);font-size:11px;font-weight:700;line-height:1.25;text-align:center}
 .keep-pen.is-open .pen-lock{display:none}
-.keep-keeper{position:absolute;left:15%;top:63%;width:8.5%;aspect-ratio:2/3;z-index:4}
-.kk-cloak{position:absolute;left:14%;right:14%;top:32%;bottom:0;border-radius:46% 46% 14% 14%;background:linear-gradient(180deg,#c4925a,#5c3b24)}
-.kk-hood{position:absolute;left:18%;right:18%;top:0;height:38%;border-radius:48% 48% 42% 42%;background:linear-gradient(180deg,#d7a56a,#6e4a30)}
-.kk-hood::after{content:"";position:absolute;left:22%;right:22%;top:46%;height:36%;border-radius:42%;background:#f0d2b0}
 .pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto}
 .pen-dragon:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:10px}
 .pen-sprite{position:relative;display:block;background-repeat:no-repeat;background-position:left center}
@@ -697,9 +691,11 @@ button.dexchip{cursor:pointer}
         <img class="keep-bg keep-art" alt="" draggable="false">
         <div class="keep-world" id="keepWorld"></div>
       </div>
-      <button type="button" class="keep-build" data-act="keep-build" aria-label="Build">Build</button>
+      <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
+      <button type="button" class="keep-spot keep-pool" data-act="keep-pool" aria-label="Moon Pool" hidden></button>
+      <button type="button" class="keep-spot keep-build" data-act="keep-build" aria-label="Build"></button>
       <div class="keep-streak" id="keepStreak" hidden></div>
-      <button type="button" class="keep-hot" data-act="keep-ledger" aria-label="Ledger"><span>Ledger</span></button>
+      <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"></button>
     </div>
   </main>
 
@@ -1835,7 +1831,7 @@ function render(){
   if (S.tab === "nest") renderNest();
   if (S.tab === "dragon"){ if (DSUB === "bestiary") renderBestiary(); else renderDragon(); }
   if (keepOn() && !$("#ledgerOv").hidden) renderLedger();
-  if (keepOn() && S.tab === "keep") syncPens();
+  if (keepOn() && S.tab === "keep"){ syncPens(); syncKeepSpots(); }
 }
 
 function dexRecord(d){
@@ -2186,6 +2182,8 @@ document.addEventListener("click", ev => {
   }
   else if (a === "close-dex") closeDex();
   else if (a === "keep-build") toast("Coming soon");
+  else if (a === "keep-forge"){ if (b.dataset.id) openCare(b.dataset.id); }
+  else if (a === "keep-pool"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "streak-claim"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "keep-ledger") openLedger();
   else if (a === "close-ledger") closeLedger();
@@ -2197,7 +2195,7 @@ document.addEventListener("click", ev => {
   else if (a === "ledger-swap-cancel"){ ledgerPick = null; renderLedger(); }
   else if (a === "care" || a === "ledger-care") openCare(b.dataset.id);
   else if (a === "close-care") closeCare();
-  else if (a === "care-do"){ if (careAct(careFor, b.dataset.kind)) renderCare(true); }
+  else if (a === "care-do"){ if (careAct(careFor, b.dataset.kind)){ renderCare(true); syncKeepSpots(); } }
   else if (a === "dex-replay"){ const d = S.dragons.find(x => x.id === b.dataset.id); closeDex(); if (d) replayReveal(d); }
   else if (a === "share") openShare();
   else if (a === "close-share"){ $("#shareOv").hidden = true; $("#shareOv").innerHTML = ""; autoHatch(); }
@@ -2264,9 +2262,11 @@ const PENS = [
   {id:"east", x:8, y:70.4, w:58, h:8.4, at:5, floor:[48, 66, 74.2, 76.6]}
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
-/* Painted controls, same percentage space as the pens. */
-const KEEP_LEDGER = {x:63.6, y:45.5, w:17.8, h:4.6};
-const KEEP_BUILD = {x:88.5, y:81.2, w:9.0, h:5.3};
+/* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
+const KEEP_LEDGER = {x:62.6, y:42.5, w:19.2, h:7.8};
+const KEEP_BUILD = {x:88.6, y:81.4, w:8.8, h:5.2};
+const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
+const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
 const KEEP_STREAK = {x:22, y:4.15, w:52};
 const PEN_TALL = [32, 36, 40, 44];
 let spriteBook = null, spriteAsked = false;
@@ -2454,8 +2454,10 @@ function measureKeepWorld(){
   world.style.width = rw + "px";
   world.style.height = rh + "px";
   penMetrics = {rw, rh, cw};
-  placeKeepBox($(".keep-hot"), rw, rh, KEEP_LEDGER);
+  placeKeepBox($(".keep-ledger"), rw, rh, KEEP_LEDGER);
   placeKeepBox($(".keep-build"), rw, rh, KEEP_BUILD);
+  placeKeepBox($(".keep-forge"), rw, rh, KEEP_FORGE);
+  placeKeepBox($(".keep-pool"), rw, rh, KEEP_POOL);
   placeKeepBox($("#keepStreak"), rw, rh, KEEP_STREAK);
   return true;
 }
@@ -2463,8 +2465,7 @@ function mountPenShell(){
   const world = $("#keepWorld");
   if (!world || world.dataset.shell) return;
   world.dataset.shell = "1";
-  world.innerHTML = PENS.map(p => `<div class="keep-pen" data-pen="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%"><i class="keep-ground"></i><p class="pen-lock">Unlocks with a new dragon</p></div>`).join("")
-    + `<div class="keep-keeper" aria-hidden="true"><i class="kk-hood"></i><i class="kk-cloak"></i></div>`;
+  world.innerHTML = PENS.map(p => `<div class="keep-pen" data-pen="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%"><i class="keep-ground"></i><p class="pen-lock">Unlocks with a new dragon</p></div>`).join("");
 }
 function penLimits(pen){
   const f = pen.floor;
@@ -2716,7 +2717,7 @@ function openLedger(){
   if (!keepOn()) return;
   const ov = $("#ledgerOv");
   const prev = document.activeElement;
-  ledgerReturn = prev && prev !== document.body ? prev : $(".keep-hot");
+  ledgerReturn = prev && prev !== document.body ? prev : $(".keep-ledger");
   keepArt(ov.querySelector(".ledger-bg"), "art/keep/ledger-v3.webp");
   renderLedger();
   ov.hidden = false;
@@ -2732,7 +2733,7 @@ function closeLedger(opts){
   ledgerReturn = null;
   if (opts && opts.restore === false) return;
   if (back && back.isConnected) back.focus();
-  else { const hot = $(".keep-hot"); if (hot && !$("#keep").hidden) hot.focus(); }
+  else { const hot = $(".keep-ledger"); if (hot && !$("#keep").hidden) hot.focus(); }
 }
 window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); penSig = ""; syncPens(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncKeepCover);
@@ -3129,6 +3130,41 @@ function renderStreak(){
   const label = rest ? "Sabbath rest" : (blocked ? "Claimed today" : "Claim " + fmt(prize) + " steps");
   el.hidden = false;
   el.innerHTML = `<p class="ks-day">Day ${streak.count || 0}</p><p class="ks-best">Best ${streak.best || 0}</p>${note}<button type="button" class="btn" data-act="streak-claim"${rest || blocked || prize <= 0 ? " disabled" : ""}>${label}</button>`;
+  syncKeepSpots({rest, blocked, prize});
+}
+/* The Forge glows when a dragon can be cared for. The Moon Pool glows when today's steps can be claimed. */
+function dragonCareReady(d, t){
+  if (!d) return false;
+  const rec = careRecord(dragonKey(d));
+  return Object.keys(CARE_ACTS).some(kind => careWait(rec[CARE_ACTS[kind].key], t, CARE_ACTS[kind].ms) <= 0);
+}
+function careReadyDragon(){
+  const t = now();
+  const prize = prizeDragon();
+  if (dragonCareReady(prize, t)) return prize;
+  return asList(S.dragons).find(d => dragonCareReady(d, t)) || null;
+}
+function spotClaimReady(){
+  const streak = streakBag();
+  const viewed = prepareHome(streak);
+  if (viewed.fresh) save();
+  return viewed.weekday !== restDayNum() && claimable(streak) && streakPrize(streak.count) > 0;
+}
+function syncKeepSpots(flags){
+  const forge = $(".keep-forge");
+  const pool = $(".keep-pool");
+  if (forge){
+    const d = careReadyDragon();
+    forge.hidden = !d;
+    forge.classList.toggle("is-live", !!d);
+    if (d) forge.dataset.id = d.id;
+    else delete forge.dataset.id;
+  }
+  if (pool){
+    const on = flags ? (!flags.rest && !flags.blocked && flags.prize > 0) : spotClaimReady();
+    pool.hidden = !on;
+    pool.classList.toggle("is-live", on);
+  }
 }
 const CARE_ACTS = {
   feed:  {key:"fed", ms:4 * 60 * 60 * 1000, label:"Feed"},
