@@ -88,9 +88,8 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-filters{position:absolute;width:0;height:0;overflow:hidden}
 .keep-slot{position:absolute;margin:0;padding:0;border:0;background:transparent;line-height:0;pointer-events:auto}
 .keep-slot img{width:100%;height:100%;display:block;object-fit:fill;pointer-events:none}
-.keep-ledger{z-index:5;display:flex;align-items:flex-end;justify-content:center;border-radius:0;background:transparent;color:#f0d59a}
-.keep-ledger span{display:flex;align-items:center;justify-content:center;gap:4px;width:88%;height:46%;margin-bottom:8%;border-radius:999px;border:1.5px solid #c9a15a;background:#140e0a;box-shadow:inset 0 0 0 1px rgba(240,213,154,.25);font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.12em;line-height:1;text-transform:uppercase;color:#f0d59a;pointer-events:none}
-.keep-ledger svg{width:12px;height:12px;flex:none}
+.keep-ledger{z-index:5;border-radius:999px;background:transparent;overflow:visible}
+.keep-ledger img{width:100%;height:100%;display:block;object-fit:fill;pointer-events:none}
 .keep-spot:focus{outline:none}
 .keep-spot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
 .keep-spot.is-live::before{content:"";position:absolute;inset:-35%;border-radius:50%;pointer-events:none;mix-blend-mode:screen}
@@ -749,7 +748,7 @@ button.dexchip{cursor:pointer}
         <div class="keep-wing" id="keepWing"><p class="wing-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span></p></div>
         <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
         <button type="button" class="keep-spot keep-pool" data-act="keep-pool" aria-label="Moon Pool" hidden></button>
-        <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"><span><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M3 2.5h4.2c.7 0 1.3.2 1.8.6.5-.4 1.1-.6 1.8-.6H15v10.2h-4.2c-.7 0-1.3.2-1.8.6-.5-.4-1.1-.6-1.8-.6H3V2.5zm1.2 1.1v7.8h2.6c.6 0 1.1.1 1.5.4V4.2c-.4-.2-.9-.4-1.5-.4H4.2zm6.5 0c-.6 0-1.1.2-1.5.4v7.6c.4-.3.9-.4 1.5-.4h2.6V3.6h-2.6z"/></svg>Ledger</span></button>
+        <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"><img alt="" draggable="false" src="art/keep/ledger-plaque.webp"></button>
       </div>
       </div>
       </div>
@@ -2664,8 +2663,9 @@ const PENS = [
   {id:"green", x:45.14, y:83.15, w:26.79, h:8.37, at:5}
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
+/* Plaque art, pixels on the 1008×1792 painting. slot-map ledgerPlaque replaces this once loaded. */
+const LEDGER_PLAQUE = {file:"ledger-plaque.webp", x:653, y:836, w:166, h:49};
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
-const KEEP_LEDGER = {x:62.6, y:42.5, w:19.2, h:7.8};
 const KEEP_BUILD = {x:70, y:88.2, w:26, h:3.6};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
 const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
@@ -2876,6 +2876,22 @@ function markPenReady(){
   });
   world.dataset.ready = ok ? "1" : "0";
 }
+function placeLedgerPlaque(){
+  const el = $(".keep-ledger");
+  const row = (slotMap && slotMap.ledgerPlaque) || LEDGER_PLAQUE;
+  if (!el || !row) return;
+  placeKeepBox(el, {
+    x: row.x / KEEP_W * 100,
+    y: row.y / KEEP_H * 100,
+    w: row.w / KEEP_W * 100,
+    h: row.h / KEEP_H * 100
+  });
+  const img = el.querySelector("img");
+  if (img && row.file){
+    const url = "art/keep/" + String(row.file).split("/").pop();
+    if (img.getAttribute("src") !== url) img.src = url;
+  }
+}
 function placeKeepBox(el, box){
   if (!el || !box) return;
   el.style.left = box.x + "%";
@@ -2911,7 +2927,7 @@ function measureKeepWorld(){
   world.style.width = "100%";
   world.style.height = "100%";
   penMetrics = {rw, rh, cw: availW, ch: availH, scale};
-  placeKeepBox($(".keep-ledger"), KEEP_LEDGER);
+  placeLedgerPlaque();
   placeKeepBox($(".keep-forge"), KEEP_FORGE);
   placeKeepBox($(".keep-pool"), KEEP_POOL);
   placeKeepBox($("#keepWing"), KEEP_WING);
@@ -3253,7 +3269,13 @@ function readSlotMap(json){
       if (Array.isArray(row) && row.length >= 4 && row.slice(0, 4).every(v => Number.isFinite(+v))) tint[key] = row.slice(0, 4).map(Number);
     });
   }
-  return {slots, tint};
+  let ledgerPlaque = null;
+  const lp = json.ledgerPlaque;
+  if (lp && typeof lp === "object" && typeof lp.file === "string" && lp.file){
+    const x = +lp.x, y = +lp.y, w = +lp.w, h = +lp.h;
+    if ([x, y, w, h].every(Number.isFinite) && w > 0 && h > 0) ledgerPlaque = {file: lp.file, x, y, w, h};
+  }
+  return {slots, tint, ledgerPlaque};
 }
 function slotLines(){
   if (!slotMap || !slotMap.slots) return [];
