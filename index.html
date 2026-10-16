@@ -756,6 +756,7 @@ const SCENES = [
 ];
 const KEY = "scalebank.v1";
 const BAK_KEY = "scalebank.bak.v3";
+const CORRUPT_KEY = "scalebank.corrupt";
 const SAVE_VER = 4;
 const DEX_LINES = ITEMS.filter(i => i.kind === "egg").map(i => i.line);
 const MUT_KEYS = Object.keys(MUTATIONS);
@@ -883,7 +884,7 @@ function load(){
   try { const raw = localStorage.getItem(KEY); if (raw) return hydrate(JSON.parse(raw)); } catch(e){}
   return null;
 }
-function save(){ dexSync(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function save(){ dexSync(); reconcileKeep(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
 let S = fresh();
 let DSUB = null;
 
@@ -2273,12 +2274,56 @@ function backupV3(raw){
   if (raw == null) return;
   try { if (localStorage.getItem(BAK_KEY) == null) localStorage.setItem(BAK_KEY, raw); } catch(e){}
 }
+/* Unparseable saves are replaced with defaults. Keep the raw text once, before that replacement. */
+function backupCorrupt(raw){
+  if (raw == null) return;
+  try {
+    const cur = localStorage.getItem(CORRUPT_KEY);
+    if (cur == null || cur === "") localStorage.setItem(CORRUPT_KEY, raw);
+  } catch(e){}
+}
+/* Owned dragon ids live in roaming (up to 6) or stables, each id once. Existing order stays. */
+function reconcileKeep(){
+  try {
+    const keep = normKeep(S.keep);
+    const owned = [];
+    const ownedSet = new Set();
+    asList(S.dragons).forEach(d => {
+      const id = dragonKey(d);
+      if (id == null || ownedSet.has(id)) return;
+      ownedSet.add(id);
+      owned.push(id);
+    });
+    const roaming = [];
+    const stables = [];
+    const placed = new Set();
+    const take = (id, list) => {
+      if (!ownedSet.has(id) || placed.has(id)) return;
+      placed.add(id);
+      list.push(id);
+    };
+    keep.roaming.forEach(id => take(id, roaming));
+    keep.stables.forEach(id => take(id, stables));
+    owned.forEach(id => {
+      if (placed.has(id)) return;
+      placed.add(id);
+      if (roaming.length < 6) roaming.push(id);
+      else stables.push(id);
+    });
+    keep.roaming = roaming;
+    keep.stables = stables;
+    S.keep = keep;
+  } catch(e){
+    if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
+  }
+}
 function start(data){
   let raw = null;
   try { raw = localStorage.getItem(KEY); } catch(e){}
   const injected = !!(data && data.state);
   let corrupt = false;
   if (!injected && raw != null){ try { JSON.parse(raw); } catch(e){ corrupt = true; } }
+  if (corrupt) backupCorrupt(raw);
   S = injected ? hydrate(data.state) : (load() || fresh());
   if (!S.opened || typeof S.opened !== "object" || Array.isArray(S.opened)) S.opened = {};
   const migrating = corrupt || (S.ver || 1) < 4;
@@ -2288,6 +2333,7 @@ function start(data){
     if ((S.ver || 1) < 3){ migrateV3(); S.ver = 3; }
     if ((S.ver || 1) < 4){ migrateV4(); S.ver = 4; }
   } catch(e){ S = fresh(); }
+  reconcileKeep();
   if (migrating) save();
   ITEMS.forEach(it => { if (S.owned[it.id]) for (let k = 1; k <= it.scene; k++) S.opened[k] = true; });
   applyDebugParams();

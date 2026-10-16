@@ -171,6 +171,7 @@ const cases = [
     name: "corrupt",
     raw: "{",
     backup: true,
+    corrupt: true,
     check(s, t) {
       t.equal(s.ver, 4, "ver 4");
       t.equal(s.bank, 0, "fell back to an empty save");
@@ -178,6 +179,19 @@ const cases = [
       t.deepEqual(s.keep.roaming, [], "roaming");
       t.keepDefaults(s);
       t.equal(t.balance, "0", "page still booted");
+      t.equal(t.corrupt, "{", "raw corrupt save copied");
+    }
+  },
+  {
+    name: "corrupt-kept",
+    raw: "{",
+    backup: true,
+    corruptSeed: "ALREADY",
+    corrupt: "ALREADY",
+    check(s, t) {
+      t.equal(s.ver, 4, "ver 4");
+      t.equal(s.bank, 0, "still reset to defaults");
+      t.equal(t.corrupt, "ALREADY", "existing corrupt copy left alone");
     }
   },
   {
@@ -245,6 +259,64 @@ const cases = [
       t.equal(s.keep.restDay, 3, "rest day");
       t.equal(t.bak, null, "no backup written for a v4 save");
     }
+  },
+  {
+    name: "hatch",
+    raw: JSON.stringify({
+      ver: 4, bank: 100, lifetime: 6000, seq: 8, prize: "old", tab: "bank", scene: 0,
+      owned: {ember: 1}, bought: {ember: 1}, opened: {},
+      eggs: [{id: "egg1", item: "ember", at: 0}],
+      dragons: [dragon("old", "ember", 0)],
+      dex: {cinder: dex(1, 0)},
+      keep: {roaming: ["old"], stables: [], zones: [], care: {}, streak: {last: null, count: 0, best: 0}, restDay: 0}
+    }),
+    backup: false,
+    waitDragons: 2,
+    check(s, t) {
+      t.equal(s.bank, 100, "coins");
+      t.equal(s.lifetime, 6000, "lifetime");
+      t.deepEqual(s.dragons.map(d => d.id), ["old", "drg8"], "hatched dragon kept");
+      t.deepEqual(s.eggs, [], "egg consumed");
+      t.deepEqual(s.keep.roaming, ["old", "drg8"], "new dragon joined roaming");
+      t.deepEqual(s.keep.stables, [], "stables");
+      t.equal(s.dex.cinder.n, 2, "hatch count");
+    }
+  },
+  {
+    name: "hatch-seventh",
+    raw: JSON.stringify({
+      ver: 4, bank: 40, lifetime: 6000, seq: 20, prize: "d1", tab: "bank", scene: 0,
+      owned: {ember: 6}, bought: {}, opened: {},
+      eggs: [{id: "egg7", item: "ember", at: 0}],
+      dragons: ["d1", "d2", "d3", "d4", "d5", "d6"].map(id => dragon(id, "ember", 0)),
+      dex: {cinder: dex(6, 0)},
+      keep: {roaming: ["d1", "d2", "d3", "d4", "d5", "d6"], stables: [], zones: [], care: {}, streak: {last: null, count: 0, best: 0}, restDay: 0}
+    }),
+    backup: false,
+    waitDragons: 7,
+    check(s, t) {
+      t.equal(s.bank, 40, "coins");
+      t.deepEqual(s.dragons.map(d => d.id), ["d1", "d2", "d3", "d4", "d5", "d6", "drg20"], "seventh dragon kept");
+      t.deepEqual(s.keep.roaming, ["d1", "d2", "d3", "d4", "d5", "d6"], "roaming stays the first six");
+      t.deepEqual(s.keep.stables, ["drg20"], "seventh goes to stables");
+    }
+  },
+  {
+    name: "reconcile",
+    raw: JSON.stringify({
+      ver: 4, bank: 15, lifetime: 15, seq: 9, prize: "r1", tab: "bank", scene: 0,
+      owned: {}, bought: {}, opened: {}, eggs: [],
+      dragons: ["r1", "r2", "r3", "r4", "r5", "r6", "extra"].map(id => dragon(id, "tide", 0)),
+      dex: {},
+      keep: {roaming: ["r1", "r2", "r3", "r4", "r5", "stale"], stables: ["ghost"], zones: [], care: {}, streak: {last: null, count: 0, best: 0}, restDay: 0}
+    }),
+    backup: false,
+    check(s, t) {
+      t.equal(s.bank, 15, "coins");
+      t.deepEqual(s.dragons.map(d => d.id), ["r1", "r2", "r3", "r4", "r5", "r6", "extra"], "owned dragons unchanged");
+      t.deepEqual(s.keep.roaming, ["r1", "r2", "r3", "r4", "r5", "r6"], "missing id filled the open roaming slot");
+      t.deepEqual(s.keep.stables, ["extra"], "the rest go to stables, stale ids dropped");
+    }
   }
 ];
 
@@ -275,11 +347,19 @@ try {
       localStorage.clear();
       if (setup.hasRaw) localStorage.setItem("scalebank.v1", setup.raw);
       if (setup.hasBak) localStorage.setItem("scalebank.bak.v3", setup.bak);
-    }, {hasRaw: c.raw !== undefined, raw: c.raw ?? null, hasBak: c.bak !== undefined, bak: c.bak ?? null});
+      if (setup.hasCorrupt) localStorage.setItem("scalebank.corrupt", setup.corrupt);
+    }, {hasRaw: c.raw !== undefined, raw: c.raw ?? null, hasBak: c.bak !== undefined, bak: c.bak ?? null, hasCorrupt: c.corruptSeed !== undefined, corrupt: c.corruptSeed ?? null});
     await page.goto(base + "/index.html", {waitUntil: "load"});
+    if (c.waitDragons){
+      await page.waitForFunction(n => {
+        try { return JSON.parse(localStorage.getItem("scalebank.v1") || "{}").dragons.length >= n; }
+        catch (e) { return false; }
+      }, {timeout: 5000}, c.waitDragons);
+    }
     const read = () => page.evaluate(() => ({
       save: localStorage.getItem("scalebank.v1"),
       bak: localStorage.getItem("scalebank.bak.v3"),
+      corrupt: localStorage.getItem("scalebank.corrupt"),
       balance: document.querySelector("#balance") ? document.querySelector("#balance").textContent : null
     }));
     const first = await read();
@@ -293,6 +373,7 @@ try {
     const t = {
       balance: first.balance,
       bak: first.bak,
+      corrupt: first.corrupt,
       equal(actual, expected, label) { if (actual !== expected) problems.push(`${label}: ${JSON.stringify(actual)} !== ${JSON.stringify(expected)}`); },
       deepEqual(actual, expected, label) { if (JSON.stringify(actual) !== JSON.stringify(expected)) problems.push(`${label}: ${JSON.stringify(actual)} !== ${JSON.stringify(expected)}`); },
       ok(cond, label) { if (!cond) problems.push(label); },
@@ -302,6 +383,9 @@ try {
     else c.check(s, t);
     if (JSON.stringify(s) !== JSON.stringify(s2)) problems.push("second boot changed the save");
     if (first.bak !== second.bak) problems.push("second boot changed the backup");
+    if (first.corrupt !== second.corrupt) problems.push("second boot changed the corrupt copy");
+    const expectCorrupt = c.corrupt === true ? c.raw : (c.corrupt === undefined ? null : c.corrupt);
+    if (first.corrupt !== expectCorrupt) problems.push("corrupt copy: " + JSON.stringify(first.corrupt) + " !== " + JSON.stringify(expectCorrupt));
     if (c.backup === false) {
       if (first.bak !== null) problems.push("backup written: " + JSON.stringify(first.bak));
     } else if (c.backup === true) {
