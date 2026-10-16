@@ -69,6 +69,7 @@ export function boot(raw){
     if (typeof careWait === "function") __api.careWait = careWait;
     if (typeof careSeals === "function") __api.careSeals = careSeals;
     if (typeof spriteKey === "function") __api.spriteKey = spriteKey;
+    if (typeof spriteChain === "function") __api.spriteChain = spriteChain;
     if (typeof pensOpen === "function") __api.pensOpen = pensOpen;
     if (typeof breedCount === "function") __api.breedCount = breedCount;
     return __api;

@@ -63,6 +63,52 @@ add("keys", t => {
   t.equal(g.spriteKey({line:"tempest", xp:400000}), "tempest-elder", "elder threshold");
 });
 
+add("mutations", t => {
+  const g = boot(save([]));
+  const plain = {line:"cinder", xp:0, item:"ember"};
+  const moon = {line:"cinder", xp:0, item:"ember", mut:"moonlit"};
+  const other = {line:"cinder", xp:0, item:"ember", mut:"obsidian"};
+  const bogus = {line:"cinder", xp:0, item:"ember", mut:"cursed"};
+  const bare = {frames:8, sprites: manifest.sprites};
+  const plainChain = g.spriteChain(plain, bare);
+  t.equal(plainChain.length, 2, "plain dragon uses the base strip and still");
+  t.equal(plainChain[0].bag, "sprites", "plain strip comes from the base book");
+  t.equal(plainChain[0].file, "cinder-hatchling.webp", "plain strip file");
+  t.equal(plainChain[0].spec.frameHeight, 176, "base height is that entry's own");
+  t.equal(g.spriteChain(moon, bare).map(s => s.file).join(","), plainChain.map(s => s.file).join(","), "a missing mutations object keeps the base sprite");
+  t.equal(g.spriteChain(moon, {frames:8, sprites: manifest.sprites, mutations: null}).length, 2, "a null mutations object keeps the base sprite");
+  const book = {frames:8, sprites: manifest.sprites, mutations: {
+    "cinder-moonlit-hatchling": {file:"mut/cinder-moonlit-hatchling.webp", still:"mut/cinder-moonlit-hatchling-still.webp", frameWidth:181, frameHeight:180, frames:8, fps:10.0, motion:"moonlit"},
+    "cinder-moonlit-juvenile": {file:"mut/cinder-moonlit-juvenile.webp", still:"mut/cinder-moonlit-juvenile-still.webp", frameWidth:160, frameHeight:200, frames:6, fps:7.5}
+  }};
+  const mut = g.spriteChain(moon, book);
+  t.equal(mut.length, 4, "mutation strip, mutation still, then the base strip and still");
+  t.equal(mut[0].bag, "mutations", "mutation strip is first");
+  t.equal(mut[0].key, "cinder-moonlit-hatchling", "mutation key");
+  t.equal(mut[0].kind, "strip", "first step is the strip");
+  t.equal(mut[0].file, "mut/cinder-moonlit-hatchling.webp", "mutation strip file");
+  t.equal(mut[0].spec.frameWidth, 181, "width is read from the mutation entry");
+  t.equal(mut[0].spec.frameHeight, 180, "height is read from the mutation entry");
+  t.equal(mut[0].spec.fps, 10, "fps is read from the mutation entry");
+  t.equal(mut[1].kind, "still", "mutation still is the next fallback");
+  t.equal(mut[1].file, "mut/cinder-moonlit-hatchling-still.webp", "mutation still file");
+  t.equal(mut[1].spec.frameHeight, 180, "the still uses that same entry");
+  t.equal(mut[2].bag, "sprites", "base strip follows the mutation art");
+  t.equal(mut[2].file, "cinder-hatchling.webp", "base strip file");
+  t.equal(mut[2].spec.frameHeight, 176, "base entry keeps its own height");
+  t.equal(mut[3].kind, "still", "base still is last");
+  const grown = g.spriteChain({line:"cinder", xp:30000, item:"ember", mut:"moonlit"}, book);
+  t.equal(grown[0].key, "cinder-moonlit-juvenile", "stage is part of the mutation key");
+  t.equal(grown[0].spec.frameWidth, 160, "juvenile width is its own");
+  t.equal(grown[0].spec.frameHeight, 200, "juvenile height is its own");
+  t.equal(grown[0].spec.fps, 7.5, "juvenile fps is its own");
+  t.equal(grown[0].spec.frames, 6, "juvenile frame count is its own");
+  t.equal(g.spriteChain(other, book)[0].bag, "sprites", "a mutation with no entry uses the base sprite");
+  t.equal(g.spriteChain(bogus, book)[0].file, "cinder-hatchling.webp", "an unknown mutation stays on the base sprite");
+  t.equal(g.spriteChain(plain, book).length, 2, "a plain dragon does not walk the mutation chain");
+  t.equal(g.spriteChain(plain, book)[0].bag, "sprites", "a plain dragon keeps the base sprite");
+});
+
 add("breeds", t => {
   const g = boot(save([
     dragon("a", "cinder", 0),

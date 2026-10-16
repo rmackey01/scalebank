@@ -2248,6 +2248,37 @@ function spriteKey(d){
   if (!d || !d.line) return "";
   return d.line + "-" + STAGES[stageIdx(d)].name.toLowerCase();
 }
+function mutSpriteKey(d){
+  if (!d || !d.line || !d.mut || !MUTATIONS[d.mut]) return "";
+  return d.line + "-" + d.mut + "-" + STAGES[stageIdx(d)].name.toLowerCase();
+}
+function bookSpec(book, bag, key){
+  if (!book || !key) return null;
+  const bagObj = book[bag];
+  if (!bagObj || typeof bagObj !== "object") return null;
+  const spec = bagObj[key];
+  if (!spec || typeof spec !== "object" || Array.isArray(spec)) return null;
+  if (!spec.file && !spec.still) return null;
+  return spec;
+}
+/* Mutation strip, mutation still, then the base breed-stage strip and still. */
+function spriteChain(d, book){
+  const src = book === undefined ? spriteBook : book;
+  const chain = [];
+  const mk = mutSpriteKey(d);
+  const mut = bookSpec(src, "mutations", mk);
+  if (mut){
+    if (mut.file) chain.push({bag:"mutations", key:mk, spec:mut, kind:"strip", file:mut.file});
+    if (mut.still) chain.push({bag:"mutations", key:mk, spec:mut, kind:"still", file:mut.still});
+  }
+  const bk = spriteKey(d);
+  const base = bookSpec(src, "sprites", bk);
+  if (base){
+    if (base.file) chain.push({bag:"sprites", key:bk, spec:base, kind:"strip", file:base.file});
+    if (base.still) chain.push({bag:"sprites", key:bk, spec:base, kind:"still", file:base.still});
+  }
+  return chain;
+}
 function u32(s){
   let h = 2166136261;
   for (let i = 0; i < String(s).length; i++) h = Math.imul(h ^ String(s).charCodeAt(i), 16777619);
@@ -2262,51 +2293,85 @@ function loadSpriteBook(){
     syncPens();
   }).catch(() => { spriteBook = {frames:8, sprites:{}}; penSig = ""; syncPens(); });
 }
-function probeSprite(key){
-  if (!keepOn() || !key || spriteMode.has(key)) return;
-  const spec = spriteBook && spriteBook.sprites && spriteBook.sprites[key];
-  if (!spriteBook) return;
-  if (!spec || !spec.file){ spriteMode.set(key, "ph"); return; }
-  spriteMode.set(key, "load");
-  const img = new Image();
-  img.onload = () => { if (!keepOn()) return; spriteMode.set(key, "strip"); paintKey(key); markPenReady(); };
-  img.onerror = () => {
-    if (!spec.still){ spriteMode.set(key, "ph"); paintKey(key); markPenReady(); return; }
-    const still = new Image();
-    still.onload = () => { if (!keepOn()) return; spriteMode.set(key, "still"); paintKey(key); markPenReady(); };
-    still.onerror = () => { spriteMode.set(key, "ph"); paintKey(key); markPenReady(); };
-    still.src = "art/keep/sprites/" + spec.still;
-  };
-  img.src = "art/keep/sprites/" + spec.file;
-}
-function spritePx(d){
+function spritePx(d, spec){
   const cw = penMetrics.cw || 390;
   const base = PEN_TALL[stageIdx(d)] || 48;
   const h = Math.max(40, Math.min(56, base * cw / 390));
-  const spec = spriteBook && spriteBook.sprites && spriteBook.sprites[spriteKey(d)];
-  const aspect = spec ? spec.frameWidth / spec.frameHeight : 1.2;
+  const fw = spec && spec.frameWidth > 0 ? spec.frameWidth : 0;
+  const fh = spec && spec.frameHeight > 0 ? spec.frameHeight : 0;
+  const aspect = fw && fh ? fw / fh : 1.2;
   return {w: h * aspect, h};
 }
-function paintKey(key){
-  penEls.forEach((el, id) => {
-    const actor = penActors.get(id);
-    if (actor && actor.key === key) paintEl(el, actor);
+function spriteCacheKey(step){ return step.bag + "\0" + step.key + "\0" + step.kind; }
+function settleSprite(ck){
+  penActors.forEach((actor, id) => {
+    const step = actor.chain && actor.chain[actor.step];
+    if (step && spriteCacheKey(step) === ck) probeActor(id);
   });
+}
+function probeActor(id){
+  if (!keepOn()) return;
+  const actor = penActors.get(id);
+  if (!actor) return;
+  const el = penEls.get(id);
+  const d = ledgerDragon(id);
+  if (!spriteBook){
+    actor.kind = "wait";
+    if (el) paintEl(el, actor);
+    markPenReady();
+    return;
+  }
+  const step = actor.chain && actor.chain[actor.step];
+  if (!step){
+    actor.kind = "ph";
+    actor.spec = null;
+    actor.key = d ? spriteKey(d) : "";
+    if (el && d) el._px = spritePx(d, null);
+    if (el) paintEl(el, actor);
+    markPenReady();
+    return;
+  }
+  actor.key = step.key;
+  actor.spec = step.spec;
+  const ck = spriteCacheKey(step);
+  const hit = spriteMode.get(ck);
+  if (hit === "fail"){
+    actor.step++;
+    actor.shown = -1;
+    probeActor(id);
+    return;
+  }
+  if (hit === "ok"){
+    actor.kind = step.kind;
+    if (el && d) el._px = spritePx(d, step.spec);
+    if (el) paintEl(el, actor);
+    markPenReady();
+    return;
+  }
+  actor.kind = "load";
+  if (el) paintEl(el, actor);
+  markPenReady();
+  if (hit === "load") return;
+  spriteMode.set(ck, "load");
+  const img = new Image();
+  img.onload = () => { if (!keepOn()) return; spriteMode.set(ck, "ok"); settleSprite(ck); };
+  img.onerror = () => { spriteMode.set(ck, "fail"); settleSprite(ck); };
+  img.src = "art/keep/sprites/" + step.file;
 }
 function paintEl(el, actor){
   if (!keepOn()) return;
   const sp = el.querySelector(".pen-sprite");
   if (!sp) return;
-  const mode = spriteMode.get(actor.key) || "ph";
-  const spec = spriteBook && spriteBook.sprites && spriteBook.sprites[actor.key];
+  const spec = actor.spec;
+  const kind = actor.kind === "strip" || actor.kind === "still" ? actor.kind : "ph";
   const px = el._px || {w:48, h:48};
-  sp.classList.toggle("is-ph", mode !== "strip" && mode !== "still");
-  sp.classList.toggle("is-still", mode === "still");
-  if (mode === "strip" && spec){
-    const frames = spec.frames || 8;
+  sp.classList.toggle("is-ph", kind === "ph");
+  sp.classList.toggle("is-still", kind === "still");
+  if (kind === "strip" && spec && spec.file){
+    const frames = spec.frames > 0 ? spec.frames : 8;
     sp.style.backgroundImage = 'url("art/keep/sprites/' + spec.file + '")';
     sp.style.backgroundSize = (px.w * frames) + "px " + px.h + "px";
-  } else if (mode === "still" && spec){
+  } else if (kind === "still" && spec && spec.still){
     sp.style.backgroundImage = 'url("art/keep/sprites/' + spec.still + '")';
     sp.style.backgroundSize = px.w + "px " + px.h + "px";
   } else sp.style.backgroundImage = "";
@@ -2319,8 +2384,7 @@ function markPenReady(){
   if (!spriteBook){ world.dataset.ready = "0"; return; }
   let ok = true;
   penActors.forEach(actor => {
-    const m = spriteMode.get(actor.key);
-    if (m !== "ph" && m !== "still" && m !== "strip") ok = false;
+    if (actor.kind !== "ph" && actor.kind !== "still" && actor.kind !== "strip") ok = false;
   });
   world.dataset.ready = ok ? "1" : "0";
 }
@@ -2410,15 +2474,15 @@ function stepActors(dt, now){
       }
     }
     const el = penEls.get(actor.id);
-    const spec = spriteBook && spriteBook.sprites && spriteBook.sprites[actor.key];
-    if (el && spec && spriteMode.get(actor.key) === "strip" && el._px){
+    const spec = actor.spec;
+    if (el && spec && actor.kind === "strip" && el._px){
       const sp = el.querySelector(".pen-sprite");
       actor.acc += dt;
-      const hop = 1 / (spec.fps || 8);
+      const hop = 1 / (spec.fps > 0 ? spec.fps : 8);
       let guard = 0;
       while (actor.acc >= hop && guard++ < 3){
         actor.acc -= hop;
-        actor.frame = (actor.frame + 1) % (spec.frames || 8);
+        actor.frame = (actor.frame + 1) % (spec.frames > 0 ? spec.frames : 8);
       }
       if (sp && actor.shown !== actor.frame){
         actor.shown = actor.frame;
@@ -2460,7 +2524,7 @@ function syncPens(){
   });
   const roaming = normKeep(S.keep).roaming;
   const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
-    + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? spriteKey(d) : ""); }).join(",");
+    + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
   if (sig !== penSig){
     penSig = sig;
     const live = new Set();
@@ -2478,18 +2542,26 @@ function syncPens(){
       live.add(id);
       const pen = PENS[i % open];
       const mates = slots.get(pen.id) || [id];
-      const key = spriteKey(d);
+      const chain = spriteChain(d);
+      const chainSig = chain.map(s => s.bag + ":" + s.kind + ":" + s.file).join("|");
       let actor = penActors.get(id);
       if (!actor){
-        actor = {id, pen: pen.id, key, x:0, y:0, tx:0, ty:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, dirty:true};
+        actor = {id, pen: pen.id, key: spriteKey(d), chain, chainSig, step:0, spec: chain[0] ? chain[0].spec : null, kind:"load", x:0, y:0, tx:0, ty:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, dirty:true};
         placeActor(actor, pen, mates.indexOf(id), mates.length);
         penActors.set(id, actor);
       } else if (actor.pen !== pen.id){
         actor.pen = pen.id;
         placeActor(actor, pen, mates.indexOf(id), mates.length);
       }
-      actor.key = key;
-      probeSprite(key);
+      if (actor.chainSig !== chainSig){
+        actor.chain = chain;
+        actor.chainSig = chainSig;
+        actor.step = 0;
+        actor.frame = 0;
+        actor.acc = 0;
+        actor.shown = -1;
+        actor.spec = chain[0] ? chain[0].spec : null;
+      }
       let el = penEls.get(id);
       if (!el){
         el = document.createElement("button");
@@ -2503,7 +2575,8 @@ function syncPens(){
       }
       const stageName = STAGES[stageIdx(d)].name;
       el.setAttribute("aria-label", (d.name || d.species || "Dragon") + ", " + stageName);
-      el._px = spritePx(d);
+      el._px = spritePx(d, actor.spec);
+      probeActor(id);
       paintEl(el, actor);
       drawActor(actor);
     });
