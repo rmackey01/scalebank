@@ -37,6 +37,7 @@ function element(){
     querySelector(){ return element(); },
     querySelectorAll(){ return []; },
     getClientRects(){ return []; },
+    getBoundingClientRect(){ return {top:0, bottom:800, left:0, right:390, width:390, height:800, x:0, y:0}; },
     closest(){ return null; }
   };
   return el;
@@ -76,6 +77,7 @@ export function boot(raw, opts){
     if (typeof spriteChain === "function") __api.spriteChain = spriteChain;
     if (typeof pensOpen === "function") __api.pensOpen = pensOpen;
     if (typeof breedCount === "function") __api.breedCount = breedCount;
+    if (typeof shownDragon === "function") __api.shownDragon = shownDragon;
     if (typeof visitKeep === "function") __api.visitKeep = visitKeep;
     if (typeof claimStreak === "function") __api.claimStreak = claimStreak;
     if (typeof streakPrize === "function") __api.streakPrize = streakPrize;

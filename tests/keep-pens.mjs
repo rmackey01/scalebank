@@ -107,6 +107,38 @@ add("mutations", t => {
   t.equal(g.spriteChain(bogus, book)[0].file, "cinder-hatchling.webp", "an unknown mutation stays on the base sprite");
   t.equal(g.spriteChain(plain, book).length, 2, "a plain dragon does not walk the mutation chain");
   t.equal(g.spriteChain(plain, book)[0].bag, "sprites", "a plain dragon keeps the base sprite");
+  const pix = {file:"cinder-hatchling.webp", still:"cinder-hatchling-still.webp", frameWidth:84, frameHeight:74, frames:8, fps:4, anchor:"bottom-center"};
+  const withPix = {frames:8, fps:4, sprites: manifest.sprites, pixel: {"cinder-hatchling": pix}, mutations: book.mutations};
+  const pixelFirst = g.spriteChain(plain, withPix);
+  t.equal(pixelFirst[0].bag, "pixel", "a plain dragon prefers the pixel strip");
+  t.equal(pixelFirst[0].kind, "strip", "pixel strip is first");
+  t.equal(pixelFirst[0].spec.fps, 4, "pixel strip breathes at 4 fps");
+  t.equal(pixelFirst[0].spec.anchor, "bottom-center", "pixel strip anchors at the feet");
+  t.equal(pixelFirst[1].kind, "still", "pixel still follows the strip");
+  t.equal(pixelFirst[2].bag, "sprites", "the old strip is the next fallback");
+  t.equal(pixelFirst[3].kind, "still", "the old still is last");
+  t.equal(g.spriteChain(moon, withPix)[0].bag, "mutations", "a mutation entry still comes before the pixel art");
+  t.equal(g.spriteChain(other, withPix)[0].bag, "pixel", "a mutation with no entry uses the pixel art");
+});
+
+add("shown dragon", t => {
+  const high = [dragon("low", "cinder", 0), dragon("grown", "cinder", 120000), dragon("moon", "cinder", 0)];
+  high[2].mut = "moonlit";
+  const g = boot(save(high));
+  t.equal(g.shownDragon("cinder").id, "grown", "highest stage is shown");
+  t.equal(g.shownDragon("brine"), null, "an unowned breed has no dragon");
+  const pair = [dragon("plain", "moss", 30000), dragon("glow", "moss", 30000)];
+  pair[1].mut = "moonlit";
+  const moss = boot(save(pair));
+  t.equal(moss.shownDragon("moss").id, "glow", "a mutation wins a stage tie");
+  const picked = moss.snapshot();
+  picked.keep.shown = {moss: "plain"};
+  const over = boot(JSON.stringify(picked));
+  t.equal(over.shownDragon("moss").id, "plain", "a saved Ledger pick overrides the default");
+  t.equal(over.snapshot().keep.shown.moss, "plain", "the pick survives a reload");
+  const stale = over.snapshot();
+  stale.keep.shown = {moss: "gone"};
+  t.equal(boot(JSON.stringify(stale)).shownDragon("moss").id, "glow", "a missing pick falls back to the default");
 });
 
 add("breeds", t => {

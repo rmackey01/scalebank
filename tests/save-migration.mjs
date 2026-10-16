@@ -255,7 +255,8 @@ const cases = [
       t.deepEqual(s.keep.stables, [], "stables");
       t.deepEqual(s.keep.zones, ["meadow"], "zones");
       t.deepEqual(s.keep.care, {b: 1}, "care");
-      t.deepEqual(s.keep.streak, {last: "yesterday", count: 4, best: 6}, "streak");
+      t.ok(visitedStreak(s.keep.streak, 3, {last: "yesterday", count: 4, best: 6}), "app load records today without dropping best");
+      t.equal(s.keep.streak.best, 6, "best is kept");
       t.equal(s.keep.restDay, 3, "rest day");
       t.equal(t.bak, null, "no backup written for a v4 save");
     }
@@ -320,11 +321,28 @@ const cases = [
   }
 ];
 
+function localDay(){
+  const d = new Date(), p = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+/* Opening the app records a visit now that the Keep is always on. */
+function visitedStreak(streak, restDay, prior){
+  if (!streak || typeof streak.homeZone !== "string" || !streak.homeZone) return false;
+  if (!Number.isInteger(streak.homeTz)) return false;
+  const day = localDay();
+  const rest = new Date().getDay() === restDay;
+  if (rest){
+    return streak.seen === day && streak.last === prior.last && streak.count === prior.count && streak.best === prior.best;
+  }
+  const lastOk = typeof prior.last === "string" && /^\d{4}-\d{2}-\d{2}$/.test(prior.last);
+  if (!lastOk) return streak.last === day && streak.count === 1 && streak.best === Math.max(prior.best || 0, 1);
+  return false;
+}
 function keepDefaults(s) {
   const k = s.keep;
   const ok = k && Array.isArray(k.zones) && k.zones.length === 0
     && k.care && typeof k.care === "object" && !Array.isArray(k.care) && Object.keys(k.care).length === 0
-    && k.streak && k.streak.last === null && k.streak.count === 0 && k.streak.best === 0
+    && visitedStreak(k.streak, 0, {last: null, count: 0, best: 0})
     && k.restDay === 0;
   return ok;
 }

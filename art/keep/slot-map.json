@@ -1,0 +1,370 @@
+{
+ "tint": {
+  "v6": [
+   1,
+   1,
+   1,
+   1
+  ],
+  "rain": [
+   0.82,
+   0.88,
+   1.0,
+   0.85
+  ],
+  "snow": [
+   0.9,
+   0.95,
+   1.08,
+   0.92
+  ],
+  "fog": [
+   0.92,
+   0.94,
+   0.97,
+   0.88
+  ],
+  "storm": [
+   0.68,
+   0.72,
+   0.9,
+   0.72
+  ],
+  "sunny": [
+   1.08,
+   1.02,
+   0.9,
+   1.06
+  ],
+  "overcast": [
+   0.92,
+   0.95,
+   1.0,
+   0.88
+  ]
+ },
+ "tint_note": "per weather variant: multiply sprite RGB by [r,g,b] then by brightness (alpha unchanged). Applies to all slot sprites.",
+ "image_size": [
+  1008,
+  1792
+ ],
+ "variant": "keep-v6 (all weathers aligned)",
+ "note": "Draw back to front by drawOrder; after each pen's dragons draw fence-front-<variant>-<pen>.webp. x,y = top-left in background px.",
+ "slots": {
+  "cinder": {
+   "pen": "ember",
+   "x": 38,
+   "y": 952,
+   "w": 204,
+   "h": 120,
+   "feetY": 1072,
+   "stages": {
+    "elder": {
+     "file": "cinder-elder.webp",
+     "x": 38,
+     "y": 952,
+     "w": 204,
+     "h": 120,
+     "feetY": 1072
+    },
+    "adult": {
+     "file": "cinder-adult.webp",
+     "x": 53,
+     "y": 970,
+     "w": 174,
+     "h": 102,
+     "feetY": 1072
+    },
+    "juvenile": {
+     "file": "cinder-juvenile.webp",
+     "x": 74,
+     "y": 979,
+     "w": 132,
+     "h": 93,
+     "feetY": 1072
+    },
+    "hatchling": {
+     "file": "cinder-hatchling.webp",
+     "x": 95,
+     "y": 1003,
+     "w": 90,
+     "h": 69,
+     "feetY": 1072
+    }
+   },
+   "file": "cinder.webp",
+   "alias_of": "elder",
+   "drawOrder": 1
+  },
+  "brine": {
+   "pen": "azure",
+   "x": 106,
+   "y": 1251,
+   "w": 228,
+   "h": 159,
+   "feetY": 1410,
+   "stages": {
+    "elder": {
+     "file": "brine-elder.webp",
+     "x": 106,
+     "y": 1251,
+     "w": 228,
+     "h": 159,
+     "feetY": 1410
+    },
+    "adult": {
+     "file": "brine-adult.webp",
+     "x": 123,
+     "y": 1275,
+     "w": 195,
+     "h": 135,
+     "feetY": 1410
+    },
+    "juvenile": {
+     "file": "brine-juvenile.webp",
+     "x": 145,
+     "y": 1299,
+     "w": 150,
+     "h": 111,
+     "feetY": 1410
+    },
+    "hatchling": {
+     "file": "brine-hatchling.webp",
+     "x": 169,
+     "y": 1332,
+     "w": 102,
+     "h": 78,
+     "feetY": 1410
+    }
+   },
+   "file": "brine.webp",
+   "alias_of": "elder",
+   "drawOrder": 5
+  },
+  "voidling": {
+   "pen": "violet",
+   "x": 383,
+   "y": 1082,
+   "w": 255,
+   "h": 108,
+   "feetY": 1190,
+   "stages": {
+    "elder": {
+     "file": "voidling-elder.webp",
+     "x": 383,
+     "y": 1082,
+     "w": 255,
+     "h": 108,
+     "feetY": 1190
+    },
+    "adult": {
+     "file": "voidling-adult.webp",
+     "x": 402,
+     "y": 1100,
+     "w": 216,
+     "h": 90,
+     "feetY": 1190
+    },
+    "juvenile": {
+     "file": "voidling-juvenile.webp",
+     "x": 428,
+     "y": 1085,
+     "w": 165,
+     "h": 105,
+     "feetY": 1190
+    },
+    "hatchling": {
+     "file": "voidling-hatchling.webp",
+     "x": 453,
+     "y": 1115,
+     "w": 114,
+     "h": 75,
+     "feetY": 1190
+    }
+   },
+   "file": "voidling.webp",
+   "alias_of": "elder",
+   "drawOrder": 3
+  },
+  "inferno": {
+   "pen": "ember",
+   "x": 198,
+   "y": 1016,
+   "w": 189,
+   "h": 84,
+   "feetY": 1100,
+   "stages": {
+    "elder": {
+     "file": "inferno-elder.webp",
+     "x": 198,
+     "y": 1016,
+     "w": 189,
+     "h": 84,
+     "feetY": 1100
+    },
+    "adult": {
+     "file": "inferno-adult.webp",
+     "x": 211,
+     "y": 1028,
+     "w": 162,
+     "h": 72,
+     "feetY": 1100
+    },
+    "juvenile": {
+     "file": "inferno-juvenile.webp",
+     "x": 231,
+     "y": 1019,
+     "w": 123,
+     "h": 81,
+     "feetY": 1100
+    },
+    "hatchling": {
+     "file": "inferno-hatchling.webp",
+     "x": 250,
+     "y": 1040,
+     "w": 84,
+     "h": 60,
+     "feetY": 1100
+    }
+   },
+   "file": "inferno.webp",
+   "alias_of": "elder",
+   "drawOrder": 2
+  },
+  "moss": {
+   "pen": "pond",
+   "x": 408,
+   "y": 1400,
+   "w": 234,
+   "h": 105,
+   "feetY": 1505,
+   "stages": {
+    "elder": {
+     "file": "moss-elder.webp",
+     "x": 408,
+     "y": 1400,
+     "w": 234,
+     "h": 105,
+     "feetY": 1505
+    },
+    "adult": {
+     "file": "moss-adult.webp",
+     "x": 426,
+     "y": 1415,
+     "w": 198,
+     "h": 90,
+     "feetY": 1505
+    },
+    "juvenile": {
+     "file": "moss-juvenile.webp",
+     "x": 449,
+     "y": 1361,
+     "w": 153,
+     "h": 144,
+     "feetY": 1505
+    },
+    "hatchling": {
+     "file": "moss-hatchling.webp",
+     "x": 473,
+     "y": 1406,
+     "w": 105,
+     "h": 99,
+     "feetY": 1505
+    }
+   },
+   "file": "moss.webp",
+   "alias_of": "elder",
+   "drawOrder": 7
+  },
+  "stormling": {
+   "pen": "violet",
+   "x": 303,
+   "y": 1125,
+   "w": 150,
+   "h": 141,
+   "feetY": 1266,
+   "stages": {
+    "elder": {
+     "file": "stormling-elder.webp",
+     "x": 303,
+     "y": 1125,
+     "w": 150,
+     "h": 141,
+     "feetY": 1266
+    },
+    "adult": {
+     "file": "stormling-adult.webp",
+     "x": 315,
+     "y": 1146,
+     "w": 126,
+     "h": 120,
+     "feetY": 1266
+    },
+    "juvenile": {
+     "file": "stormling-juvenile.webp",
+     "x": 330,
+     "y": 1176,
+     "w": 96,
+     "h": 90,
+     "feetY": 1266
+    },
+    "hatchling": {
+     "file": "stormling-hatchling.webp",
+     "x": 345,
+     "y": 1206,
+     "w": 66,
+     "h": 60,
+     "feetY": 1266
+    }
+   },
+   "file": "stormling.webp",
+   "alias_of": "elder",
+   "drawOrder": 4
+  },
+  "tempest": {
+   "pen": "azure",
+   "x": 363,
+   "y": 1292,
+   "w": 264,
+   "h": 120,
+   "feetY": 1412,
+   "stages": {
+    "elder": {
+     "file": "tempest-elder.webp",
+     "x": 363,
+     "y": 1292,
+     "w": 264,
+     "h": 120,
+     "feetY": 1412
+    },
+    "adult": {
+     "file": "tempest-adult.webp",
+     "x": 383,
+     "y": 1310,
+     "w": 225,
+     "h": 102,
+     "feetY": 1412
+    },
+    "juvenile": {
+     "file": "tempest-juvenile.webp",
+     "x": 410,
+     "y": 1298,
+     "w": 171,
+     "h": 114,
+     "feetY": 1412
+    },
+    "hatchling": {
+     "file": "tempest-hatchling.webp",
+     "x": 437,
+     "y": 1331,
+     "w": 117,
+     "h": 81,
+     "feetY": 1412
+    }
+   },
+   "file": "tempest.webp",
+   "alias_of": "elder",
+   "drawOrder": 6
+  }
+ }
+}

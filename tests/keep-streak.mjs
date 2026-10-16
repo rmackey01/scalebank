@@ -201,20 +201,19 @@ add("sunday-pay", t => {
 
 add("load", t => {
   let clock = stamp(2026, 10, 16, 9);
-  const on = boot(save({last: key(2026, 10, 15), count: 4, best: 4}), {search: "?keep=1"});
+  const on = boot(save({last: key(2026, 10, 15), count: 4, best: 4}));
   on.setCareClock(() => clock);
   on.start();
   t.equal(on.snapshot().tab, "bank", "the visit is recorded without opening Keep");
-  t.equal(on.snapshot().keep.streak.count, 5, "app load with keep=1 adds the day");
+  t.equal(on.snapshot().keep.streak.count, 5, "app load adds the day");
   t.equal(on.snapshot().keep.streak.last, key(2026, 10, 16), "app load stores today");
   on.start();
   t.equal(on.snapshot().keep.streak.count, 5, "loading again the same day does not add");
-  const off = boot(save({last: key(2026, 10, 15), count: 4, best: 4}));
-  off.setCareClock(() => clock);
-  t.equal(off.noteDailyVisit(), null, "without keep=1 a visit is not recorded");
-  off.start();
-  t.equal(off.snapshot().keep.streak.count, 4, "app load without keep=1 leaves the streak");
-  t.equal(off.snapshot().keep.streak.last, key(2026, 10, 15), "last stays put when keep is off");
+  const flagged = boot(save({last: key(2026, 10, 15), count: 4, best: 4}), {search: "?keep=1"});
+  flagged.setCareClock(() => clock);
+  flagged.start();
+  t.equal(flagged.snapshot().keep.streak.count, 5, "an old keep=1 link still records the day");
+  t.equal(flagged.snapshot().keep.streak.last, key(2026, 10, 16), "an old keep=1 link stores today");
 });
 
 add("timezone", t => {

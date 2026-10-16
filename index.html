@@ -1,5 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<script>try{var kq=new URLSearchParams(location.search);if(kq.get("keep")==="1")sessionStorage.setItem("scalebank.keep","1");if(kq.get("keep")==="1"||sessionStorage.getItem("scalebank.keep")==="1")document.documentElement.classList.add("keep-on");}catch(e){}</script>
+<!doctype html><html lang="en" class="keep-on"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="data:,"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 </head><body>
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,9 +34,9 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .pad{padding-inline:16px}
 
 /* ---------- tab bar ---------- */
-.tabs{flex:none;position:relative;display:grid;grid-template-columns:repeat(4,1fr);margin:0 8px 11px;padding:6px 0 4px;font-family:"Lato",var(--body)}
+.tabs{flex:none;min-width:0;position:relative;display:flex;flex-flow:row nowrap;margin:0 8px 11px;padding:6px 0 4px;font-family:"Lato",var(--body)}
 .tabs::before{content:"";position:absolute;inset:-6px;pointer-events:none;border-style:solid;border-width:26px 24px;border-image:url(art/nest/nav_bar_bg.webp) 78 72 fill / 26px 24px stretch}
-.tab{position:relative;background:none;border:0;padding:4px 2px 9.55px;display:flex;flex-direction:column;align-items:center;gap:3.65px;color:#c3b197;font-size:11.5px;line-height:13.8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tab{position:relative;flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap;background:none;border:0;padding:4px 2px 9.55px;display:flex;flex-direction:column;align-items:center;gap:3.65px;color:#c3b197;font-size:11.5px;line-height:13.8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .tab .ti{width:30px;height:30px;display:block}
 .tab .ti.on,.tab[aria-current="page"] .ti.off{display:none}
 .tab[aria-current="page"] .ti.on{display:block}
@@ -46,44 +45,76 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .tab-ul{position:absolute;z-index:1;top:-4.2px;left:calc((var(--ti,0) + .5) * 25%);width:50px;height:12px;margin-left:-25px;pointer-events:none;background:url(art/nest/nav_active_underline.webp) center/100% 100% no-repeat;transition:left .25s cubic-bezier(.65,0,.35,1)}
 .tab .dot{position:absolute;top:-2px;left:calc(50% + 5px);width:20px;height:20px;animation:dotpulse 1.6s ease-in-out infinite}
 @keyframes dotpulse{0%,100%{opacity:.7}50%{opacity:1}}
-/* Keep is off unless html.keep-on (?keep=1, remembered in sessionStorage). */
+/* Keep is on for every visit. html.keep-on is the layout hook, not a flag. */
 .tab-keep{display:none!important}
-html.keep-on .tabs{grid-template-columns:repeat(5,1fr)}
 html.keep-on .tab-ul{left:calc((var(--ti,0) + .5) * 20%)}
 html.keep-on .tab-keep{display:flex!important}
 html.keep-on .tab-keep .ti{object-fit:contain}
-/* Keep art is assigned from script only while the flag is on, so these files are never requested otherwise. */
+/* Keep paintings stay hidden until they load, then the still or silhouette stands in if a sprite is missing. */
 .keep-art{visibility:hidden}
 .keep-art.is-ok{visibility:visible}
-html.keep-on #keep{position:relative;overflow:visible;background:var(--ink)}
-html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;top:0;right:0;height:calc(100% + var(--keep-cover,96px));overflow:hidden}
-html.keep-open #app::before{content:"";position:absolute;z-index:1;left:0;right:0;bottom:0;height:var(--keep-cover,96px);background:var(--ink);pointer-events:none}
+html.keep-on #keep{position:relative;overflow:hidden;background:var(--ink)}
+/* The scene scrolls inside the keep, above the one real tab bar. Art and every overlay share .keep-fit. */
+html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;right:0;top:var(--keep-head,0px);bottom:var(--keep-tab,16px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background:#070708}
 html.keep-open .tabs{position:relative;z-index:2}
-.keep-bg{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
-.keep-build{position:absolute;z-index:3;top:12px;right:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206;font-size:12px;font-weight:700;letter-spacing:.06em;box-shadow:inset 0 1px 0 rgba(255,240,200,.5),0 2px 0 #5c3d0c}
-.keep-streak{position:absolute;z-index:5;top:72px;left:12px;width:min(200px,calc(100% - 24px));padding:8px 10px 10px;border-radius:14px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.9);pointer-events:auto}
-.keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:22px;line-height:1;color:var(--gold-hi)}
-.keep-streak .ks-best{margin:2px 0 0;font-size:11px;letter-spacing:.06em;color:var(--muted)}
-.keep-streak .ks-note{margin:6px 0 0;font-size:12px;line-height:1.3;color:var(--gold-hi)}
-.keep-streak .btn{min-width:0;width:100%;margin-top:8px;padding:7px 8px;font-size:12px}
-.keep-build:active{transform:translateY(1px)}
-/* Lectern hotspot, fractions of the full painting (1008×1792, tab strip included). */
-.keep-hot{position:absolute;z-index:3;left:27%;top:70%;width:46%;height:14%;padding:0;border:0;background:transparent;color:var(--gold-hi)}
-.keep-hot span{position:absolute;left:50%;bottom:10%;transform:translateX(-50%);padding:5px 12px;border-radius:999px;background:rgba(12,16,21,.82);border:1px solid var(--gold-lo);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
-.keep-hot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:12px}
-/* Pens sit on the painting in scene percentages. The world box is the covered image, so they scale with it. */
-.keep-world{position:absolute;z-index:2;pointer-events:none}
+.keep-scroll{position:relative;width:100%}
+.keep-clip{position:relative;width:100%;overflow:hidden}
+.keep-fit{position:absolute;left:0;top:0;pointer-events:none}
+.keep-bg{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
+/* Day pill keeps the pre-clean styles. The claim control is the flame button. */
+.keep-streak{position:relative;z-index:1;display:flex;flex-flow:row nowrap;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;width:auto;max-width:100%;height:auto;overflow:visible;padding:3px 7px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);pointer-events:auto}
+.keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:11px;line-height:1;color:var(--gold-hi);white-space:nowrap}
+.keep-streak .ks-best{margin:0;font-size:10px;line-height:1;letter-spacing:.02em;color:var(--muted);white-space:nowrap}
+.keep-streak .ks-note{display:none}
+.keep-streak .btn{min-width:0;width:auto;height:auto;margin:0;padding:0 7px;border-radius:999px;box-shadow:none;font-size:11px;line-height:1;white-space:nowrap}
+/* Invisible taps on the painted lectern. A ring shows for keyboard focus only. */
+.keep-spot{position:absolute;z-index:4;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;font-size:0;line-height:0;cursor:pointer;pointer-events:auto}
+/* Header: steps, title and day pill, coins and the flame streak button. */
+.keep-head{position:relative;z-index:3;container:keephead / inline-size;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;column-gap:4px;box-sizing:border-box;width:100%;padding:5px 6px 4px;pointer-events:none;color:#f4d78f}
+.keep-head .kh-center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;max-width:100%}
+.keep-head h1{margin:0;min-width:0;font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;line-height:1;white-space:nowrap}
+.keep-head .kh-steps,.keep-head .kh-coins{display:inline-flex;align-items:center;gap:3px;max-width:100%;margin:0;padding:3px 5px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);font-weight:700;font-variant-numeric:tabular-nums;font-size:10px;line-height:1;color:var(--gold-hi);white-space:nowrap}
+.keep-head .kh-steps{justify-self:start}
+.keep-head .kh-right{justify-self:end;display:flex;align-items:center;gap:3px;min-width:0}
+.keep-head .kh-foot{width:11px;height:13px;flex:none;display:block;color:var(--gold-hi)}
+.keep-head .kh-coin{width:12px;height:12px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 32%,#fff6d0,#f4d78f 42%,#c4923a 70%,#7b5517);box-shadow:inset 0 0 0 1px #6a4a12,0 1px 1px rgba(0,0,0,.45)}
+.keep-head .kh-flame.btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:auto;min-width:0;height:auto;margin:0;padding:2px 5px 2px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);box-shadow:none;color:#ffb347;font-family:var(--body);font-size:7px;font-weight:700;letter-spacing:.08em;line-height:1;text-transform:uppercase;pointer-events:auto;cursor:pointer}
+.keep-head .kh-flame svg{width:12px;height:14px;display:block}
+.keep-head .kh-flame:disabled{opacity:.45;cursor:default}
+@container keephead (min-width: 380px){.keep-head h1{font-size:15px;letter-spacing:.1em}.keep-head .kh-steps,.keep-head .kh-coins{font-size:12px;padding:4px 7px}.keep-streak .ks-day{font-size:12px}.keep-streak .ks-best{font-size:11px}.keep-head .kh-flame.btn{font-size:8px;padding:3px 6px 2px}.keep-head .kh-flame svg{width:14px;height:16px}}
+.keep-build{position:absolute;z-index:5;right:12px;bottom:calc(var(--keep-tab,16px) + 8px);left:auto;top:auto;display:flex;align-items:center;justify-content:center;width:auto;min-width:76px;height:32px;margin:0;padding:0 12px;border:1.5px solid #5a3810;border-radius:8px;color:#3a2412;background:linear-gradient(180deg,rgba(255,244,214,.55),rgba(255,244,214,0) 42%),linear-gradient(180deg,#f0d59a 0%,#c8923e 48%,#8a5a1c 100%);box-shadow:inset 0 1px 0 rgba(255,248,220,.85),inset 0 -2px 0 rgba(74,40,8,.28),0 2px 3px rgba(0,0,0,.45);font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.12em;line-height:1;text-transform:uppercase;cursor:pointer;pointer-events:auto}
+.keep-build:focus{outline:none}
+.keep-build:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.keep-filters{position:absolute;width:0;height:0;overflow:hidden}
+.keep-slot{position:absolute;margin:0;padding:0;border:0;background:transparent;line-height:0;pointer-events:auto}
+.keep-slot img{width:100%;height:100%;display:block;object-fit:fill;pointer-events:none}
+.keep-spot:focus{outline:none}
+.keep-spot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.keep-spot.is-live::before{content:"";position:absolute;inset:-35%;border-radius:50%;pointer-events:none;mix-blend-mode:screen}
+.keep-forge.is-live::before{background:radial-gradient(ellipse at 50% 42%, rgba(255,226,160,.95), rgba(255,150,40,.5) 42%, transparent 72%)}
+.keep-pool.is-live::before{background:radial-gradient(ellipse at 50% 55%, rgba(220,248,255,.95), rgba(90,190,255,.55) 46%, transparent 74%)}
+/* Pens are percentages of the full 1008×1792 painting, inside the same fit as the art. */
+.keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.keep-fence{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
+.keep-plates{position:absolute;z-index:4;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.pen-plaques{position:absolute;z-index:5;inset:0;pointer-events:none}
 .keep-pen{position:absolute}
 .keep-ground{position:absolute;left:6%;right:6%;bottom:0;height:36%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(216,169,75,.2),rgba(216,169,75,0) 72%)}
-.pen-lock{position:absolute;left:50%;top:42%;width:90%;transform:translate(-50%,-50%);margin:0;padding:5px 6px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.86);color:var(--gold-hi);font-size:11px;font-weight:700;line-height:1.25;text-align:center}
+.keep-stage:has(.keep-bg.is-ok) .keep-ground{display:none}
+/* Brass plaque with a lock, centered on the pen floor. */
+.pen-lock,.wing-lock{position:absolute;z-index:3;left:50%;top:50%;display:flex;flex-flow:row nowrap;align-items:center;gap:5px;width:max-content;max-width:calc(100% - 6px);box-sizing:border-box;margin:0;padding:4px 8px 4px 6px;border-radius:7px;border:1.5px solid #5a3810;color:#3a2412;background:linear-gradient(180deg,rgba(255,244,214,.55),rgba(255,244,214,0) 42%),linear-gradient(180deg,#f0d59a 0%,#c8923e 48%,#8a5a1c 100%);box-shadow:inset 0 1px 0 rgba(255,248,220,.85),inset 0 -2px 0 rgba(74,40,8,.28),0 2px 3px rgba(0,0,0,.45);font-family:var(--display);font-weight:700;line-height:1;text-align:left;pointer-events:none;transform:translate(-50%,-50%)}
+.pen-lock svg,.wing-lock svg{width:14px;height:14px;flex:none;display:block}
+.pen-lock b,.wing-lock b{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.pen-lock small,.wing-lock small{display:block;margin-top:1px;font-size:9px;letter-spacing:.03em;font-weight:600}
+.keep-pen .pen-lock{display:none}
 .keep-pen.is-open .pen-lock{display:none}
-.keep-keeper{position:absolute;left:15%;top:63%;width:8.5%;aspect-ratio:2/3;z-index:4}
-.kk-cloak{position:absolute;left:14%;right:14%;top:32%;bottom:0;border-radius:46% 46% 14% 14%;background:linear-gradient(180deg,#c4925a,#5c3b24)}
-.kk-hood{position:absolute;left:18%;right:18%;top:0;height:38%;border-radius:48% 48% 42% 42%;background:linear-gradient(180deg,#d7a56a,#6e4a30)}
-.kk-hood::after{content:"";position:absolute;left:22%;right:22%;top:46%;height:36%;border-radius:42%;background:#f0d2b0}
-.pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto}
+/* Cleared wing on the painting. The plaque sits in the middle of that box and leaves when the wing opens. */
+.keep-wing{position:absolute;z-index:4;pointer-events:none}
+.keep-wing.is-open{display:none}
+.pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto;transition:none}
+.pen-shadow{position:absolute;z-index:1;left:50%;bottom:0;border-radius:50%;background:rgba(0,0,0,.5);filter:blur(3px);pointer-events:none;transform:translate(-50%,45%)}
 .pen-dragon:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:10px}
-.pen-sprite{position:relative;display:block;background-repeat:no-repeat;background-position:left center}
+.pen-sprite{position:relative;z-index:2;display:block;background-repeat:no-repeat;background-position:left center}
 .pen-sprite svg{display:none;width:100%;height:100%}
 .pen-sprite.is-ph svg{display:block}
 .ledger{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
@@ -523,6 +554,7 @@ button.dexchip{cursor:pointer}
 
 /* ---------- overlays ---------- */
 .overlay{position:absolute;inset:0;z-index:20;background:rgba(6,8,11,.88);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px}
+#hatchOv{overflow:hidden}
 .hatch{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
 .hstage{position:relative;width:220px;height:260px}
 .hstage .halves,.hstage .born{position:absolute;inset:0;display:grid;place-items:center}
@@ -687,13 +719,34 @@ button.dexchip{cursor:pointer}
   </main>
 
   <main id="keep" class="screen" aria-label="Keep" hidden>
+    <header class="keep-head">
+      <p class="kh-steps" id="keepSteps"><svg class="kh-foot" viewBox="0 0 16 20" aria-hidden="true"><ellipse cx="8" cy="13.2" rx="4.6" ry="5.4" fill="currentColor"/><circle cx="4.1" cy="5.2" r="1.55" fill="currentColor"/><circle cx="8" cy="3.3" r="1.7" fill="currentColor"/><circle cx="11.9" cy="5.2" r="1.55" fill="currentColor"/></svg><span id="keepStepN">0</span> steps</p>
+      <div class="kh-center">
+        <h1>Dragon Keep</h1>
+        <div class="keep-streak" id="keepStreak" hidden></div>
+      </div>
+      <div class="kh-right">
+        <p class="kh-coins" id="keepCoins"><i class="kh-coin" aria-hidden="true"></i><span id="keepCoinN">0</span></p>
+        <button type="button" class="btn kh-flame" id="keepFlame" data-act="streak-claim" disabled><svg viewBox="0 0 16 20" aria-hidden="true"><path fill="#ff9a2e" d="M8.2 1.2c.2 2.4-.4 3.8-1.4 5.1.9-.2 1.6-1.4 1.8-2.4 1.6 1.5 3.2 3.6 3.2 6.3 0 3.2-2.4 5.6-5.6 5.6S1 13.4 1 10.2c0-1.7.7-3.1 1.6-4.4.2 1.3 1 2.2 2 2.4C4.2 6.4 4.6 4.2 5.4 2.4 6.2 2.6 7.2 1.8 8.2 1.2z"/><path fill="#ffe08a" d="M8 8.2c.8 1.1 1.8 2 1.8 3.4a2.4 2.4 0 0 1-4.8 0c0-1 .5-1.8 1.1-2.6.5.8.8 1.5 1.5 1.5-.4-1.5.1-2.8.4-2.3z"/></svg><span>Streak</span></button>
+      </div>
+    </header>
     <div class="keep-stage">
-      <img class="keep-bg keep-art" alt="" draggable="false">
-      <div class="keep-world" id="keepWorld"></div>
-      <button type="button" class="keep-build" data-act="keep-build">Build</button>
-      <div class="keep-streak" id="keepStreak" hidden></div>
-      <button type="button" class="keep-hot" data-act="keep-ledger" aria-label="Ledger"><span>Ledger</span></button>
+      <div class="keep-scroll" id="keepScroll">
+      <div class="keep-clip" id="keepClip">
+      <div class="keep-fit" id="keepFit">
+        <img class="keep-bg keep-art" alt="" draggable="false">
+        <svg class="keep-filters" aria-hidden="true" focusable="false"><filter id="keepSlotTint" color-interpolation-filters="sRGB"><feColorMatrix id="keepSlotMatrix" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/></filter></svg>
+        <div class="keep-world" id="keepWorld"></div>
+        <div class="keep-plates" id="keepPlates"></div>
+        <div class="keep-wing" id="keepWing"><p class="wing-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span></p></div>
+        <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
+        <button type="button" class="keep-spot keep-pool" data-act="keep-pool" aria-label="Moon Pool" hidden></button>
+        <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"></button>
+      </div>
+      </div>
+      </div>
     </div>
+    <button type="button" class="keep-build" data-act="keep-build">Build</button>
   </main>
 
   <main id="bestiary" class="screen bst-journal" aria-label="Bestiary" hidden>
@@ -914,7 +967,7 @@ function loadMutArt(){
 
 /* ================= state ================= */
 /* restDay 0 is Sunday. */
-function freshKeep(){ return {roaming:[], stables:[], zones:[], care:{}, streak:{last:null, count:0, best:0}, restDay:0}; }
+function freshKeep(){ return {roaming:[], stables:[], zones:[], care:{}, streak:{last:null, count:0, best:0}, restDay:0, shown:{}}; }
 function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1, dex:{}, keep:freshKeep(), ver:SAVE_VER}; }
 function asList(v){ return Array.isArray(v) ? v : []; }
 function asMap(v){ return v && typeof v === "object" && !Array.isArray(v) ? v : {}; }
@@ -954,6 +1007,14 @@ function normKeep(k){
     if (typeof s.homeZone === "string" && s.homeZone) base.streak.homeZone = s.homeZone;
   }
   if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
+  base.shown = {};
+  const shown = k.shown;
+  if (shown && typeof shown === "object" && !Array.isArray(shown)){
+    DEX_LINES.forEach(line => {
+      const id = idKey(shown[line]);
+      if (id) base.shown[line] = id;
+    });
+  }
   return base;
 }
 function hydrate(obj){
@@ -1434,7 +1495,7 @@ function artRoostVideo(){ return sceneVideo("roost", "A hooded stranger crouches
 
 /* ================= screens ================= */
 function setTab(t, sub){
-  if (t === "keep" && !document.documentElement.classList.contains("keep-on")) t = "bank";
+  if (t === "keep" && !keepOn()) t = "bank";
   closeCare({restore:false});
   document.documentElement.classList.toggle("keep-open", t === "keep");
   S.tab = t;
@@ -1776,7 +1837,7 @@ function renderDragon(){
         <div class="growth"><div class="growth-head"><span class="stage-pill">${st.name}</span><span class="growth-note">Steps you add while it\u2019s your prize grow it</span></div>${growth}${replayKey ? `<button class="reset replay-reveal" data-act="replay-reveal" data-id="${p.id}" hidden>Watch it grow again</button>` : ""}</div>
       </div>
       <button class="btn share-btn" data-act="share">Make share card</button>
-      ${document.documentElement.classList.contains("keep-on") ? `<button class="btn ghost" data-act="care" data-id="${esc(p.id)}">Care</button>` : ""}
+      ${keepOn() ? `<button class="btn ghost" data-act="care" data-id="${esc(p.id)}">Care</button>` : ""}
       ${bstEntry()}
       <div class="section"><h2>Customize</h2>
         <div class="custom">
@@ -1827,8 +1888,21 @@ function render(){
   if (S.tab === "vendors") renderVendors();
   if (S.tab === "nest") renderNest();
   if (S.tab === "dragon"){ if (DSUB === "bestiary") renderBestiary(); else renderDragon(); }
-  if (document.documentElement.classList.contains("keep-on") && !$("#ledgerOv").hidden) renderLedger();
-  if (document.documentElement.classList.contains("keep-on") && S.tab === "keep") syncPens();
+  if (keepOn() && !$("#ledgerOv").hidden) renderLedger();
+  if (keepOn() && S.tab === "keep"){ syncPens(); syncKeepSpots(); }
+  renderKeepChrome();
+}
+function renderKeepChrome(){
+  const stepN = $("#keepStepN");
+  const steps = $("#keepSteps");
+  const coinN = $("#keepCoinN");
+  const coins = $("#keepCoins");
+  const walked = fmt(S && S.lifetime || 0);
+  const bank = fmt(S && S.bank || 0);
+  if (stepN) stepN.textContent = walked;
+  if (steps) steps.setAttribute("aria-label", walked + " steps");
+  if (coinN) coinN.textContent = bank;
+  if (coins) coins.setAttribute("aria-label", bank + " coins");
 }
 
 function dexRecord(d){
@@ -2179,6 +2253,8 @@ document.addEventListener("click", ev => {
   }
   else if (a === "close-dex") closeDex();
   else if (a === "keep-build") toast("Coming soon");
+  else if (a === "keep-forge"){ if (b.dataset.id) openCare(b.dataset.id); }
+  else if (a === "keep-pool"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "streak-claim"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "keep-ledger") openLedger();
   else if (a === "close-ledger") closeLedger();
@@ -2190,7 +2266,7 @@ document.addEventListener("click", ev => {
   else if (a === "ledger-swap-cancel"){ ledgerPick = null; renderLedger(); }
   else if (a === "care" || a === "ledger-care") openCare(b.dataset.id);
   else if (a === "close-care") closeCare();
-  else if (a === "care-do"){ if (careAct(careFor, b.dataset.kind)) renderCare(true); }
+  else if (a === "care-do"){ if (careAct(careFor, b.dataset.kind)){ renderCare(true); syncKeepSpots(); } }
   else if (a === "dex-replay"){ const d = S.dragons.find(x => x.id === b.dataset.id); closeDex(); if (d) replayReveal(d); }
   else if (a === "share") openShare();
   else if (a === "close-share"){ $("#shareOv").hidden = true; $("#shareOv").innerHTML = ""; autoHatch(); }
@@ -2232,45 +2308,146 @@ document.addEventListener("keydown", ev => {
   else if (!$("#hatchOv").hidden && $("#hafter")?.classList.contains("show")) closeHatch();
 });
 function syncKeepCover(){
-  if (!document.documentElement.classList.contains("keep-on")) return;
-  const tabs = $(".tabs"), app = $("#app");
+  if (!keepOn()) return;
+  const tabs = $(".tabs"), app = $("#app"), keep = $("#keep");
   if (!tabs || !app) return;
   const cover = app.getBoundingClientRect().bottom - tabs.getBoundingClientRect().top;
   if (cover > 0) app.style.setProperty("--keep-cover", Math.ceil(cover) + "px");
+  if (!keep || typeof getComputedStyle !== "function") return;
+  const frame = getComputedStyle(tabs, "::before");
+  const ornament = parseFloat(frame.top);
+  const border = parseFloat(frame.borderTopWidth);
+  const lift = (isFinite(ornament) && ornament < 0 ? -ornament : 0) + (isFinite(border) ? border : 0);
+  keep.style.setProperty("--keep-tab", Math.max(8, Math.ceil(lift)) + "px");
+}
+function keepScrollPad(){
+  const tabs = $(".tabs");
+  if (!tabs || typeof getComputedStyle !== "function") return 16;
+  const rect = tabs.getBoundingClientRect();
+  const frame = getComputedStyle(tabs, "::before");
+  const ornament = parseFloat(frame.top);
+  const border = parseFloat(frame.borderTopWidth);
+  const lift = (isFinite(ornament) && ornament < 0 ? -ornament : 0) + (isFinite(border) ? border : 0);
+  return Math.ceil(rect.height + lift + 16);
 }
 function keepArt(img, url){
   if (!img || img.getAttribute("src")) return;
   img.addEventListener("load", () => { if (img.naturalWidth) img.classList.add("is-ok"); });
   img.src = url;
 }
+/* One front fence per pen, art/keep/fence-front-<variant>-<pen>.webp. A miss is remembered. */
+const FENCE_PENS = [
+  {id:"red", name:"ember"},
+  {id:"purple", name:"violet"},
+  {id:"blue", name:"azure"},
+  {id:"green", name:"pond"}
+];
+const fenceState = new Map();
+function fenceVariant(src){
+  const name = String(src || "").split("?")[0].split("/").pop();
+  if (name === "keep-v6.webp") return "v6";
+  const hit = /^keep-weather-(fog|overcast|rain|snow|storm|sunny)\.webp$/.exec(name);
+  return hit ? hit[1] : "";
+}
+function fencePenUrl(variant, pen){
+  return "art/keep/fence-front-" + variant + "-" + pen + ".webp";
+}
+function hidePenFence(img){
+  img.hidden = true;
+  img.classList.remove("is-ok");
+  if (img.getAttribute("src")) img.removeAttribute("src");
+}
+function showPenFence(img, url){
+  const state = fenceState.get(url);
+  if (state && state !== "miss" && state !== "pend"){
+    if (img.getAttribute("src") !== state) img.src = state;
+    img.hidden = false;
+    img.classList.add("is-ok");
+    return;
+  }
+  if (state === "miss"){ hidePenFence(img); return; }
+  if (state === "pend") return;
+  fenceState.set(url, "pend");
+  hidePenFence(img);
+  fetch(url).then(r => r.ok ? r.blob() : null).then(blob => {
+    if (!blob){ fenceState.set(url, "miss"); }
+    else fenceState.set(url, URL.createObjectURL(blob));
+    if (img.dataset.file === url) showPenFence(img, url);
+  }).catch(() => {
+    fenceState.set(url, "miss");
+    if (img.dataset.file === url) showPenFence(img, url);
+  });
+}
+function syncPenFences(src){
+  const world = $("#keepWorld");
+  if (!world || !keepOn()) return;
+  const variant = fenceVariant(src);
+  FENCE_PENS.forEach((pen, i) => {
+    let img = world.querySelector('.keep-fence[data-pen="' + pen.name + '"]');
+    if (!img){
+      img = document.createElement("img");
+      img.className = "keep-fence keep-art";
+      img.alt = "";
+      img.draggable = false;
+      img.hidden = true;
+      img.dataset.pen = pen.name;
+      world.appendChild(img);
+    }
+    const z = penFenceZ(pen.name);
+    img.style.zIndex = String(z == null ? i * 20 + 10 : z);
+    if (!variant){
+      img.dataset.file = "";
+      hidePenFence(img);
+      return;
+    }
+    const url = fencePenUrl(variant, pen.name);
+    if (img.dataset.file === url){
+      showPenFence(img, url);
+      return;
+    }
+    img.dataset.file = url;
+    showPenFence(img, url);
+  });
+  applySlotTint(variant);
+}
 function mountKeepArt(){
-  if (!document.documentElement.classList.contains("keep-on")) return;
-  keepArt($(".keep-bg"), "art/keep/keep-v6.webp");
+  if (!keepOn()) return;
+  const bg = $(".keep-bg");
+  if (bg && !bg.dataset.fence){
+    bg.dataset.fence = "1";
+    const kick = () => syncPenFences(bg.getAttribute("src"));
+    bg.addEventListener("load", kick);
+    bg.addEventListener("error", kick);
+  }
+  keepArt(bg, "art/keep/keep-v6.webp");
   keepArt($(".tab-keep .ti.off"), "art/keep/icon_keep_inactive.png");
   keepArt($(".tab-keep .ti.on"), "art/keep/icon_keep_active.png");
   loadSpriteBook();
+  syncPenFences(bg ? bg.getAttribute("src") : "");
 }
-/* Three pens on the 1008×1792 painting. They unlock at 1, 3, and 5 distinct breeds. */
+/* Feet boxes on the 1008×1792 painting. Ember, violet, azure, pond. */
 const PENS = [
-  {id:"court", x:32, y:48, w:36, h:20, at:1},
-  {id:"west", x:10, y:34, w:26, h:18, at:3},
-  {id:"east", x:64, y:34, w:26, h:18, at:5}
+  {id:"red", x:22.32, y:56.47, w:33.73, h:12.56, at:1},
+  {id:"purple", x:45.83, y:66.63, w:27.28, h:10.49, at:3},
+  {id:"blue", x:39.98, y:75.06, w:41.37, h:8.93, at:5},
+  {id:"green", x:45.14, y:83.15, w:26.79, h:8.37, at:5}
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
-const PEN_TALL = [42, 46, 51, 56];
-let spriteBook = null, spriteAsked = false;
+/* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
+const KEEP_LEDGER = {x:62.6, y:42.5, w:19.2, h:7.8};
+const KEEP_BUILD = {x:70, y:88.2, w:26, h:3.6};
+const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
+const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
+const KEEP_STREAK = {x:18, y:4.12, w:60, h:2.35};
+/* Cleared stone where the painted lock was. */
+const KEEP_WING = {x:68.5, y:60.9, w:31.2, h:20.3};
+let spriteBook = null, spriteAsked = false, spotBook = null, slotMap = null;
 const spriteMode = new Map();
 const penActors = new Map();
 const penEls = new Map();
 let penMetrics = {rw:0, rh:0, cw:0};
 let penSig = "", penRaf = 0, penLast = 0, penFrames = 0;
-function keepOn(){
-  try {
-    if (new URLSearchParams(location.search).get("keep") === "1") return true;
-    if (sessionStorage.getItem("scalebank.keep") === "1") return true;
-  } catch (e) {}
-  return document.documentElement.classList.contains("keep-on");
-}
+function keepOn(){ return true; }
 function penStill(){ return matchMedia("(prefers-reduced-motion: reduce)").matches; }
 function penNow(){ return typeof performance !== "undefined" ? performance.now() : Date.now(); }
 function pensOpen(n){
@@ -2279,6 +2456,12 @@ function pensOpen(n){
   if (c >= 3) return 2;
   if (c >= 1) return 1;
   return 0;
+}
+/* The third breed gate opens the green pen along with the blue pen. */
+function yardsOpen(n){
+  const open = pensOpen(n);
+  if (open >= 3) return PENS.length;
+  return open;
 }
 function breedCount(){
   const lines = new Set();
@@ -2302,23 +2485,25 @@ function bookSpec(book, bag, key){
   if (!spec.file && !spec.still) return null;
   return spec;
 }
-/* Mutation strip, mutation still, then the base breed-stage strip and still. */
+function pushArt(chain, bag, key, spec){
+  if (!spec) return;
+  if (spec.file) chain.push({bag, key, spec, kind:"strip", file:spec.file});
+  if (spec.still) chain.push({bag, key, spec, kind:"still", file:spec.still});
+}
+/* Mutations first when that art exists. Then the pixel strip and still, then the old sprites, then the silhouette. */
 function spriteChain(d, book){
   const src = book === undefined ? spriteBook : book;
   const chain = [];
   const mk = mutSpriteKey(d);
-  const mut = bookSpec(src, "mutations", mk);
-  if (mut){
-    if (mut.file) chain.push({bag:"mutations", key:mk, spec:mut, kind:"strip", file:mut.file});
-    if (mut.still) chain.push({bag:"mutations", key:mk, spec:mut, kind:"still", file:mut.still});
-  }
+  pushArt(chain, "mutations", mk, bookSpec(src, "mutations", mk));
   const bk = spriteKey(d);
-  const base = bookSpec(src, "sprites", bk);
-  if (base){
-    if (base.file) chain.push({bag:"sprites", key:bk, spec:base, kind:"strip", file:base.file});
-    if (base.still) chain.push({bag:"sprites", key:bk, spec:base, kind:"still", file:base.still});
-  }
+  pushArt(chain, "pixel", bk, bookSpec(src, "pixel", bk));
+  pushArt(chain, "sprites", bk, bookSpec(src, "sprites", bk));
   return chain;
+}
+function spriteUrl(bag, file){
+  if (!file) return "";
+  return (bag === "pixel" ? "art/keep/sprites/pixel/" : "art/keep/sprites/") + file;
 }
 function u32(s){
   let h = 2166136261;
@@ -2328,20 +2513,37 @@ function u32(s){
 function loadSpriteBook(){
   if (!keepOn() || spriteAsked) return;
   spriteAsked = true;
-  fetch("art/keep/sprites/manifest.json").then(r => r.ok ? r.json() : Promise.reject(new Error("manifest"))).then(m => {
-    spriteBook = m && m.sprites ? m : {frames:8, sprites:{}};
+  const read = url => fetch(url).then(r => r.ok ? r.json() : null).catch(() => null);
+  Promise.all([
+    read("art/keep/sprites/manifest.json"),
+    read("art/keep/sprites/pixel/manifest.json"),
+    read("art/keep/pen-spots.json"),
+    read("art/keep/slot-map.json")
+  ]).then(([oldM, pixM, spots, slots]) => {
+    const old = oldM && oldM.sprites ? oldM : {frames:8, sprites:{}};
+    spriteBook = {
+      frames: old.frames || 8,
+      fps: pixM && pixM.fps > 0 ? pixM.fps : 4,
+      sprites: old.sprites || {},
+      mutations: old.mutations && typeof old.mutations === "object" && !Array.isArray(old.mutations) ? old.mutations : {},
+      pixel: pixM && pixM.sprites ? pixM.sprites : {}
+    };
+    const readSpots = readSpotBook(spots);
+    if (readSpots) spotBook = readSpots;
+    const readSlots = readSlotMap(slots);
+    if (readSlots) slotMap = readSlots;
     penSig = "";
     syncPens();
-  }).catch(() => { spriteBook = {frames:8, sprites:{}}; penSig = ""; syncPens(); });
+  });
 }
+/* Native frame on the 1008-wide painting. Feet sit at x = frameWidth/2, y = feetY (or the frame bottom). */
 function spritePx(d, spec){
-  const cw = penMetrics.cw || 390;
-  const base = PEN_TALL[stageIdx(d)] || 48;
-  const h = Math.max(40, Math.min(56, base * cw / 390));
-  const fw = spec && spec.frameWidth > 0 ? spec.frameWidth : 0;
-  const fh = spec && spec.frameHeight > 0 ? spec.frameHeight : 0;
-  const aspect = fw && fh ? fw / fh : 1.2;
-  return {w: h * aspect, h};
+  const rw = penMetrics.rw || penMetrics.cw || 390;
+  const scale = rw / KEEP_W;
+  const fw = spec && spec.frameWidth > 0 ? spec.frameWidth : 84;
+  const fh = spec && spec.frameHeight > 0 ? spec.frameHeight : 74;
+  const feetY = spec && isFinite(+spec.feetY) && +spec.feetY > 0 ? +spec.feetY : fh;
+  return {w: fw * scale, h: fh * scale, foot: Math.max(0.05, Math.min(1, feetY / fh))};
 }
 function spriteCacheKey(step){ return step.bag + "\0" + step.key + "\0" + step.kind; }
 function settleSprite(ck){
@@ -2367,7 +2569,7 @@ function probeActor(id){
     actor.kind = "ph";
     actor.spec = null;
     actor.key = d ? spriteKey(d) : "";
-    if (el && d) el._px = spritePx(d, null);
+    if (el && d) el._px = spritePx(d, null, actor);
     if (el) paintEl(el, actor);
     markPenReady();
     return;
@@ -2384,7 +2586,8 @@ function probeActor(id){
   }
   if (hit === "ok"){
     actor.kind = step.kind;
-    if (el && d) el._px = spritePx(d, step.spec);
+    actor.bag = step.bag;
+    if (el && d) el._px = spritePx(d, step.spec, actor);
     if (el) paintEl(el, actor);
     markPenReady();
     return;
@@ -2397,7 +2600,7 @@ function probeActor(id){
   const img = new Image();
   img.onload = () => { if (!keepOn()) return; spriteMode.set(ck, "ok"); settleSprite(ck); };
   img.onerror = () => { spriteMode.set(ck, "fail"); settleSprite(ck); };
-  img.src = "art/keep/sprites/" + step.file;
+  img.src = spriteUrl(step.bag, step.file);
 }
 function paintEl(el, actor){
   if (!keepOn()) return;
@@ -2410,14 +2613,27 @@ function paintEl(el, actor){
   sp.classList.toggle("is-still", kind === "still");
   if (kind === "strip" && spec && spec.file){
     const frames = spec.frames > 0 ? spec.frames : 8;
-    sp.style.backgroundImage = 'url("art/keep/sprites/' + spec.file + '")';
+    sp.style.backgroundImage = 'url("' + spriteUrl(actor.bag, spec.file) + '")';
     sp.style.backgroundSize = (px.w * frames) + "px " + px.h + "px";
   } else if (kind === "still" && spec && spec.still){
-    sp.style.backgroundImage = 'url("art/keep/sprites/' + spec.still + '")';
+    sp.style.backgroundImage = 'url("' + spriteUrl(actor.bag, spec.still) + '")';
     sp.style.backgroundSize = px.w + "px " + px.h + "px";
   } else sp.style.backgroundImage = "";
   sp.style.width = px.w + "px";
   sp.style.height = px.h + "px";
+  el.style.width = px.w + "px";
+  el.style.height = px.h + "px";
+  const foot = px.foot > 0 ? px.foot : 1;
+  el.style.transform = "translate(-50%, " + (-foot * 100).toFixed(3) + "%)";
+  const shadow = el.querySelector(".pen-shadow");
+  if (shadow){
+    const sw = Math.max(10, px.w * 0.6);
+    shadow.style.width = sw + "px";
+    shadow.style.height = Math.max(6, sw * 0.42) + "px";
+    shadow.style.top = (foot * 100) + "%";
+    shadow.style.bottom = "auto";
+    shadow.style.transform = "translate(-50%, 15%)";
+  }
 }
 function markPenReady(){
   const world = $("#keepWorld");
@@ -2429,63 +2645,288 @@ function markPenReady(){
   });
   world.dataset.ready = ok ? "1" : "0";
 }
+function placeKeepBox(el, box){
+  if (!el || !box) return;
+  el.style.left = box.x + "%";
+  el.style.top = box.y + "%";
+  if (box.w) el.style.width = box.w + "%";
+  if (box.h) el.style.height = box.h + "%";
+  el.style.right = "auto";
+  el.style.bottom = "auto";
+}
 function measureKeepWorld(){
-  const stage = $(".keep-stage"), world = $("#keepWorld");
-  if (!stage || !world) return false;
-  const cw = stage.clientWidth, ch = stage.clientHeight;
-  if (cw < 20 || ch < 20) return false;
-  const scale = Math.max(cw / KEEP_W, ch / KEEP_H);
+  const stage = $(".keep-stage"), fit = $("#keepFit"), world = $("#keepWorld");
+  const scroll = $("#keepScroll"), clip = $("#keepClip"), keep = $("#keep");
+  if (!stage || !fit || !world || !scroll || !clip || !keep) return false;
+  const head = $(".keep-head");
+  const headH = head ? head.offsetHeight : 0;
+  keep.style.setProperty("--keep-head", headH + "px");
+  const availW = stage.clientWidth, availH = stage.clientHeight;
+  if (availW < 20 || availH < 20) return false;
+  /* Width fit. When that is shorter than the stage, grow it so the painting ends at the tab bar. */
+  let scale = availW / KEEP_W;
+  if (KEEP_H * scale < availH - 0.5) scale = availH / KEEP_H;
   const rw = KEEP_W * scale, rh = KEEP_H * scale;
-  world.style.left = ((cw - rw) / 2) + "px";
-  world.style.top = "0px";
-  world.style.width = rw + "px";
-  world.style.height = rh + "px";
-  penMetrics = {rw, rh, cw};
+  fit.style.width = rw + "px";
+  fit.style.height = rh + "px";
+  fit.style.left = ((availW - rw) / 2) + "px";
+  fit.style.top = "0px";
+  fit.style.setProperty("--ks", String(scale));
+  clip.style.height = rh + "px";
+  scroll.style.height = rh + "px";
+  scroll.style.paddingBottom = "0px";
+  world.style.left = "0";
+  world.style.top = "0";
+  world.style.width = "100%";
+  world.style.height = "100%";
+  penMetrics = {rw, rh, cw: availW, ch: availH, scale};
+  placeKeepBox($(".keep-ledger"), KEEP_LEDGER);
+  placeKeepBox($(".keep-forge"), KEEP_FORGE);
+  placeKeepBox($(".keep-pool"), KEEP_POOL);
+  placeKeepBox($("#keepWing"), KEEP_WING);
+  trackKeepScroll();
   return true;
 }
+/* The wing is not a pen. It stays locked, and the plaque hides if that ever changes. */
+function wingLocked(){ return true; }
+const PEN_LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span>';
 function mountPenShell(){
-  const world = $("#keepWorld");
-  if (!world || world.dataset.shell) return;
-  world.dataset.shell = "1";
-  world.innerHTML = PENS.map(p => `<div class="keep-pen" data-pen="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%"><i class="keep-ground"></i><p class="pen-lock">Unlocks with a new dragon</p></div>`).join("")
-    + `<div class="keep-keeper" aria-hidden="true"><i class="kk-hood"></i><i class="kk-cloak"></i></div>`;
+  const plates = $("#keepPlates");
+  if (!plates || plates.dataset.shell) return;
+  plates.dataset.shell = "1";
+  plates.innerHTML = PENS.map(p => `<div class="keep-pen" data-pen="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%"><i class="keep-ground"></i><p class="pen-lock">${PEN_LOCK}</p></div>`).join("");
 }
 function penLimits(pen){
-  const rw = penMetrics.rw || 480;
-  const mx = Math.min(pen.w * 0.28, (28 / rw) * 100);
-  return {x0: pen.x + mx, x1: pen.x + pen.w - mx, y0: pen.y + pen.h * 0.62, y1: pen.y + pen.h * 0.92};
+  return {x0: pen.x, x1: pen.x + pen.w, y0: pen.y, y1: pen.y + pen.h};
+}
+function spotCentroid(id){
+  const spots = penSpots(id);
+  if (!spots.length) return null;
+  let x = 0, y = 0;
+  spots.forEach(s => { x += s.x; y += s.y; });
+  return {x: x / spots.length / KEEP_W * 100, y: y / spots.length / KEEP_H * 100};
+}
+function plaqueOverlap(a, b, gap){
+  return a.left < b.right + gap && a.right > b.left - gap && a.top < b.bottom + gap && a.bottom > b.top - gap;
+}
+function nudgePlaque(el, dx, dy, fit){
+  const left = parseFloat(el.style.left) + dx / fit.width * 100;
+  const top = parseFloat(el.style.top) + dy / fit.height * 100;
+  el.style.left = Math.max(6, Math.min(94, left)).toFixed(3) + "%";
+  el.style.top = Math.max(2, Math.min(98, top)).toFixed(3) + "%";
+}
+function layoutPlaques(){
+  const plates = $("#keepPlates");
+  const fit = $("#keepFit");
+  if (!plates || !fit) return;
+  plates.querySelectorAll(".keep-pen .pen-lock").forEach(el => { el.hidden = true; });
+  let host = $("#penPlaques");
+  if (!host){
+    host = document.createElement("div");
+    host.id = "penPlaques";
+    host.className = "pen-plaques";
+    plates.appendChild(host);
+  }
+  const open = yardsOpen(breedCount());
+  const locked = PENS.filter((_, i) => i >= open);
+  host.innerHTML = locked.map(p => {
+    const c = spotCentroid(p.id) || {x: p.x + p.w / 2, y: p.y + p.h / 2};
+    return `<p class="pen-lock" data-pen="${p.id}" style="left:${c.x.toFixed(3)}%;top:${c.y.toFixed(3)}%">${PEN_LOCK}</p>`;
+  }).join("");
+  settlePlaques(host, fit);
+  settleWing(host, fit);
+}
+function settlePlaques(host, fit){
+  const nodes = [...host.querySelectorAll(".pen-lock")];
+  if (nodes.length < 2) return;
+  const fitRect = () => fit.getBoundingClientRect();
+  for (let pass = 0; pass < 8; pass++){
+    const box = fitRect();
+    const rects = nodes.filter(el => el.isConnected).map(el => el.getBoundingClientRect());
+    const live = nodes.filter(el => el.isConnected);
+    let moved = false;
+    for (let i = 0; i < live.length; i++){
+      for (let j = i + 1; j < live.length; j++){
+        if (!plaqueOverlap(rects[i], rects[j], 8)) continue;
+        const overlap = Math.min(rects[i].bottom, rects[j].bottom) - Math.max(rects[i].top, rects[j].top) + 8;
+        const upper = rects[i].top <= rects[j].top ? live[i] : live[j];
+        const lower = upper === live[i] ? live[j] : live[i];
+        nudgePlaque(upper, 0, -overlap / 2, box);
+        nudgePlaque(lower, 0, overlap / 2, box);
+        moved = true;
+        break;
+      }
+      if (moved) break;
+    }
+    if (!moved) break;
+  }
+  let guard = 0;
+  while (guard++ < 4){
+    const live = [...host.querySelectorAll(".pen-lock")];
+    const rects = live.map(el => el.getBoundingClientRect());
+    let pair = null;
+    for (let i = 0; i < live.length && !pair; i++){
+      for (let j = i + 1; j < live.length; j++){
+        if (plaqueOverlap(rects[i], rects[j], 4)){ pair = [live[i], live[j], rects[i], rects[j]]; break; }
+      }
+    }
+    if (!pair) break;
+    const box = fitRect();
+    const cx = (pair[2].left + pair[2].right + pair[3].left + pair[3].right) / 4;
+    const cy = (pair[2].top + pair[2].bottom + pair[3].top + pair[3].bottom) / 4;
+    pair[0].dataset.pen = pair[0].dataset.pen + " " + pair[1].dataset.pen;
+    pair[0].style.left = ((cx - box.left) / box.width * 100).toFixed(3) + "%";
+    pair[0].style.top = ((cy - box.top) / box.height * 100).toFixed(3) + "%";
+    pair[1].remove();
+  }
+}
+function settleWing(host, fit){
+  const wing = $("#keepWing");
+  const lock = wing && wing.querySelector(".wing-lock");
+  if (!wing || !lock || wing.classList.contains("is-open")) return;
+  lock.style.left = "";
+  lock.style.top = "";
+  const home = wing.getBoundingClientRect();
+  const build = $(".keep-build");
+  for (let pass = 0; pass < 8; pass++){
+    const wr = lock.getBoundingClientRect();
+    const obstacles = host ? [...host.querySelectorAll(".pen-lock")] : [];
+    if (build) obstacles.push(build);
+    const hit = obstacles.find(el => plaqueOverlap(wr, el.getBoundingClientRect(), 6));
+    if (!hit) return;
+    const hr = hit.getBoundingClientRect();
+    const fixed = hit === build;
+    const dx = !fixed && wr.left < hr.right && wr.right > hr.left ? (wr.left + wr.width / 2 < hr.left + hr.width / 2 ? -1 : 1) * (Math.min(wr.right, hr.right) - Math.max(wr.left, hr.left) + 8) : 0;
+    const overlapY = Math.min(wr.bottom, hr.bottom) - Math.max(wr.top, hr.top) + 8;
+    const dy = fixed ? -overlapY : (wr.top < hr.bottom && wr.bottom > hr.top ? (wr.top < hr.top ? -1 : 1) * overlapY : 0);
+    const left = (parseFloat(lock.style.left) || 50) + (home.width ? dx / home.width * 100 : 0);
+    const top = (parseFloat(lock.style.top) || 50) + (home.height ? dy / home.height * 100 : 0);
+    lock.style.left = Math.max(8, Math.min(92, left)).toFixed(3) + "%";
+    lock.style.top = Math.max(-20, Math.min(92, top)).toFixed(3) + "%";
+  }
+}
+let wingScroll = 0;
+function trackKeepScroll(){
+  const stage = $(".keep-stage");
+  if (!stage || stage.dataset.wingScroll) return;
+  stage.dataset.wingScroll = "1";
+  stage.addEventListener("scroll", () => {
+    if (wingScroll) return;
+    wingScroll = requestAnimationFrame(() => {
+      wingScroll = 0;
+      const host = $("#penPlaques");
+      const fit = $("#keepFit");
+      if (fit) settleWing(host, fit);
+    });
+  }, {passive:true});
+}
+/* Animator names in pen-spots.json, in pen order. */
+const PEN_NAME = {ember:"red", violet:"purple", azure:"blue", pond:"green", red:"red", purple:"purple", blue:"blue", green:"green"};
+const STAGE_NAME = ["hatchling", "juvenile", "adult", "elder"];
+function stageRank(stage){
+  if (typeof stage === "number" && isFinite(stage)) return Math.max(0, Math.min(3, stage));
+  const name = String(stage || "").toLowerCase();
+  const i = STAGE_NAME.indexOf(name);
+  if (i >= 0) return i;
+  if (name === "h") return 0;
+  if (name === "j") return 1;
+  if (name === "a") return 2;
+  if (name === "e") return 3;
+  return 3;
+}
+function spotPoint(raw){
+  if (Array.isArray(raw)) return {x:+raw[0], y:+raw[1], maxStage:"elder", main:false, id:0};
+  if (raw && typeof raw === "object") return {x:+raw.x, y:+raw.y, maxStage: raw.maxStage != null ? raw.maxStage : "elder", main: !!raw.main, id: raw.id};
+  return {x:NaN, y:NaN, maxStage:"elder", main:false, id:0};
+}
+/* pen-spots.json is the spot table. Pens are ember, violet, azure, and pond. */
+function readSpotBook(json){
+  if (!json || typeof json !== "object") return null;
+  const src = json.pens && typeof json.pens === "object" ? json.pens : json;
+  const next = {};
+  let n = 0;
+  Object.keys(src).forEach(key => {
+    const id = PEN_NAME[key];
+    const pen = src[key];
+    if (!id || !pen) return;
+    const arr = Array.isArray(pen) ? pen : pen.spots;
+    if (!Array.isArray(arr)) return;
+    const spots = [];
+    arr.forEach(raw => {
+      const pt = spotPoint(raw);
+      if (!isFinite(pt.x) || !isFinite(pt.y)) return;
+      spots.push(pt);
+    });
+    if (!spots.length) return;
+    next[id] = spots;
+    n++;
+  });
+  if (!n) return null;
+  return next;
+}
+function penSpots(id){
+  const src = spotBook && spotBook[id];
+  return src || [];
+}
+/* Biggest stages take main spots they fit, then any spot they fit. A leftover takes the largest free spot. */
+function assignSpots(dragons, spots){
+  const order = dragons.slice().sort((a, b) => b.stage - a.stage || a.ord - b.ord);
+  const used = new Set();
+  const out = new Map();
+  const indexed = spots.map((s, index) => ({s, index}));
+  const take = (d, list) => {
+    const hit = list.find(row => !used.has(row.index));
+    if (!hit) return false;
+    used.add(hit.index);
+    out.set(d.id, hit.index);
+    return true;
+  };
+  order.forEach(d => take(d, indexed.filter(row => row.s.main && stageRank(row.s.maxStage) >= d.stage)));
+  order.forEach(d => { if (!out.has(d.id)) take(d, indexed.filter(row => stageRank(row.s.maxStage) >= d.stage)); });
+  order.forEach(d => {
+    if (out.has(d.id)) return;
+    const free = indexed.filter(row => !used.has(row.index)).sort((a, b) => stageRank(b.s.maxStage) - stageRank(a.s.maxStage) || a.index - b.index);
+    take(d, free);
+  });
+  return out;
+}
+function seatActor(actor){
+  const spots = penSpots(actor.pen);
+  const slot = actor.slot;
+  if (!spots.length || slot == null || slot < 0 || !spots[slot]) return;
+  const spot = spots[slot];
+  const x = spot.x / KEEP_W * 100;
+  const y = spot.y / KEEP_H * 100;
+  if (Math.abs(actor.x - x) > 0.01 || Math.abs(actor.y - y) > 0.01){
+    actor.x = x;
+    actor.y = y;
+    actor.dirty = true;
+  }
 }
 function placeActor(actor, pen, slot, count){
-  const box = penLimits(pen);
-  const n = Math.max(1, count || 1);
-  const span = (box.x1 - box.x0) / n;
   const h = u32(actor.id + ":home");
-  actor.x = box.x0 + span * (slot || 0) + span * (0.28 + (h % 400) / 1000);
-  actor.y = box.y0 + (box.y1 - box.y0) * (0.2 + ((h >>> 12) % 650) / 1000);
+  const i = Math.max(0, slot || 0);
   actor.mode = "idle";
   actor.face = (h & 1) ? -1 : 1;
-  actor.until = penNow() / 1000 + 0.35 + (h % 1600) / 1000;
+  actor.until = penNow() / 1000 + 6 + (h % 8000) / 1000;
   actor.seed = 1;
+  actor.slot = i;
+  actor.count = Math.max(1, count || 1);
+  actor.pen = pen.id;
   actor.dirty = true;
-}
-function retarget(actor, pen, now){
-  const box = penLimits(pen);
-  const h = u32(actor.id + ":go:" + actor.seed);
-  actor.seed = (actor.seed + 1) | 0;
-  actor.tx = box.x0 + (box.x1 - box.x0) * ((h & 65535) / 65535);
-  actor.ty = box.y0 + (box.y1 - box.y0) * (((h >>> 16) & 65535) / 65535);
-  actor.mode = "walk";
-  actor.until = now + 8;
+  seatActor(actor);
 }
 function drawActor(actor){
   const el = penEls.get(actor.id);
   if (!el) return;
-  if (actor.dirty || actor.mode === "walk"){
+  seatActor(actor);
+  if (actor.dirty){
     el.style.left = actor.x.toFixed(3) + "%";
     el.style.top = actor.y.toFixed(3) + "%";
     actor.dirty = false;
   }
-  const z = 8 + Math.round(actor.y * 2);
+  const penZ = {red:0, purple:1, blue:2, green:3};
+  const z = (penZ[actor.pen] || 0) * 20 + Math.max(0, actor.slot || 0);
   if (el._z !== z){ el._z = z; el.style.zIndex = String(z); }
   const sp = el.querySelector(".pen-sprite");
   if (sp && el._face !== actor.face){
@@ -2495,31 +2936,17 @@ function drawActor(actor){
 }
 function stepActors(dt, now){
   penActors.forEach(actor => {
-    const pen = PENS.find(p => p.id === actor.pen);
-    if (!pen) return;
-    if (actor.mode !== "walk"){
-      if (now >= actor.until) retarget(actor, pen, now);
-    } else {
-      const dx = actor.tx - actor.x, dy = actor.ty - actor.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist < 0.35 || now >= actor.until){
-        actor.mode = "idle";
-        actor.until = now + 1.3 + (u32(actor.id + ":idle:" + actor.seed) % 1800) / 1000;
-        actor.seed = (actor.seed + 1) | 0;
-      } else {
-        const step = Math.min(dist, 4.2 * dt);
-        actor.x += dx / dist * step;
-        actor.y += dy / dist * step;
-        if (dx < -0.08) actor.face = -1;
-        else if (dx > 0.08) actor.face = 1;
-      }
+    if (now >= actor.until){
+      actor.face = actor.face < 0 ? 1 : -1;
+      actor.seed = (actor.seed + 1) | 0;
+      actor.until = now + 6 + (u32(actor.id + ":flip:" + actor.seed) % 8000) / 1000;
     }
     const el = penEls.get(actor.id);
     const spec = actor.spec;
     if (el && spec && actor.kind === "strip" && el._px){
       const sp = el.querySelector(".pen-sprite");
       actor.acc += dt;
-      const hop = 1 / (spec.fps > 0 ? spec.fps : 8);
+      const hop = 1 / (spec.fps > 0 ? spec.fps : 4);
       let guard = 0;
       while (actor.acc >= hop && guard++ < 3){
         actor.acc -= hop;
@@ -2553,82 +2980,316 @@ function startPenLoop(){
   if (penRaf || !penLive() || penStill()) return;
   penRaf = requestAnimationFrame(penTick);
 }
+/* One shown dragon per breed. Highest stage, mutated wins a tie, and a saved Ledger pick overrides both. */
+function mutRank(d){ return d && d.mut && MUTATIONS[d.mut] ? 1 : 0; }
+function shownDragon(line){
+  const owned = asList(S && S.dragons).filter(d => d && d.line === line);
+  if (!owned.length) return null;
+  const pick = normKeep(S.keep).shown[line];
+  if (pick){
+    const chosen = owned.find(d => dragonKey(d) === pick);
+    if (chosen) return chosen;
+  }
+  return owned.slice().sort((a, b) => stageIdx(b) - stageIdx(a) || mutRank(b) - mutRank(a) || String(dragonKey(a)).localeCompare(String(dragonKey(b))))[0];
+}
+function readSlotMap(json){
+  if (!json || typeof json !== "object" || !json.slots || typeof json.slots !== "object") return null;
+  const slots = {};
+  let n = 0;
+  Object.keys(json.slots).forEach(line => {
+    const s = json.slots[line];
+    if (!s || typeof s !== "object") return;
+    const x = +s.x, y = +s.y, w = +s.w, h = +s.h, drawOrder = +s.drawOrder;
+    if (![x, y, w, h, drawOrder].every(Number.isFinite) || w <= 0 || h <= 0) return;
+    const stages = {};
+    if (s.stages && typeof s.stages === "object" && !Array.isArray(s.stages)){
+      Object.keys(s.stages).forEach(name => {
+        const row = s.stages[name];
+        if (!row || typeof row !== "object" || typeof row.file !== "string" || !row.file) return;
+        const sx = +row.x, sy = +row.y, sw = +row.w, sh = +row.h;
+        if (![sx, sy, sw, sh].every(Number.isFinite) || sw <= 0 || sh <= 0) return;
+        stages[name] = {file: row.file, x: sx, y: sy, w: sw, h: sh, feetY: Number.isFinite(+row.feetY) ? +row.feetY : sy + sh};
+      });
+    }
+    slots[line] = {pen: typeof s.pen === "string" ? s.pen : "", x, y, w, h, feetY: Number.isFinite(+s.feetY) ? +s.feetY : y + h, drawOrder, stages};
+    n++;
+  });
+  if (!n) return null;
+  const tint = {};
+  if (json.tint && typeof json.tint === "object"){
+    Object.keys(json.tint).forEach(key => {
+      const row = json.tint[key];
+      if (Array.isArray(row) && row.length >= 4 && row.slice(0, 4).every(v => Number.isFinite(+v))) tint[key] = row.slice(0, 4).map(Number);
+    });
+  }
+  return {slots, tint};
+}
+function slotLines(){
+  if (!slotMap || !slotMap.slots) return [];
+  return Object.keys(slotMap.slots).map(line => ({line, slot: slotMap.slots[line]})).sort((a, b) => a.slot.drawOrder - b.slot.drawOrder);
+}
+function penFenceZ(name){
+  const rows = slotLines().filter(row => row.slot.pen === name);
+  if (!rows.length) return null;
+  return Math.max.apply(null, rows.map(row => row.slot.drawOrder * 2)) + 1;
+}
+/* Hatchling through elder, feet anchored on the one slot sprite until the map names a stage file. */
+const SLOT_STAGE = [0.55, 0.72, 0.87, 1];
+function slotPath(file){
+  if (typeof file !== "string" || !file) return "";
+  if (file.indexOf("/") >= 0) return file;
+  return "art/keep/sprites/slot/" + file.replace(/^\/+/, "");
+}
+/* A stage file is used only when slot-map.json names one. Nothing else is requested. */
+function stageSlotUrl(slot, d){
+  if (!slot || !d) return "";
+  const stage = STAGES[stageIdx(d)].name.toLowerCase();
+  const mut = d.mut && MUTATIONS[d.mut] ? d.mut : "";
+  const named = [];
+  const push = v => { if (typeof v === "string" && v) named.push(v); };
+  const stages = slot.stages;
+  if (stages && typeof stages === "object" && !Array.isArray(stages)){
+    const row = stages[stage];
+    if (typeof row === "string") push(row);
+    else if (row && typeof row === "object"){
+      if (mut) push(row[mut]);
+      push(row.file);
+    }
+  }
+  const files = slot.files;
+  if (files && typeof files === "object" && !Array.isArray(files)){
+    if (mut) push(files[mut + "-" + stage]);
+    push(files[stage]);
+  }
+  return named.length ? slotPath(named[0]) : "";
+}
+function breedSlotUrl(line){
+  return "art/keep/sprites/slot/" + line + ".webp";
+}
+const slotFile = new Map();
+function askSlot(url){
+  if (slotFile.has(url)) return;
+  slotFile.set(url, "pend");
+  fetch(url).then(r => r.ok ? r.blob() : null).then(blob => {
+    slotFile.set(url, blob ? URL.createObjectURL(blob) : "miss");
+    penSig = "";
+    if (keepOn() && S && S.tab === "keep") syncPens();
+  }).catch(() => {
+    slotFile.set(url, "miss");
+    penSig = "";
+    if (keepOn() && S && S.tab === "keep") syncPens();
+  });
+}
+/* null means the file missed. "pend" means it is still being checked. fitted is the single sprite, scaled by stage. */
+function slotSrc(line, d){
+  const slot = slotMap && slotMap.slots && slotMap.slots[line];
+  const specific = stageSlotUrl(slot, d);
+  const url = specific || breedSlotUrl(line);
+  const fitted = !specific;
+  const hit = slotFile.get(url);
+  if (hit && hit !== "miss" && hit !== "pend") return {src: hit, fitted};
+  if (hit === "pend") return {src: "pend", fitted};
+  if (hit === "miss"){
+    if (!specific) return null;
+    const base = breedSlotUrl(line);
+    const back = slotFile.get(base);
+    if (back && back !== "miss" && back !== "pend") return {src: back, fitted: true};
+    if (back === "pend") return {src: "pend", fitted: true};
+    if (back === "miss") return null;
+    askSlot(base);
+    return {src: "pend", fitted: true};
+  }
+  askSlot(url);
+  return {src: "pend", fitted};
+}
+function stageBox(slot, d){
+  if (!slot || !slot.stages || !d) return null;
+  const name = STAGES[stageIdx(d)].name.toLowerCase();
+  const row = slot.stages[name];
+  return row && row.file ? row : null;
+}
+function placeSlot(el, slot, d, fitted){
+  const listed = stageBox(slot, d);
+  const useMap = !!(listed && !fitted);
+  const box = useMap ? listed : slot;
+  const grow = useMap || !fitted ? 1 : (SLOT_STAGE[stageIdx(d)] || 1);
+  const w = box.w * grow;
+  const h = box.h * grow;
+  const feet = Number.isFinite(+box.feetY) ? +box.feetY : box.y + box.h;
+  const x = useMap ? box.x : box.x + (box.w - w) / 2;
+  const y = useMap ? box.y : feet - h;
+  el.style.left = (x / KEEP_W * 100) + "%";
+  el.style.top = (y / KEEP_H * 100) + "%";
+  el.style.width = (w / KEEP_W * 100) + "%";
+  el.style.height = (h / KEEP_H * 100) + "%";
+  el.dataset.scale = listed && !fitted ? "map" : String(grow);
+}
+function applySlotTint(variant){
+  const row = slotMap && slotMap.tint && slotMap.tint[variant];
+  const tint = row || [1, 1, 1, 1];
+  const r = tint[0] * tint[3], g = tint[1] * tint[3], b = tint[2] * tint[3];
+  const mat = $("#keepSlotMatrix");
+  if (mat) mat.setAttribute("values", r + " 0 0 0 0  0 " + g + " 0 0 0  0 0 " + b + " 0 0  0 0 0 1 0");
+  const identity = Math.abs(r - 1) < 1e-4 && Math.abs(g - 1) < 1e-4 && Math.abs(b - 1) < 1e-4;
+  document.querySelectorAll(".keep-slot").forEach(el => { el.style.filter = identity ? "" : "url(#keepSlotTint)"; });
+}
+function dropPixel(id){
+  penActors.delete(id);
+  const el = penEls.get(id);
+  if (el) el.remove();
+  penEls.delete(id);
+}
+/* Pixel strips and the 6-spot packer, used only when a slot file is missing or the map has not loaded. */
+function syncPixelActors(world, open, allow){
+  const roaming = allow ? [...allow] : normKeep(S.keep).roaming;
+  const live = new Set();
+  const slots = new Map();
+  if (open > 0) roaming.forEach((id, i) => {
+    if (!ledgerDragon(id)) return;
+    const pen = PENS[i % open];
+    const list = slots.get(pen.id) || [];
+    list.push(id);
+    slots.set(pen.id, list);
+  });
+  const seat = new Map();
+  slots.forEach((ids, penId) => {
+    const dragons = ids.map((id, ord) => {
+      const d = ledgerDragon(id);
+      return {id, stage: d ? stageIdx(d) : 0, ord};
+    });
+    assignSpots(dragons, penSpots(penId)).forEach((slot, id) => seat.set(id, slot));
+  });
+  if (open > 0) roaming.forEach((id, i) => {
+    const d = ledgerDragon(id);
+    if (!d) return;
+    live.add(id);
+    const pen = PENS[i % open];
+    const mates = slots.get(pen.id) || [id];
+    const chain = spriteChain(d);
+    const chainSig = chain.map(s => s.bag + ":" + s.kind + ":" + s.file).join("|");
+    let actor = penActors.get(id);
+    const slot = seat.has(id) ? seat.get(id) : 0;
+    if (!actor){
+      actor = {id, pen: pen.id, key: spriteKey(d), chain, chainSig, step:0, spec: chain[0] ? chain[0].spec : null, kind:"load", x:0, y:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, slot:-1, count:0, dirty:true};
+      placeActor(actor, pen, slot, mates.length);
+      penActors.set(id, actor);
+    } else if (actor.pen !== pen.id || actor.slot !== slot || actor.count !== mates.length){
+      actor.pen = pen.id;
+      placeActor(actor, pen, slot, mates.length);
+    }
+    if (actor.chainSig !== chainSig){
+      actor.chain = chain;
+      actor.chainSig = chainSig;
+      actor.step = 0;
+      actor.frame = 0;
+      actor.acc = 0;
+      actor.shown = -1;
+      actor.spec = chain[0] ? chain[0].spec : null;
+    }
+    let el = penEls.get(id);
+    if (!el || !el.classList.contains("pen-dragon")){
+      if (el) el.remove();
+      el = document.createElement("button");
+      el.type = "button";
+      el.className = "pen-dragon";
+      el.dataset.act = "pen-dragon";
+      el.dataset.id = id;
+      el.innerHTML = '<span class="pen-shadow"></span><span class="pen-sprite is-ph"><svg viewBox="0 0 72 48" aria-hidden="true"><path fill="#e8bd5f" d="M2 31c5-2 9 0 13 2 0 5 5 9 12 9 9 0 16-6 20-11 2 2 6 3 9 1 2-2 2-5 0-7 4-1 7-4 7-8 0-5-5-8-9-7-1-5-7-8-12-6-2 1-4 3-5 6-6-6-16-6-20-1-1 2-1 5 0 7-6 1-12 4-14 10-4 1-7 0-9-1z"/><path fill="#c4923a" d="M22 22c7-12 18-9 17 3-7 1-13-1-17-3z"/><path fill="#f6e2a8" d="M44 24c3-7 10-9 14-6 2 2 3 4 2 6-5 2-11 2-16 0z"/><path fill="#b8862e" d="M56 20l14 3-14 3zM22 38l-2 8h6zM34 38l-2 8h6z"/></svg></span>';
+      world.appendChild(el);
+      penEls.set(id, el);
+    }
+    const stageName = STAGES[stageIdx(d)].name;
+    el.setAttribute("aria-label", (d.name || d.species || "Dragon") + ", " + stageName);
+    el._px = spritePx(d, actor.spec, actor);
+    probeActor(id);
+    paintEl(el, actor);
+    drawActor(actor);
+  });
+  [...penActors.keys()].forEach(id => { if (!live.has(id)) dropPixel(id); });
+}
+function syncSlotDragons(world){
+  const rows = slotLines();
+  const fallback = new Set();
+  const placed = new Set();
+  rows.forEach(row => {
+    const d = shownDragon(row.line);
+    let el = world.querySelector('.keep-slot[data-line="' + row.line + '"]');
+    if (!d){
+      if (el) el.remove();
+      return;
+    }
+    const id = dragonKey(d);
+    placed.add(id);
+    dropPixel(id);
+    if (!el){
+      el = document.createElement("button");
+      el.type = "button";
+      el.className = "keep-slot";
+      el.dataset.act = "pen-dragon";
+      el.dataset.line = row.line;
+      el.innerHTML = '<img alt="" draggable="false">';
+      world.appendChild(el);
+    }
+    el.dataset.id = id;
+    el.setAttribute("aria-label", (d.name || d.species || row.line) + ", " + STAGES[stageIdx(d)].name);
+    const slot = row.slot;
+    el.style.zIndex = String(slot.drawOrder * 2);
+    const got = slotSrc(row.line, d);
+    placeSlot(el, slot, d, got ? got.fitted : true);
+    const img = el.querySelector("img");
+    if (got && got.src && got.src !== "pend"){
+      if (img.getAttribute("src") !== got.src) img.src = got.src;
+      el.hidden = false;
+    } else if (got && got.src === "pend"){
+      el.hidden = true;
+    } else {
+      el.remove();
+      fallback.add(id);
+    }
+  });
+  world.querySelectorAll(".keep-slot").forEach(el => {
+    if (!rows.some(row => row.line === el.dataset.line)) el.remove();
+  });
+  return {fallback, placed};
+}
 function syncPens(){
   if (!keepOn() || !S || S.tab !== "keep") return;
   const world = $("#keepWorld");
-  if (!world || !measureKeepWorld()) return;
+  const plates = $("#keepPlates");
+  if (!world || !plates || !measureKeepWorld()) return;
   mountPenShell();
-  const open = pensOpen(breedCount());
+  const open = yardsOpen(breedCount());
   PENS.forEach((p, i) => {
-    const el = world.querySelector('.keep-pen[data-pen="' + p.id + '"]');
-    if (el) el.classList.toggle("is-open", i < open);
+    const el = plates.querySelector('.keep-pen[data-pen="' + p.id + '"]');
+    if (!el) return;
+    const box = penLimits(p);
+    el.style.left = box.x0 + "%";
+    el.style.top = box.y0 + "%";
+    el.style.width = (box.x1 - box.x0) + "%";
+    el.style.height = (box.y1 - box.y0) + "%";
+    el.classList.toggle("is-open", i < open);
   });
+  const wing = $("#keepWing");
+  if (wing) wing.classList.toggle("is-open", !wingLocked());
+  layoutPlaques();
+  const bg = $(".keep-bg");
+  const variant = fenceVariant(bg ? bg.getAttribute("src") : "");
   const roaming = normKeep(S.keep).roaming;
-  const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
-    + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
+  const shownSig = slotLines().map(row => {
+    const d = shownDragon(row.line);
+    return row.line + "=" + (d ? dragonKey(d) + ":" + stageIdx(d) + ":" + (d.mut || "") : "");
+  }).join(",");
+  const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + (slotMap ? "s" : "p") + "|" + variant + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
+    + shownSig + "|" + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
   if (sig !== penSig){
     penSig = sig;
-    const live = new Set();
-    const slots = new Map();
-    if (open > 0) roaming.forEach((id, i) => {
-      if (!ledgerDragon(id)) return;
-      const pen = PENS[i % open];
-      const list = slots.get(pen.id) || [];
-      list.push(id);
-      slots.set(pen.id, list);
-    });
-    if (open > 0) roaming.forEach((id, i) => {
-      const d = ledgerDragon(id);
-      if (!d) return;
-      live.add(id);
-      const pen = PENS[i % open];
-      const mates = slots.get(pen.id) || [id];
-      const chain = spriteChain(d);
-      const chainSig = chain.map(s => s.bag + ":" + s.kind + ":" + s.file).join("|");
-      let actor = penActors.get(id);
-      if (!actor){
-        actor = {id, pen: pen.id, key: spriteKey(d), chain, chainSig, step:0, spec: chain[0] ? chain[0].spec : null, kind:"load", x:0, y:0, tx:0, ty:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, dirty:true};
-        placeActor(actor, pen, mates.indexOf(id), mates.length);
-        penActors.set(id, actor);
-      } else if (actor.pen !== pen.id){
-        actor.pen = pen.id;
-        placeActor(actor, pen, mates.indexOf(id), mates.length);
-      }
-      if (actor.chainSig !== chainSig){
-        actor.chain = chain;
-        actor.chainSig = chainSig;
-        actor.step = 0;
-        actor.frame = 0;
-        actor.acc = 0;
-        actor.shown = -1;
-        actor.spec = chain[0] ? chain[0].spec : null;
-      }
-      let el = penEls.get(id);
-      if (!el){
-        el = document.createElement("button");
-        el.type = "button";
-        el.className = "pen-dragon";
-        el.dataset.act = "pen-dragon";
-        el.dataset.id = id;
-        el.innerHTML = '<span class="pen-sprite is-ph"><svg viewBox="0 0 72 48" aria-hidden="true"><path fill="#e8bd5f" d="M2 31c5-2 9 0 13 2 0 5 5 9 12 9 9 0 16-6 20-11 2 2 6 3 9 1 2-2 2-5 0-7 4-1 7-4 7-8 0-5-5-8-9-7-1-5-7-8-12-6-2 1-4 3-5 6-6-6-16-6-20-1-1 2-1 5 0 7-6 1-12 4-14 10-4 1-7 0-9-1z"/><path fill="#c4923a" d="M22 22c7-12 18-9 17 3-7 1-13-1-17-3z"/><path fill="#f6e2a8" d="M44 24c3-7 10-9 14-6 2 2 3 4 2 6-5 2-11 2-16 0z"/><path fill="#b8862e" d="M56 20l14 3-14 3zM22 38l-2 8h6zM34 38l-2 8h6z"/></svg></span>';
-        world.appendChild(el);
-        penEls.set(id, el);
-      }
-      const stageName = STAGES[stageIdx(d)].name;
-      el.setAttribute("aria-label", (d.name || d.species || "Dragon") + ", " + stageName);
-      el._px = spritePx(d, actor.spec);
-      probeActor(id);
-      paintEl(el, actor);
-      drawActor(actor);
-    });
-    [...penActors.keys()].forEach(id => {
-      if (live.has(id)) return;
-      penActors.delete(id);
-      const el = penEls.get(id);
-      if (el) el.remove();
-      penEls.delete(id);
-    });
+    if (slotMap){
+      const slot = syncSlotDragons(world);
+      syncPixelActors(world, open, slot.fallback);
+    } else syncPixelActors(world, open, null);
+    syncPenFences(bg ? bg.getAttribute("src") : "");
   }
+  applySlotTint(variant);
   markPenReady();
   if (penStill()) stopPenLoop();
   else startPenLoop();
@@ -2676,7 +3337,7 @@ function ledgerRow(id, kind){
 }
 function renderLedger(){
   const body = $("#ledgerBody");
-  if (!body || !document.documentElement.classList.contains("keep-on")) return;
+  if (!body || !keepOn()) return;
   const keep = normKeep(S.keep);
   if (ledgerPick && keep.roaming.indexOf(ledgerPick) < 0) ledgerPick = null;
   const pick = ledgerPick && ledgerDragon(ledgerPick);
@@ -2690,15 +3351,15 @@ function renderLedger(){
   syncPens();
 }
 function openLedgerDragon(id){
-  if (!document.documentElement.classList.contains("keep-on")) return;
+  if (!keepOn()) return;
   const d = ledgerDragon(id); if (!d) return;
   S.prize = d.id; ledgerPick = null; setTab("dragon");
 }
 function openLedger(){
-  if (!document.documentElement.classList.contains("keep-on")) return;
+  if (!keepOn()) return;
   const ov = $("#ledgerOv");
   const prev = document.activeElement;
-  ledgerReturn = prev && prev !== document.body ? prev : $(".keep-hot");
+  ledgerReturn = prev && prev !== document.body ? prev : $(".keep-ledger");
   keepArt(ov.querySelector(".ledger-bg"), "art/keep/ledger-v3.webp");
   renderLedger();
   ov.hidden = false;
@@ -2714,7 +3375,7 @@ function closeLedger(opts){
   ledgerReturn = null;
   if (opts && opts.restore === false) return;
   if (back && back.isConnected) back.focus();
-  else { const hot = $(".keep-hot"); if (hot && !$("#keep").hidden) hot.focus(); }
+  else { const hot = $(".keep-ledger"); if (hot && !$("#keep").hidden) hot.focus(); }
 }
 window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); penSig = ""; syncPens(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncKeepCover);
@@ -3098,19 +3759,59 @@ function noteDailyVisit(){
 }
 function renderStreak(){
   const el = $("#keepStreak");
+  const flame = $("#keepFlame");
   if (!el) return;
-  if (!keepOn()){ el.hidden = true; return; }
+  if (!keepOn()){ el.hidden = true; if (flame) flame.hidden = true; return; }
   const streak = streakBag();
   const viewed = prepareHome(streak);
   if (viewed.fresh) save();
-  const day = viewed.day;
   const rest = viewed.weekday === restDayNum();
   const prize = streakPrize(streak.count);
   const blocked = !claimable(streak);
-  const note = rest ? `<p class="ks-note">${SABBATH_NOTE}</p>` : "";
   const label = rest ? "Sabbath rest" : (blocked ? "Claimed today" : "Claim " + fmt(prize) + " steps");
   el.hidden = false;
-  el.innerHTML = `<p class="ks-day">Day ${streak.count || 0}</p><p class="ks-best">Best ${streak.best || 0}</p>${note}<button type="button" class="btn" data-act="streak-claim"${rest || blocked || prize <= 0 ? " disabled" : ""}>${label}</button>`;
+  el.innerHTML = `<p class="ks-day">Day ${streak.count || 0}</p><p class="ks-best">Best ${streak.best || 0}</p>`;
+  if (flame){
+    flame.hidden = false;
+    flame.disabled = !!(rest || blocked || prize <= 0);
+    flame.setAttribute("aria-label", label);
+  }
+  renderKeepChrome();
+  syncKeepSpots({rest, blocked, prize});
+}
+/* The Forge glows when a dragon can be cared for. The Moon Pool glows when today's steps can be claimed. */
+function dragonCareReady(d, t){
+  if (!d) return false;
+  const rec = careRecord(dragonKey(d));
+  return Object.keys(CARE_ACTS).some(kind => careWait(rec[CARE_ACTS[kind].key], t, CARE_ACTS[kind].ms) <= 0);
+}
+function careReadyDragon(){
+  const t = now();
+  const prize = prizeDragon();
+  if (dragonCareReady(prize, t)) return prize;
+  return asList(S.dragons).find(d => dragonCareReady(d, t)) || null;
+}
+function spotClaimReady(){
+  const streak = streakBag();
+  const viewed = prepareHome(streak);
+  if (viewed.fresh) save();
+  return viewed.weekday !== restDayNum() && claimable(streak) && streakPrize(streak.count) > 0;
+}
+function syncKeepSpots(flags){
+  const forge = $(".keep-forge");
+  const pool = $(".keep-pool");
+  if (forge){
+    const d = careReadyDragon();
+    forge.hidden = !d;
+    forge.classList.toggle("is-live", !!d);
+    if (d) forge.dataset.id = d.id;
+    else delete forge.dataset.id;
+  }
+  if (pool){
+    const on = flags ? (!flags.rest && !flags.blocked && flags.prize > 0) : spotClaimReady();
+    pool.hidden = !on;
+    pool.classList.toggle("is-live", on);
+  }
 }
 const CARE_ACTS = {
   feed:  {key:"fed", ms:4 * 60 * 60 * 1000, label:"Feed"},
@@ -3231,7 +3932,7 @@ function careAct(id, kind){
 }
 let careFor = null, careReturn = null;
 function openCare(id){
-  if (!document.documentElement.classList.contains("keep-on")) return;
+  if (!keepOn()) return;
   const d = S.dragons.find(x => dragonKey(x) === idKey(id));
   if (!d) return;
   careFor = dragonKey(d);
