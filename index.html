@@ -2558,12 +2558,30 @@ function careLeft(ms){
   if (m) return m + "m";
   return Math.max(1, Math.ceil(ms / 1000)) + "s";
 }
-/* A stamp ahead of the clock is ready. A wait is never longer than that action's cooldown. */
+/* A stamp ahead of the clock is not ready. The wait is the full cooldown, never more. */
 function careWait(last, t, ms){
-  if (last == null || t < last) return 0;
+  if (last == null || !(ms > 0)) return 0;
+  if (t < last) return ms;
   const left = last + ms - t;
   if (left <= 0) return 0;
   return left > ms ? ms : left;
+}
+/* Pull future stamps back to now and save, so a rolled-back clock starts one full cooldown. */
+function careClamp(id){
+  const key = idKey(id);
+  if (key == null || !S.dragons.some(d => dragonKey(d) === key)) return null;
+  if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
+  if (!S.keep.care || typeof S.keep.care !== "object" || Array.isArray(S.keep.care)) S.keep.care = {};
+  const cur = careRecord(key);
+  const t = now();
+  const next = {fed: cur.fed, groomed: cur.groomed, petted: cur.petted, bond: cur.bond};
+  let changed = false;
+  Object.keys(CARE_ACTS).forEach(kind => {
+    const field = CARE_ACTS[kind].key;
+    if (next[field] != null && t < next[field]){ next[field] = t; changed = true; }
+  });
+  if (changed){ S.keep.care[key] = next; save(); }
+  return key;
 }
 function careSeals(d){
   return d && d.mut && MUTATIONS[d.mut] ? [d.mut] : [];
@@ -2577,10 +2595,8 @@ function keeperNotes(id){
 /* One save for a care action. Bond rises by one, capped at 100. A cooldown writes nothing. */
 function careAct(id, kind){
   const spec = CARE_ACTS[kind];
-  const key = idKey(id);
-  if (!spec || key == null || !S.dragons.some(d => dragonKey(d) === key)) return false;
-  if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
-  if (!S.keep.care || typeof S.keep.care !== "object" || Array.isArray(S.keep.care)) S.keep.care = {};
+  const key = careClamp(id);
+  if (!spec || key == null) return false;
   const cur = careRecord(key);
   const t = now();
   if (careWait(cur[spec.key], t, spec.ms) > 0) return false;
@@ -2618,6 +2634,7 @@ function renderCare(hop){
   const body = $("#careBody");
   const d = S.dragons.find(x => dragonKey(x) === careFor);
   if (!body || !d) return;
+  careClamp(d.id);
   const rec = careRecord(d.id);
   const t = now();
   const acts = Object.keys(CARE_ACTS).map(kind => {

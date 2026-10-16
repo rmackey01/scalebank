@@ -121,30 +121,59 @@ add("notes", t => {
 });
 
 add("future-clock", t => {
-  const g = boot(save([dragon("a", "ember")], {
-    a: {fed: 10 * H, groomed: 50 * H, petted: 3 * H, bond: 4}
-  }));
-  let clock = 0;
+  const minute = 60 * 1000;
+  let clock = 10 * H;
+  const g = boot(save([dragon("a", "ember")]));
   g.setCareClock(() => clock);
-  t.equal(g.careWait(10 * H, clock, 4 * H), 0, "a future feed stamp is ready");
-  t.equal(g.careWait(50 * H, clock, 8 * H), 0, "a future groom stamp is not an 8h wait");
-  t.equal(g.careWait(3 * H, clock, H), 0, "a future pet stamp is not longer than 1h");
-  t.ok(g.careAct("a", "feed"), "feed works when its stamp is ahead of the clock");
-  t.equal(g.careRecord("a").fed, 0, "feed stamp rewrites to now");
-  t.equal(g.careRecord("a").bond, 5, "bond still rises");
-  t.ok(g.careAct("a", "groom"), "groom works when its stamp is ahead of the clock");
-  t.ok(g.careAct("a", "pet"), "pet works when its stamp is ahead of the clock");
-  t.equal(g.careWait(g.careRecord("a").fed, clock, 4 * H), 4 * H, "a fresh feed waits exactly 4h");
-  t.equal(g.careWait(g.careRecord("a").groomed, clock, 8 * H), 8 * H, "a fresh groom waits exactly 8h");
-  t.equal(g.careWait(g.careRecord("a").petted, clock, H), H, "a fresh pet waits exactly 1h");
-  t.ok(g.careWait(g.careRecord("a").fed, clock, 4 * H) <= 4 * H, "feed wait is capped at 4h");
-  t.ok(g.careWait(g.careRecord("a").groomed, clock, 8 * H) <= 8 * H, "groom wait is capped at 8h");
-  t.ok(g.careWait(g.careRecord("a").petted, clock, H) <= H, "pet wait is capped at 1h");
-  clock = H - 1;
-  t.ok(!g.careAct("a", "pet"), "pet still cools inside its normal hour");
-  t.ok(g.careWait(g.careRecord("a").petted, clock, H) <= H, "the remaining pet wait stays within 1h");
+  t.ok(g.careAct("a", "feed"), "feed before the rollback");
+  t.ok(g.careAct("a", "groom"), "groom before the rollback");
+  t.ok(g.careAct("a", "pet"), "pet before the rollback");
+  const bond = g.careRecord("a").bond;
+  t.equal(g.careWait(10 * H, 0, 4 * H), 4 * H, "a future feed stamp waits the full 4h, not zero");
+  t.equal(g.careWait(50 * H, 0, 8 * H), 8 * H, "a future groom stamp waits 8h, not days");
+  t.equal(g.careWait(3 * H, 0, H), H, "a future pet stamp waits 1h");
+  clock = 10 * H - minute;
+  t.ok(!g.careAct("a", "feed"), "feed stays locked after a 1 minute rollback");
+  t.ok(!g.careAct("a", "groom"), "groom stays locked after a 1 minute rollback");
+  t.ok(!g.careAct("a", "pet"), "pet stays locked after a 1 minute rollback");
+  t.equal(g.careRecord("a").bond, bond, "a rollback does not grant bond");
+  const now = clock;
+  t.equal(g.careRecord("a").fed, now, "feed stamp clamped to now");
+  t.equal(g.careRecord("a").groomed, now, "groom stamp clamped to now");
+  t.equal(g.careRecord("a").petted, now, "pet stamp clamped to now");
+  t.equal(g.careWait(now, clock, 4 * H), 4 * H, "clamped feed waits the full cooldown");
+  clock = now + minute;
+  t.ok(!g.careAct("a", "feed"), "one minute later feed is still locked");
+  clock = now + H - 1;
+  t.ok(!g.careAct("a", "pet"), "pet stays locked until its own hour");
+  clock = now + H;
+  t.ok(g.careAct("a", "pet"), "pet unlocks after one normal hour");
+  clock = now + 4 * H - 1;
+  t.ok(!g.careAct("a", "feed"), "feed stays locked until 4h from the clamp");
+  clock = now + 4 * H;
+  t.ok(g.careAct("a", "feed"), "feed unlocks after one normal cooldown");
+  clock = now + 8 * H - 1;
+  t.ok(!g.careAct("a", "groom"), "groom stays locked until 8h from the clamp");
+  clock = now + 8 * H;
+  t.ok(g.careAct("a", "groom"), "groom unlocks after one normal cooldown");
+});
+
+add("rollback-days", t => {
+  let clock = 12 * 24 * H;
+  const g = boot(save([dragon("a", "ember")]));
+  g.setCareClock(() => clock);
+  t.ok(g.careAct("a", "feed"), "feed days before the rollback");
+  const bond = g.careRecord("a").bond;
+  clock = 0;
+  t.ok(g.careWait(g.careRecord("a").fed, clock, 4 * H) <= 4 * H, "the wait is at most one feed cooldown");
+  t.ok(!g.careAct("a", "feed"), "a multi-day rollback does not make feed ready");
+  t.equal(g.careRecord("a").fed, 0, "the future stamp is clamped to now");
+  t.equal(g.careRecord("a").bond, bond, "clamping does not raise bond");
+  clock = 4 * H - 1;
+  t.ok(!g.careAct("a", "feed"), "still locked inside that one cooldown");
   clock = 4 * H;
-  t.ok(g.careAct("a", "feed"), "feed is ready again after its normal 4h");
+  t.ok(g.careAct("a", "feed"), "feed unlocks after at most one normal cooldown");
+  t.equal(g.careRecord("a").bond, bond + 1, "the later feed raises bond once");
 });
 
 add("seals", t => {
