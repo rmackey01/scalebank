@@ -34,9 +34,9 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .pad{padding-inline:16px}
 
 /* ---------- tab bar ---------- */
-.tabs{flex:none;position:relative;display:grid;grid-template-columns:repeat(4,1fr);margin:0 8px 11px;padding:6px 0 4px;font-family:"Lato",var(--body)}
+.tabs{flex:none;min-width:0;position:relative;display:flex;flex-flow:row nowrap;margin:0 8px 11px;padding:6px 0 4px;font-family:"Lato",var(--body)}
 .tabs::before{content:"";position:absolute;inset:-6px;pointer-events:none;border-style:solid;border-width:26px 24px;border-image:url(art/nest/nav_bar_bg.webp) 78 72 fill / 26px 24px stretch}
-.tab{position:relative;background:none;border:0;padding:4px 2px 9.55px;display:flex;flex-direction:column;align-items:center;gap:3.65px;color:#c3b197;font-size:11.5px;line-height:13.8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tab{position:relative;flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap;background:none;border:0;padding:4px 2px 9.55px;display:flex;flex-direction:column;align-items:center;gap:3.65px;color:#c3b197;font-size:11.5px;line-height:13.8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .tab .ti{width:30px;height:30px;display:block}
 .tab .ti.on,.tab[aria-current="page"] .ti.off{display:none}
 .tab[aria-current="page"] .ti.on{display:block}
@@ -47,7 +47,6 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 @keyframes dotpulse{0%,100%{opacity:.7}50%{opacity:1}}
 /* Keep is on for every visit. html.keep-on is the layout hook, not a flag. */
 .tab-keep{display:none!important}
-html.keep-on .tabs{grid-template-columns:repeat(5,1fr)}
 html.keep-on .tab-ul{left:calc((var(--ti,0) + .5) * 20%)}
 html.keep-on .tab-keep{display:flex!important}
 html.keep-on .tab-keep .ti{object-fit:contain}
@@ -58,23 +57,29 @@ html.keep-on #keep{position:relative;overflow:visible;background:var(--ink)}
 html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;top:0;right:0;height:calc(100% + var(--keep-cover,96px));overflow:hidden}
 html.keep-open #app::before{content:"";position:absolute;z-index:1;left:0;right:0;bottom:0;height:var(--keep-cover,96px);background:var(--ink);pointer-events:none}
 html.keep-open .tabs{position:relative;z-index:2}
-.keep-bg{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
-.keep-build{position:absolute;z-index:3;top:12px;right:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206;font-size:12px;font-weight:700;letter-spacing:.06em;box-shadow:inset 0 1px 0 rgba(255,240,200,.5),0 2px 0 #5c3d0c}
-.keep-streak{position:absolute;z-index:5;top:72px;left:12px;width:min(200px,calc(100% - 24px));padding:8px 10px 10px;border-radius:14px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.9);pointer-events:auto}
-.keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:22px;line-height:1;color:var(--gold-hi)}
-.keep-streak .ks-best{margin:2px 0 0;font-size:11px;letter-spacing:.06em;color:var(--muted)}
-.keep-streak .ks-note{margin:6px 0 0;font-size:12px;line-height:1.3;color:var(--gold-hi)}
-.keep-streak .btn{min-width:0;width:100%;margin-top:8px;padding:7px 8px;font-size:12px}
+/* Full painting width stays on screen (the locked wing is at the right edge). The frame clips the baked tab strip. */
+.keep-frame{position:absolute;left:0;top:0;width:100%;aspect-ratio:1008/1572;overflow:hidden;pointer-events:none}
+.keep-bg{position:absolute;left:0;top:0;width:100%;height:calc(100% * 1792 / 1572);max-width:none;object-fit:fill;object-position:center top}
+.keep-build{position:absolute;z-index:4;right:12px;bottom:calc(var(--keep-cover,96px) + 12px);padding:6px 12px;border-radius:999px;border:1px solid var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206;font-size:12px;font-weight:700;letter-spacing:.06em;box-shadow:inset 0 1px 0 rgba(255,240,200,.5),0 2px 0 #5c3d0c}
+.keep-streak{position:absolute;z-index:5;left:20%;top:5%;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;width:54%;padding:2px 6px 2px 10px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);pointer-events:auto}
+.keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.1;color:var(--gold-hi);white-space:nowrap}
+.keep-streak .ks-best{margin:0;font-size:11px;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
+.keep-streak .ks-note{flex:1 0 100%;margin:0;font-size:11px;line-height:1.25;color:var(--gold-hi)}
+.keep-streak .btn{min-width:0;width:auto;margin:0 0 0 auto;padding:3px 8px;font-size:11px;line-height:1.2;white-space:nowrap}
 .keep-build:active{transform:translateY(1px)}
-/* Lectern hotspot, fractions of the full painting (1008×1792, tab strip included). */
-.keep-hot{position:absolute;z-index:3;left:27%;top:70%;width:46%;height:14%;padding:0;border:0;background:transparent;color:var(--gold-hi)}
-.keep-hot span{position:absolute;left:50%;bottom:10%;transform:translateX(-50%);padding:5px 12px;border-radius:999px;background:rgba(12,16,21,.82);border:1px solid var(--gold-lo);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
-.keep-hot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:12px}
-/* Pens sit on the painting in scene percentages. The world box is the covered image, so they scale with it. */
-.keep-world{position:absolute;z-index:2;pointer-events:none}
+/* Lectern hotspot. The painting already says LEDGER; the pill shows only before the art loads. */
+.keep-hot{position:absolute;z-index:4;left:64%;top:46%;width:17%;height:5%;padding:0;border:0;background:transparent;color:var(--gold-hi)}
+.keep-hot span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:5px 12px;border-radius:999px;background:rgba(12,16,21,.82);border:1px solid var(--gold-lo);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.keep-hot:focus-visible,.keep-build:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+/* Once the painting is up, use its keeper, its ledger label, and its hammer. */
+.keep-stage:has(.keep-bg.is-ok) .keep-keeper,.keep-stage:has(.keep-bg.is-ok) .keep-ground{display:none}
+.keep-stage:has(.keep-bg.is-ok) .keep-hot span{display:none}
+.keep-stage:has(.keep-bg.is-ok) .keep-build{right:auto;bottom:auto;padding:0;border:0;background:transparent;color:transparent;box-shadow:none;font-size:0;border-radius:50%}
+/* Pens are percentages of the full 1008×1792 painting. The world box matches that image. */
+.keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:calc(100% * 1792 / 1572);pointer-events:none}
 .keep-pen{position:absolute}
 .keep-ground{position:absolute;left:6%;right:6%;bottom:0;height:36%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(216,169,75,.2),rgba(216,169,75,0) 72%)}
-.pen-lock{position:absolute;left:50%;top:42%;width:90%;transform:translate(-50%,-50%);margin:0;padding:5px 6px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.86);color:var(--gold-hi);font-size:11px;font-weight:700;line-height:1.25;text-align:center}
+.pen-lock{position:absolute;left:50%;top:50%;width:88%;transform:translate(-50%,-50%);margin:0;padding:4px 6px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.86);color:var(--gold-hi);font-size:11px;font-weight:700;line-height:1.25;text-align:center}
 .keep-pen.is-open .pen-lock{display:none}
 .keep-keeper{position:absolute;left:15%;top:63%;width:8.5%;aspect-ratio:2/3;z-index:4}
 .kk-cloak{position:absolute;left:14%;right:14%;top:32%;bottom:0;border-radius:46% 46% 14% 14%;background:linear-gradient(180deg,#c4925a,#5c3b24)}
@@ -522,6 +527,7 @@ button.dexchip{cursor:pointer}
 
 /* ---------- overlays ---------- */
 .overlay{position:absolute;inset:0;z-index:20;background:rgba(6,8,11,.88);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px}
+#hatchOv{overflow:hidden}
 .hatch{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
 .hstage{position:relative;width:220px;height:260px}
 .hstage .halves,.hstage .born{position:absolute;inset:0;display:grid;place-items:center}
@@ -687,9 +693,11 @@ button.dexchip{cursor:pointer}
 
   <main id="keep" class="screen" aria-label="Keep" hidden>
     <div class="keep-stage">
-      <img class="keep-bg keep-art" alt="" draggable="false">
-      <div class="keep-world" id="keepWorld"></div>
-      <button type="button" class="keep-build" data-act="keep-build">Build</button>
+      <div class="keep-frame">
+        <img class="keep-bg keep-art" alt="" draggable="false">
+        <div class="keep-world" id="keepWorld"></div>
+      </div>
+      <button type="button" class="keep-build" data-act="keep-build" aria-label="Build">Build</button>
       <div class="keep-streak" id="keepStreak" hidden></div>
       <button type="button" class="keep-hot" data-act="keep-ledger" aria-label="Ledger"><span>Ledger</span></button>
     </div>
@@ -2249,14 +2257,18 @@ function mountKeepArt(){
   keepArt($(".tab-keep .ti.on"), "art/keep/icon_keep_active.png");
   loadSpriteBook();
 }
-/* Three pens on the 1008×1792 painting. They unlock at 1, 3, and 5 distinct breeds. */
+/* Three pens on keep-v6.webp (1008×1792). x/y/w/h are the painted yard; floor is where feet may stand. */
 const PENS = [
-  {id:"court", x:32, y:48, w:36, h:20, at:1},
-  {id:"west", x:10, y:34, w:26, h:18, at:3},
-  {id:"east", x:64, y:34, w:26, h:18, at:5}
+  {id:"court", x:22, y:16.6, w:48, h:8.2, at:1, floor:[22, 40, 27.4, 29.2]},
+  {id:"west", x:5, y:52.4, w:34, h:8.4, at:3, floor:[28, 44, 60.4, 62.6]},
+  {id:"east", x:8, y:70.4, w:58, h:8.4, at:5, floor:[48, 66, 74.2, 76.6]}
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
-const PEN_TALL = [42, 46, 51, 56];
+/* Painted controls, same percentage space as the pens. */
+const KEEP_LEDGER = {x:63.6, y:45.5, w:17.8, h:4.6};
+const KEEP_BUILD = {x:88.5, y:81.2, w:9.0, h:5.3};
+const KEEP_STREAK = {x:22, y:4.15, w:52};
+const PEN_TALL = [32, 36, 40, 44];
 let spriteBook = null, spriteAsked = false;
 const spriteMode = new Map();
 const penActors = new Map();
@@ -2330,7 +2342,7 @@ function loadSpriteBook(){
 function spritePx(d, spec){
   const cw = penMetrics.cw || 390;
   const base = PEN_TALL[stageIdx(d)] || 48;
-  const h = Math.max(40, Math.min(56, base * cw / 390));
+  const h = Math.max(30, Math.min(48, base * cw / 390));
   const fw = spec && spec.frameWidth > 0 ? spec.frameWidth : 0;
   const fh = spec && spec.frameHeight > 0 ? spec.frameHeight : 0;
   const aspect = fw && fh ? fw / fh : 1.2;
@@ -2422,18 +2434,29 @@ function markPenReady(){
   });
   world.dataset.ready = ok ? "1" : "0";
 }
+function placeKeepBox(el, rw, rh, box){
+  if (!el || !box) return;
+  el.style.left = (rw * box.x / 100) + "px";
+  el.style.top = (rh * box.y / 100) + "px";
+  if (box.w) el.style.width = (rw * box.w / 100) + "px";
+  if (box.h) el.style.height = (rh * box.h / 100) + "px";
+  el.style.right = "auto";
+  el.style.bottom = "auto";
+}
 function measureKeepWorld(){
-  const stage = $(".keep-stage"), world = $("#keepWorld");
-  if (!stage || !world) return false;
-  const cw = stage.clientWidth, ch = stage.clientHeight;
-  if (cw < 20 || ch < 20) return false;
-  const scale = Math.max(cw / KEEP_W, ch / KEEP_H);
-  const rw = KEEP_W * scale, rh = KEEP_H * scale;
-  world.style.left = ((cw - rw) / 2) + "px";
+  const frame = $(".keep-frame"), world = $("#keepWorld");
+  if (!frame || !world) return false;
+  const cw = frame.clientWidth;
+  if (cw < 20) return false;
+  const rw = cw, rh = cw * KEEP_H / KEEP_W;
+  world.style.left = "0px";
   world.style.top = "0px";
   world.style.width = rw + "px";
   world.style.height = rh + "px";
   penMetrics = {rw, rh, cw};
+  placeKeepBox($(".keep-hot"), rw, rh, KEEP_LEDGER);
+  placeKeepBox($(".keep-build"), rw, rh, KEEP_BUILD);
+  placeKeepBox($("#keepStreak"), rw, rh, KEEP_STREAK);
   return true;
 }
 function mountPenShell(){
@@ -2444,6 +2467,8 @@ function mountPenShell(){
     + `<div class="keep-keeper" aria-hidden="true"><i class="kk-hood"></i><i class="kk-cloak"></i></div>`;
 }
 function penLimits(pen){
+  const f = pen.floor;
+  if (f) return {x0:f[0], x1:f[1], y0:f[2], y1:f[3]};
   const rw = penMetrics.rw || 480;
   const mx = Math.min(pen.w * 0.28, (28 / rw) * 100);
   return {x0: pen.x + mx, x1: pen.x + pen.w - mx, y0: pen.y + pen.h * 0.62, y1: pen.y + pen.h * 0.92};
