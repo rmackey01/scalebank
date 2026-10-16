@@ -2925,7 +2925,7 @@ function streakView(streak){
   const ms = now();
   const cur = zoneOffset(ms);
   const saved = streak && Number.isInteger(streak.tz) ? streak.tz : cur;
-  return {cur, day: ymdAt(ms, saved)};
+  return {ms, cur, day: ymdAt(ms, saved)};
 }
 const SABBATH_NOTE = "Sabbath rest. No chores required.";
 const STREAK_PRIZES = [{at:30, steps:300}, {at:14, steps:140}, {at:7, steps:70}, {at:3, steps:30}, {at:1, steps:10}];
@@ -2974,7 +2974,8 @@ function streakBag(){
   S.keep = keep;
   return keep.streak;
 }
-/* Today's date is the saved offset only. A new day is strictly later than last on that calendar. */
+/* A new day is strictly later than last on the saved-offset calendar.
+   Once it counts, last and tz anchor to the current offset so a later check the same instant sees that date. */
 function visitKeep(){
   const streak = streakBag();
   const view = streakView(streak);
@@ -2993,12 +2994,13 @@ function visitKeep(){
   if (isoDay(streak.last) && !(day > streak.last)) return held;
   const count = !isoDay(streak.last) || streakBroken(streak.last, day) ? 1 : Math.max(0, Math.round(+streak.count || 0)) + 1;
   const best = Math.max(Math.round(+streak.best || 0), count);
-  streak.last = day;
+  const recorded = ymdAt(view.ms, view.cur);
+  streak.last = recorded;
   streak.count = count;
   streak.best = best;
   streak.tz = view.cur;
   save();
-  return {fresh:true, clamped:false, rest, note, blessing:true, day, count, best};
+  return {fresh:true, clamped:false, rest, note, blessing:true, day: recorded, count, best};
 }
 /* Pay the current tier once per later local date. Sunday and a day that is not past claimed pay nothing. */
 function claimStreak(){

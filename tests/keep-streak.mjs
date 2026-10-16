@@ -398,6 +398,52 @@ add("sunday-still-skipped", t => {
   t.equal(g.claimStreak(), 30, "Monday pays the continued tier");
 });
 
+add("zone-farm", t => {
+  const CHI = 300, TYO = -540;
+  let off = CHI;
+  let clock = Date.UTC(2026, 9, 19, 20, 0, 0);
+  const g = boot(save(), {search: "?keep=1"});
+  g.setCareClock(() => clock);
+  g.setZoneOffset(() => off);
+  t.equal(g.noteDailyVisit().count, 1, "load records day 1");
+  t.equal(g.noteDailyVisit().fresh, false, "opening Keep the same day does not add");
+  t.equal(g.claimStreak(), 10, "day 1 pays 10 once");
+  t.equal(g.claimStreak(), 0, "day 1 does not pay twice");
+  const bank = g.snapshot().bank;
+  off = TYO;
+  clock = Date.UTC(2026, 9, 21, 1, 0, 0);
+  const loaded = g.noteDailyVisit();
+  t.equal(loaded.count, 2, "load in Tokyo adds one day, not two");
+  t.equal(loaded.day, "2026-10-21", "the counting visit reports the new-offset date");
+  t.equal(g.snapshot().keep.streak.tz, TYO, "tz is now Tokyo");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-21", "last is the new-offset date");
+  const kept = g.noteDailyVisit();
+  t.equal(kept.fresh, false, "opening Keep does not count a second day");
+  t.equal(kept.count, 2, "Keep still shows day 2");
+  t.equal(g.snapshot().keep.streak.count, 2, "still day 2, not day 3");
+  t.equal(g.claimStreak(), 10, "day 2 pays 10, not the 30-step tier");
+  t.equal(g.snapshot().keep.streak.claimed, "2026-10-21", "the claim stores that same date");
+  t.equal(g.claimStreak(), 0, "that payout cannot repeat");
+  t.equal(g.snapshot().bank, bank + 10, "one payout");
+  off = CHI;
+  t.equal(g.noteDailyVisit().fresh, false, "load after switching back is the same date");
+  t.equal(g.noteDailyVisit().count, 2, "Keep tab after switching back does not add");
+  t.equal(g.claimStreak(), 0, "switching back does not pay");
+  t.equal(g.snapshot().keep.streak.count, 2, "the round trip added only one day");
+  t.equal(g.snapshot().bank, bank + 10, "the round trip does not pay again");
+  const same = boot(save({last: "2026-10-19", count: 1, best: 1, claimed: "2026-10-19", tz: CHI}), {search: "?keep=1"});
+  let zone = TYO;
+  same.setCareClock(() => clock);
+  same.setZoneOffset(() => zone);
+  t.equal(same.claimStreak(), 10, "a claim on the counting visit pays once");
+  t.equal(same.snapshot().keep.streak.count, 2, "that claim counted one day");
+  t.equal(same.snapshot().keep.streak.last, "2026-10-21", "the claim's visit stored the new-offset date");
+  t.equal(same.snapshot().keep.streak.claimed, "2026-10-21", "claimed matches the date that visit stored");
+  t.equal(same.noteDailyVisit().fresh, false, "opening Keep after that claim does not add a day");
+  t.equal(same.claimStreak(), 0, "the same visit cannot pay twice");
+  t.equal(same.snapshot().keep.streak.count, 2, "Keep does not make day 3");
+});
+
 add("old-save-offset", t => {
   let clock = stamp(2026, 10, 16, 15);
   const g = boot(save({last: key(2026, 10, 15), count: 2, best: 2}));
