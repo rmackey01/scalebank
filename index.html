@@ -80,7 +80,7 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-pen{position:absolute}
 .keep-ground{position:absolute;left:6%;right:6%;bottom:0;height:36%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(216,169,75,.2),rgba(216,169,75,0) 72%)}
 .keep-stage:has(.keep-bg.is-ok) .keep-ground{display:none}
-/* Brass plaque with a lock, centered on the pen floor. The hoard one sits on the door, off the coins. */
+/* Brass plaque with a lock, centered on the pen floor. */
 .pen-lock,.wing-lock{position:absolute;z-index:3;left:50%;top:50%;display:flex;flex-flow:row nowrap;align-items:center;gap:5px;width:max-content;max-width:calc(100% - 6px);box-sizing:border-box;margin:0;padding:4px 8px 4px 6px;border-radius:7px;border:1.5px solid #5a3810;color:#3a2412;background:linear-gradient(180deg,rgba(255,244,214,.55),rgba(255,244,214,0) 42%),linear-gradient(180deg,#f0d59a 0%,#c8923e 48%,#8a5a1c 100%);box-shadow:inset 0 1px 0 rgba(255,248,220,.85),inset 0 -2px 0 rgba(74,40,8,.28),0 2px 3px rgba(0,0,0,.45);font-family:var(--display);font-weight:700;line-height:1;text-align:left;pointer-events:none;transform:translate(-50%,-50%)}
 .pen-lock svg,.wing-lock svg{width:14px;height:14px;flex:none;display:block}
 .pen-lock b,.wing-lock b{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
@@ -89,7 +89,6 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-pen[data-pen="purple"] .pen-lock{left:32%;top:58%}
 .keep-pen[data-pen="blue"] .pen-lock{left:30%;top:52%}
 .keep-pen[data-pen="green"] .pen-lock{left:38%;top:12%}
-.keep-pen[data-pen="hoard"] .pen-lock{left:78%;top:34%}
 .keep-pen.is-open .pen-lock{display:none}
 /* Cleared wing on the painting. The plaque sits in the middle of that box and leaves when the wing opens. */
 .keep-wing{position:absolute;z-index:4;pointer-events:none}
@@ -2351,13 +2350,12 @@ function mountKeepArt(){
   loadSpriteBook();
   loadFenceBook();
 }
-/* Feet boxes on the 1008×1792 painting. Snow drops every box 8px. */
+/* Feet boxes on the 1008×1792 painting. Snow drops every box 8px. Ember, violet, azure, pond. */
 const PENS = [
   {id:"red", x:22.32, y:56.47, w:33.73, h:12.56, at:1},
   {id:"purple", x:45.83, y:66.63, w:27.28, h:10.49, at:3},
   {id:"blue", x:39.98, y:75.06, w:41.37, h:8.93, at:5},
-  {id:"green", x:45.14, y:83.15, w:26.79, h:8.37, at:5},
-  {id:"hoard", x:51.29, y:22.99, w:36.21, h:7.53, at:5}
+  {id:"green", x:45.14, y:83.15, w:26.79, h:8.37, at:5}
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
@@ -2385,7 +2383,7 @@ function pensOpen(n){
   if (c >= 1) return 1;
   return 0;
 }
-/* The third breed gate opens the green pen and the hoard along with the blue pen. */
+/* The third breed gate opens the green pen along with the blue pen. */
 function yardsOpen(n){
   const open = pensOpen(n);
   if (open >= 3) return PENS.length;
@@ -2462,24 +2460,14 @@ function loadSpriteBook(){
     syncPens();
   });
 }
-/* Hatchling through elder. The back row of a pen is a little smaller than this. */
-const STAGE_MUL = [0.52, 0.68, 0.84, 1];
-function spritePx(d, spec, actor){
+/* Native frame on the 1008-wide painting. Feet sit at x = frameWidth/2, y = feetY (or the frame bottom). */
+function spritePx(d, spec){
   const rw = penMetrics.rw || penMetrics.cw || 390;
-  const stage = Math.max(0, Math.min(3, stageIdx(d)));
+  const scale = rw / KEEP_W;
   const fw = spec && spec.frameWidth > 0 ? spec.frameWidth : 84;
   const fh = spec && spec.frameHeight > 0 ? spec.frameHeight : 74;
-  const aspect = fw / fh;
-  const penId = actor && actor.pen;
-  const gap = penId ? penGap(penId) : null;
-  let maxW = fw * rw / KEEP_W;
-  if (gap){
-    const maxH = gap.dy * 0.9 * rw / KEEP_W;
-    maxW = Math.min(gap.pitch * 0.88 * rw / KEEP_W, maxH * aspect);
-  }
-  let w = Math.max(12, maxW * STAGE_MUL[stage]);
-  if (actor && actor.slot < 3) w *= 0.86;
-  return {w, h: w / aspect};
+  const feetY = spec && isFinite(+spec.feetY) && +spec.feetY > 0 ? +spec.feetY : fh;
+  return {w: fw * scale, h: fh * scale, foot: Math.max(0.05, Math.min(1, feetY / fh))};
 }
 function spriteCacheKey(step){ return step.bag + "\0" + step.key + "\0" + step.kind; }
 function settleSprite(ck){
@@ -2559,11 +2547,16 @@ function paintEl(el, actor){
   sp.style.height = px.h + "px";
   el.style.width = px.w + "px";
   el.style.height = px.h + "px";
+  const foot = px.foot > 0 ? px.foot : 1;
+  el.style.transform = "translate(-50%, " + (-foot * 100).toFixed(3) + "%)";
   const shadow = el.querySelector(".pen-shadow");
   if (shadow){
     const sw = Math.max(10, px.w * 0.6);
     shadow.style.width = sw + "px";
     shadow.style.height = Math.max(6, sw * 0.42) + "px";
+    shadow.style.top = (foot * 100) + "%";
+    shadow.style.bottom = "auto";
+    shadow.style.transform = "translate(-50%, 15%)";
   }
 }
 function markPenReady(){
@@ -2633,71 +2626,84 @@ function penLimits(pen){
   const dy = penSnow() ? 8 * 100 / KEEP_H : 0;
   return {x0: pen.x, x1: pen.x + pen.w, y0: pen.y + dy, y1: pen.y + pen.h + dy};
 }
-/* Six feet spots per pen, art pixels of the 1008×1792 painting. Back row, then front row. */
-const PEN_SPOTS = {
-  red:[
-    {x:398, y:1146}, {x:476, y:1146}, {x:552, y:1146},
-    {x:398, y:1228}, {x:476, y:1228}, {x:552, y:1228}
-  ],
-  purple:[
-    {x:492, y:1272}, {x:552, y:1272}, {x:612, y:1272},
-    {x:492, y:1362}, {x:552, y:1362}, {x:612, y:1362}
-  ],
-  blue:[
-    {x:448, y:1386}, {x:528, y:1386}, {x:608, y:1386},
-    {x:448, y:1482}, {x:528, y:1482}, {x:608, y:1482}
-  ],
-  green:[
-    {x:488, y:1504}, {x:548, y:1504}, {x:608, y:1504},
-    {x:488, y:1556}, {x:548, y:1556}, {x:608, y:1556}
-  ],
-  hoard:[
-    {x:548, y:448}, {x:618, y:448}, {x:688, y:448},
-    {x:548, y:518}, {x:618, y:518}, {x:688, y:518}
-  ]
-};
-function spotPoint(raw){
-  if (Array.isArray(raw)) return {x:+raw[0], y:+raw[1]};
-  if (raw && typeof raw === "object") return {x:+raw.x, y:+raw.y};
-  return {x:NaN, y:NaN};
+/* Animator names in pen-spots.json, in pen order. */
+const PEN_NAME = {ember:"red", violet:"purple", azure:"blue", pond:"green", red:"red", purple:"purple", blue:"blue", green:"green"};
+const STAGE_NAME = ["hatchling", "juvenile", "adult", "elder"];
+function stageRank(stage){
+  if (typeof stage === "number" && isFinite(stage)) return Math.max(0, Math.min(3, stage));
+  const name = String(stage || "").toLowerCase();
+  const i = STAGE_NAME.indexOf(name);
+  if (i >= 0) return i;
+  if (name === "h") return 0;
+  if (name === "j") return 1;
+  if (name === "a") return 2;
+  if (name === "e") return 3;
+  return 3;
 }
-/* pen-spots.json replaces a pen when that pen lists six points. Missing pens keep PEN_SPOTS. */
+function spotPoint(raw){
+  if (Array.isArray(raw)) return {x:+raw[0], y:+raw[1], maxStage:"elder", main:false, id:0};
+  if (raw && typeof raw === "object") return {x:+raw.x, y:+raw.y, maxStage: raw.maxStage != null ? raw.maxStage : "elder", main: !!raw.main, id: raw.id};
+  return {x:NaN, y:NaN, maxStage:"elder", main:false, id:0};
+}
+/* pen-spots.json is the spot table. Pens are ember, violet, azure, and pond. */
 function readSpotBook(json){
   if (!json || typeof json !== "object") return null;
-  const src = json.spots && typeof json.spots === "object" ? json.spots : json;
+  const src = json.pens && typeof json.pens === "object" ? json.pens : json;
   const next = {};
   let n = 0;
-  PENS.forEach(p => {
-    const arr = src[p.id];
-    if (!Array.isArray(arr) || arr.length < 6) return;
-    const pts = [];
-    for (let i = 0; i < 6; i++){
-      const pt = spotPoint(arr[i]);
+  Object.keys(src).forEach(key => {
+    const id = PEN_NAME[key];
+    const pen = src[key];
+    if (!id || !pen) return;
+    const arr = Array.isArray(pen) ? pen : pen.spots;
+    if (!Array.isArray(arr)) return;
+    const spots = [];
+    arr.forEach(raw => {
+      const pt = spotPoint(raw);
       if (!isFinite(pt.x) || !isFinite(pt.y)) return;
-      pts.push(pt);
-    }
-    next[p.id] = pts;
+      spots.push(pt);
+    });
+    if (!spots.length) return;
+    next[id] = spots;
     n++;
   });
-  return n ? next : null;
+  if (!n) return null;
+  const snow = json.snow_variant_y_offset;
+  next.snowY = isFinite(+snow) ? +snow : 8;
+  return next;
 }
 function penSpots(id){
-  const src = (spotBook && spotBook[id]) || PEN_SPOTS[id] || PEN_SPOTS.red;
-  const dy = penSnow() ? 8 : 0;
-  return src.map(s => ({x:s.x, y:s.y + dy}));
+  const src = spotBook && spotBook[id];
+  if (!src) return [];
+  const dy = penSnow() ? (isFinite(+spotBook.snowY) ? +spotBook.snowY : 8) : 0;
+  return src.map(s => ({x:s.x, y:s.y + dy, maxStage:s.maxStage, main:s.main, id:s.id}));
 }
-function penGap(id){
-  const spots = penSpots(id);
-  const rowPitch = row => {
-    const xs = [0, 1, 2].map(i => spots[row * 3 + i].x).sort((a, b) => a - b);
-    return Math.min(xs[1] - xs[0], xs[2] - xs[1]);
+/* Biggest stages take main spots they fit, then any spot they fit. A leftover takes the largest free spot. */
+function assignSpots(dragons, spots){
+  const order = dragons.slice().sort((a, b) => b.stage - a.stage || a.ord - b.ord);
+  const used = new Set();
+  const out = new Map();
+  const indexed = spots.map((s, index) => ({s, index}));
+  const take = (d, list) => {
+    const hit = list.find(row => !used.has(row.index));
+    if (!hit) return false;
+    used.add(hit.index);
+    out.set(d.id, hit.index);
+    return true;
   };
-  const dy = Math.min(spots[3].y - spots[0].y, spots[4].y - spots[1].y, spots[5].y - spots[2].y);
-  return {pitch: Math.min(rowPitch(0), rowPitch(1)), dy: Math.max(24, dy)};
+  order.forEach(d => take(d, indexed.filter(row => row.s.main && stageRank(row.s.maxStage) >= d.stage)));
+  order.forEach(d => { if (!out.has(d.id)) take(d, indexed.filter(row => stageRank(row.s.maxStage) >= d.stage)); });
+  order.forEach(d => {
+    if (out.has(d.id)) return;
+    const free = indexed.filter(row => !used.has(row.index)).sort((a, b) => stageRank(b.s.maxStage) - stageRank(a.s.maxStage) || a.index - b.index);
+    take(d, free);
+  });
+  return out;
 }
 function seatActor(actor){
   const spots = penSpots(actor.pen);
-  const slot = Math.max(0, Math.min(5, actor.slot || 0));
+  const slot = actor.slot;
+  if (!spots.length || slot == null || slot < 0 || !spots[slot]) return;
   const spot = spots[slot];
   const x = spot.x / KEEP_W * 100;
   const y = spot.y / KEEP_H * 100;
@@ -2729,7 +2735,7 @@ function drawActor(actor){
     el.style.top = actor.y.toFixed(3) + "%";
     actor.dirty = false;
   }
-  const z = 8 + Math.round(actor.y * 2);
+  const z = 20 + Math.round(actor.y * 10) + Math.max(0, actor.slot || 0);
   if (el._z !== z){ el._z = z; el.style.zIndex = String(z); }
   const sp = el.querySelector(".pen-sprite");
   if (sp && el._face !== actor.face){
@@ -2816,6 +2822,14 @@ function syncPens(){
       list.push(id);
       slots.set(pen.id, list);
     });
+    const seat = new Map();
+    slots.forEach((ids, penId) => {
+      const dragons = ids.map((id, ord) => {
+        const d = ledgerDragon(id);
+        return {id, stage: d ? stageIdx(d) : 0, ord};
+      });
+      assignSpots(dragons, penSpots(penId)).forEach((slot, id) => seat.set(id, slot));
+    });
     if (open > 0) roaming.forEach((id, i) => {
       const d = ledgerDragon(id);
       if (!d) return;
@@ -2825,7 +2839,7 @@ function syncPens(){
       const chain = spriteChain(d);
       const chainSig = chain.map(s => s.bag + ":" + s.kind + ":" + s.file).join("|");
       let actor = penActors.get(id);
-      const slot = mates.indexOf(id);
+      const slot = seat.has(id) ? seat.get(id) : 0;
       if (!actor){
         actor = {id, pen: pen.id, key: spriteKey(d), chain, chainSig, step:0, spec: chain[0] ? chain[0].spec : null, kind:"load", x:0, y:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, slot:-1, count:0, dirty:true};
         placeActor(actor, pen, slot, mates.length);
