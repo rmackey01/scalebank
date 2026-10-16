@@ -120,6 +120,48 @@ add("notes", t => {
   t.deepEqual(at100.map(n => n.at), [10, 30, 60, 100], "unlock thresholds");
 });
 
+add("future-clock", t => {
+  const g = boot(save([dragon("a", "ember")], {
+    a: {fed: 10 * H, groomed: 50 * H, petted: 3 * H, bond: 4}
+  }));
+  let clock = 0;
+  g.setCareClock(() => clock);
+  t.equal(g.careWait(10 * H, clock, 4 * H), 0, "a future feed stamp is ready");
+  t.equal(g.careWait(50 * H, clock, 8 * H), 0, "a future groom stamp is not an 8h wait");
+  t.equal(g.careWait(3 * H, clock, H), 0, "a future pet stamp is not longer than 1h");
+  t.ok(g.careAct("a", "feed"), "feed works when its stamp is ahead of the clock");
+  t.equal(g.careRecord("a").fed, 0, "feed stamp rewrites to now");
+  t.equal(g.careRecord("a").bond, 5, "bond still rises");
+  t.ok(g.careAct("a", "groom"), "groom works when its stamp is ahead of the clock");
+  t.ok(g.careAct("a", "pet"), "pet works when its stamp is ahead of the clock");
+  t.equal(g.careWait(g.careRecord("a").fed, clock, 4 * H), 4 * H, "a fresh feed waits exactly 4h");
+  t.equal(g.careWait(g.careRecord("a").groomed, clock, 8 * H), 8 * H, "a fresh groom waits exactly 8h");
+  t.equal(g.careWait(g.careRecord("a").petted, clock, H), H, "a fresh pet waits exactly 1h");
+  t.ok(g.careWait(g.careRecord("a").fed, clock, 4 * H) <= 4 * H, "feed wait is capped at 4h");
+  t.ok(g.careWait(g.careRecord("a").groomed, clock, 8 * H) <= 8 * H, "groom wait is capped at 8h");
+  t.ok(g.careWait(g.careRecord("a").petted, clock, H) <= H, "pet wait is capped at 1h");
+  clock = H - 1;
+  t.ok(!g.careAct("a", "pet"), "pet still cools inside its normal hour");
+  t.ok(g.careWait(g.careRecord("a").petted, clock, H) <= H, "the remaining pet wait stays within 1h");
+  clock = 4 * H;
+  t.ok(g.careAct("a", "feed"), "feed is ready again after its normal 4h");
+});
+
+add("seals", t => {
+  const g = boot(save([
+    dragon("plain", "ember"),
+    dragon("moon", "ember", {mut: "moonlit"}),
+    dragon("gilt", "tide", {mut: "gilded"})
+  ]));
+  const dragons = g.snapshot().dragons;
+  const byId = id => dragons.find(d => d.id === id);
+  t.deepEqual(g.careSeals(byId("plain")), [], "a plain dragon shows no seal");
+  t.deepEqual(g.careSeals(byId("moon")), ["moonlit"], "a mutated dragon shows only its own seal");
+  t.deepEqual(g.careSeals(byId("gilt")), ["gilded"], "another dragon's mutation is not borrowed");
+  t.deepEqual(g.careSeals({id: "plain", line: "cinder", mut: null}), [], "null mut stays plain");
+  t.deepEqual(g.careSeals({id: "x", line: "cinder", mut: "nope"}), [], "an unknown mutation is not a seal");
+});
+
 add("unknown", t => {
   const g = boot(save([dragon("a", "ember"), dragon("b", "tide")]));
   g.setCareClock(() => 50_000);

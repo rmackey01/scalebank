@@ -66,6 +66,8 @@ export function boot(raw){
     if (typeof careAct === "function") __api.careAct = careAct;
     if (typeof careRecord === "function") __api.careRecord = careRecord;
     if (typeof keeperNotes === "function") __api.keeperNotes = keeperNotes;
+    if (typeof careWait === "function") __api.careWait = careWait;
+    if (typeof careSeals === "function") __api.careSeals = careSeals;
     return __api;
   `;
 
