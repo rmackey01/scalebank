@@ -140,44 +140,40 @@ html.keep-open .tabs{position:relative;z-index:2}
 /* Writing area on the 1008×1792 page: x235 y140 w597 h1150. */
 .ledger-body{position:absolute;z-index:1;left:calc(235 / 1008 * 100%);top:calc(140 / 1792 * 100%);width:calc(597 / 1008 * 100%);height:calc(1150 / 1792 * 100%);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;padding:2px 1px 4px;background:transparent;color:#2a160c}
 /* Wooden board: y1425–1545. Swap and Send sit on the plank, clear of the clasp. */
-.ledger-board{position:absolute;z-index:2;left:4%;width:92%;top:calc(1425 / 1792 * 100%);height:calc(120 / 1792 * 100%);display:flex;align-items:center;justify-content:space-evenly;pointer-events:none}
-.ledger-board .btn{pointer-events:auto;min-width:0;padding:3px 8px;border-radius:8px;font-size:11px;line-height:1.1}
-.ledger-board .btn[disabled]{background:#3a2a18;border-color:#6b4a28;color:#c4a57a}
-.ledger-body h2{margin:0;text-align:center;font-family:var(--display);font-weight:600;font-size:22px;line-height:1.05;color:#2a160c}
-.ldg-verse{margin:0;padding:8px 10px;border-radius:12px;border:1px solid #8a5a1c;background:rgba(255,244,214,.42);color:#2a160c;font-size:13px;line-height:1.35}
-.ldg-swap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:0;text-align:center;color:#3a2412;font-size:12px}
-.ldg-swap .btn{min-width:0;padding:4px 8px;font-size:11px}
-.ldg-sec{min-width:0}
-.ldg-sec h3{margin:0 0 2px;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.15;color:#2a160c}
-.ldg-stables-sec{flex:none;min-height:0}
-.ldg-stables{min-height:0}
-.ldg-list{list-style:none;margin:0;padding:0}
-.ldg-empty{margin:0 0 6px;color:#6b4e2e;font-size:13px}
-.ldg-row{display:grid;grid-template-columns:32px minmax(0,1fr);column-gap:6px;row-gap:1px;align-items:center;padding:3px 2px;border-bottom:1px solid rgba(90,50,16,.28)}
-.ldg-row.is-pick{background:rgba(216,169,75,.2);border-radius:10px;box-shadow:inset 0 0 0 1px var(--gold)}
-.ldg-art{grid-column:1;grid-row:1 / span 2;width:32px;height:32px;min-width:0;padding:0;border:0;background:transparent;line-height:0;cursor:pointer}
-.ldg-art[aria-pressed="true"]{border-radius:7px;box-shadow:0 0 0 2px #6b3e12}
-.ldg-art .dart{width:32px;height:32px;aspect-ratio:auto;border-radius:7px}
-.ldg-who{grid-column:2;grid-row:1;min-width:0;display:flex;flex-direction:column;gap:0}
-.ldg-name{justify-self:start;max-width:100%;background:none;border:0;padding:0;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.05;color:#2a160c;text-align:left}
-.ldg-name:hover{text-decoration:underline}
-.ldg-meta{font-size:11px;line-height:1.15;color:#5c4030}
-.ldg-meta .r{font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
-.ldg-acts{grid-column:2;grid-row:2;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-.ldg-acts .btn,.ldg-swap .btn{min-width:0;padding:3px 7px;border-radius:8px;font-size:11px;white-space:nowrap}
-.ldg-roam .ldg-row{grid-template-columns:26px minmax(0,1fr) auto;align-items:center;padding:1px 0}
-.ldg-roam .ldg-art{grid-row:1;width:26px;height:26px}
-.ldg-roam .ldg-art .dart{width:26px;height:26px}
-.ldg-roam .ldg-who{grid-row:1;flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:6px}
-.ldg-roam .ldg-name{font-size:14px}
-.ldg-roam .ldg-acts{grid-column:3;grid-row:1}
-.ldg-hint{margin:0 0 2px;color:#6b3e12;font-size:11px;line-height:1.2}
-.ledger-body .btn.ghost{color:#3a2412;border-color:#8a5a1c;background:rgba(255,244,214,.45)}
-.ledger-body .r.r-common{color:#5c4630}
-.ledger-body .r.r-uncommon{color:#2d6a38}
-.ledger-body .r.r-rare{color:#3a3680}
-.ledger-body .r.r-epic{color:#6d2f86}
-.ledger-body .r.r-legendary{color:#8a5a10;text-shadow:none}
+.ledger-board{position:absolute;z-index:2;left:3%;width:94%;top:calc(1425 / 1792 * 100%);height:calc(120 / 1792 * 100%);display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:0 2% 0 4%;box-sizing:border-box;pointer-events:none}
+.ldg-cross{width:16px;height:16px;flex:none;filter:drop-shadow(0 1px 0 #3a2412)}
+.ledger-board .btn{pointer-events:auto;flex:1;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:3px 6px;border-radius:8px;border:1px solid #6b4420;background:linear-gradient(180deg,#f0d7a2,#d7b56a 42%,#a67c3d);color:#3a2412;font-family:var(--display);font-weight:700;font-size:12px;line-height:1.05;letter-spacing:.01em;text-shadow:0 1px 0 rgba(255,248,230,.65);box-shadow:inset 0 1px 0 rgba(255,248,230,.85),inset 0 -2px 0 #6b4420,0 1px 1px rgba(0,0,0,.45)}
+.ledger-board .btn svg{width:12px;height:12px;flex:none}
+.ledger-board .btn[disabled]{background:linear-gradient(180deg,#e6c98a,#c4a15a 46%,#8f6a38);color:#5c4330;border-color:#6b4420;box-shadow:inset 0 1px 0 rgba(255,248,230,.7),inset 0 -2px 0 #6b4420}
+.ldg-seal{width:13px;height:13px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#e2583e,#7a1e14);box-shadow:inset 0 1px 0 rgba(255,200,180,.45),0 0 0 1px #4a140e}
+.ldg-seal svg{width:8px;height:8px}
+.ldg-title{margin:0;text-align:center;font-family:var(--display);font-weight:700;font-size:20px;line-height:1;color:#e8bd5f;text-shadow:0 1px 0 #6b3e12,0 2px 0 #3a2412,0 0 8px rgba(216,169,75,.4)}
+.ldg-sub{margin:1px 0 0;text-align:center;font-family:var(--display);font-style:italic;font-weight:600;font-size:10px;line-height:1.15;color:#3a2412}
+.ldg-verse{margin:0;padding:4px 6px;border-radius:4px;border:1px solid #8a5a1c;background:linear-gradient(180deg,rgba(255,248,230,.62),rgba(224,188,120,.28));color:#2a160c;font-family:var(--display);font-style:italic;font-size:11px;line-height:1.3;text-align:center}
+.ldg-rule{display:flex;align-items:center;gap:5px;margin:1px 0}
+.ldg-rule::before,.ldg-rule::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#7a5420 12%,#e8bd5f,#7a5420 88%,transparent)}
+.ldg-rule i{width:5px;height:5px;flex:none;background:#e8bd5f;transform:rotate(45deg);box-shadow:0 0 0 1px #6b3e12}
+.ldg-rule span{font-family:var(--display);font-weight:700;font-size:12px;line-height:1;color:#2a160c;white-space:nowrap}
+.ldg-roam-h{display:flex;align-items:center;gap:6px;margin:0;font-family:var(--display);font-weight:700;font-size:13px;line-height:1;color:#2a160c}
+.ldg-drop{flex:none;font-family:var(--display);font-weight:700;font-size:30px;line-height:.75;color:#e8bd5f;text-shadow:0 1px 0 #6b3e12,0 2px 0 #3a2412}
+.ldg-grid{display:grid;gap:4px;margin:0;padding:0;list-style:none}
+.ldg-roam-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ldg-stall-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ldg-pcard,.ldg-stall{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;width:100%;min-width:0;margin:0;padding:3px 2px 2px;cursor:pointer;font:inherit;line-height:1}
+.ldg-pcard{min-height:62px;border:1px solid #6e4a22;border-radius:3px;background:linear-gradient(180deg,rgba(255,248,230,.7),rgba(224,188,120,.28));color:#2a160c;box-shadow:inset 0 0 0 1px rgba(255,244,214,.45)}
+.ldg-stall{position:relative;min-height:58px;border:1px solid #1a0e08;border-radius:46% 46% 4px 4px;background:linear-gradient(180deg,#6b4630 0%,#3a2416 42%,#24160e);color:#f3e0b8;box-shadow:inset 0 0 0 1px #a07848,inset 0 8px 6px rgba(0,0,0,.28)}
+.ldg-pcard.is-on,.ldg-stall.is-on{box-shadow:0 0 0 2px #f4d78f,0 0 16px 3px rgba(244,215,143,.95);outline:1px solid #f4d78f}
+.ldg-slot{min-height:62px;border:1px dashed #8a6840;border-radius:3px;background:transparent}
+.ldg-pcard .dart,.ldg-stall .dart{width:78%;aspect-ratio:3/4;border-radius:2px;background:transparent;box-shadow:none}
+.ldg-pcard .dart::after,.ldg-stall .dart::after{box-shadow:none}
+.ldg-pcard .dart > img,.ldg-stall .dart > img{object-fit:contain;-webkit-mask:none;mask:none}
+.ldg-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--display);font-weight:700;font-size:10px;line-height:1.05;text-align:center;color:inherit}
+.ldg-stall .ldg-name{font-size:8px}
+.ldg-star{width:9px;height:9px;display:block;flex:none}
+.ldg-gem{position:absolute;top:3px;right:2px;width:7px;height:7px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.6),inset 0 -1px 1px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.4)}
+.ldg-swap{margin:0;text-align:center;color:#3a2412;font-family:var(--display);font-size:10px;line-height:1.2}
+.ldg-swap .btn{min-width:0;padding:1px 5px;font-size:10px}
+.ldg-hint{margin:0;color:#6b3e12;font-size:10px;line-height:1.2;text-align:center}
 .ledger > .btn{align-self:center;min-width:140px;padding:8px 16px}
 .care{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
 .care-ov{z-index:24}
@@ -2299,7 +2295,10 @@ document.addEventListener("click", ev => {
   else if (a === "streak-claim"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "keep-ledger") openLedger();
   else if (a === "close-ledger") closeLedger();
-  else if (a === "ledger-focus"){ ledgerFocus = b.dataset.id; renderLedger(); }
+  else if (a === "ledger-focus"){
+    if (ledgerFocus === b.dataset.id) openLedgerDragon(b.dataset.id);
+    else { ledgerFocus = b.dataset.id; renderLedger(); }
+  }
   else if (a === "ledger-dragon" || a === "pen-dragon") openLedgerDragon(b.dataset.id);
   else if (a === "ledger-rest"){ if (moveKeep("rest", b.dataset.id) && ledgerPick === b.dataset.id) ledgerPick = null; renderLedger(); }
   else if (a === "ledger-send"){ if (moveKeep("send", b.dataset.id)) renderLedger(); }
@@ -3636,13 +3635,18 @@ function trapTab(ev, root){
   return true;
 }
 function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || null; }
-function ledgerRow(id, kind){
+const LEDGER_STAR = `<svg class="ldg-star" viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" stroke="#6b3e12" stroke-width=".5" d="M6 .7 7.5 4.2l3.8.3-2.9 2.4.9 3.6L6 8.6 2.7 10.5l.9-3.6L.7 4.5l3.8-.3z"/></svg>`;
+const BREED_GEM = {cinder:"#c23b2e", inferno:"#d3541a", brine:"#2f6fbf", moss:"#3d8a45", stormling:"#3a62c4", voidling:"#6a3d9a", tempest:"#7a4ea3"};
+function ledgerCard(id, kind){
   const d = ledgerDragon(id); if (!d) return "";
-  const picked = ledgerPick === id || ledgerFocus === id;
-  const care = `<button type="button" class="btn ghost" data-act="ledger-care" data-id="${esc(id)}">Care</button>`;
-  const rest = kind === "roam" ? `<button type="button" class="btn ghost" data-act="ledger-rest" data-id="${esc(id)}">Rest</button>` : "";
-  const art = `<button type="button" class="ldg-art" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${ledgerFocus === id ? "true" : "false"}" aria-label="Choose ${esc(d.name || d.species)}">${dragonArt(d)}</button>`;
-  return `<li class="ldg-row${picked ? " is-pick" : ""}">${art}<div class="ldg-who"><button type="button" class="ldg-name" data-act="ledger-dragon" data-id="${esc(id)}">${esc(d.name || d.species)}</button><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div></div><div class="ldg-acts">${rest}${care}</div></li>`;
+  const on = ledgerFocus === id || ledgerPick === id;
+  const name = d.name || d.species;
+  const pressed = ledgerFocus === id ? "true" : "false";
+  if (kind === "roam"){
+    return `<button type="button" class="ldg-pcard${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}">${dragonArt(d)}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
+  }
+  const gem = BREED_GEM[d.line] || "#8a6a3a";
+  return `<button type="button" class="ldg-stall${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}"><i class="ldg-gem" style="background:${gem}" aria-hidden="true"></i>${dragonArt(d)}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
 }
 function ledgerVerseCard(){
   if (!verseOn()) return "";
@@ -3657,17 +3661,21 @@ function renderLedger(){
   if (ledgerPick && keep.roaming.indexOf(ledgerPick) < 0) ledgerPick = null;
   const pick = ledgerPick && ledgerDragon(ledgerPick);
   const noRoom = keep.roaming.length >= keepCap() && keep.stables.length > 0 && keep.stables.every(id => keepFullFor(keep, id));
-  const roamRows = keep.roaming.map(id => ledgerRow(id, "roam")).join("");
-  const stabRows = keep.stables.map(id => ledgerRow(id, "stab")).join("");
+  const roamRows = keep.roaming.map(id => ledgerCard(id, "roam")).join("");
+  const empties = Math.max(0, keepCap() - keep.roaming.length);
+  const emptySlots = Array.from({length: empties}, () => `<div class="ldg-slot" aria-hidden="true"></div>`).join("");
+  const stabRows = keep.stables.map(id => ledgerCard(id, "stab")).join("");
   const opt = (act, label, on) => `<button type="button" class="ldg-opt" data-act="${act}" role="switch" aria-pressed="${on ? "true" : "false"}"><span>${label}</span><i aria-hidden="true"></i></button>`;
   if (ledgerFocus && keep.roaming.indexOf(ledgerFocus) < 0 && keep.stables.indexOf(ledgerFocus) < 0) ledgerFocus = null;
   renderLedgerBoard(keep);
-  body.innerHTML = `<h2>Keeper's Ledger</h2>
+  body.innerHTML = `<h2 class="ldg-title">The Keeper's Ledger</h2>
+    <p class="ldg-sub">Stewards of every creature entrusted to us</p>
     <div class="ldg-opts">${opt("ledger-verse", "Morning Blessing", verseOn())}${opt("ledger-weather", "Live weather", weatherOn())}</div>
     ${ledgerVerseCard()}
-    ${pick ? `<p class="ldg-swap" role="status">Pick a dragon in the stables to swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
-    <section class="ldg-sec ldg-roam"><h3>Roaming in the Keep (${keep.roaming.length}/${keepCap()})</h3>${roamRows ? `<ul class="ldg-list">${roamRows}</ul>` : `<p class="ldg-empty">No one is roaming.</p>`}</section>
-    <section class="ldg-sec ldg-stables-sec"><h3>Resting in the Stables (${keep.stables.length})</h3>${noRoom ? `<p class="ldg-hint" id="ldgFull">Keep is full</p>` : ""}<div class="ldg-stables">${stabRows ? `<ul class="ldg-list">${stabRows}</ul>` : `<p class="ldg-empty">The stables are empty.</p>`}</div></section>`;
+    ${pick ? `<p class="ldg-swap" role="status">Swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
+    <section class="ldg-sec ldg-roam"><h3 class="ldg-roam-h"><span class="ldg-drop" aria-hidden="true">T</span><span>Roaming in the Keep (${keep.roaming.length}/${keepCap()})</span></h3><div class="ldg-grid ldg-roam-grid">${roamRows}${emptySlots}</div></section>
+    <h3 class="ldg-rule"><span>Resting in the Stables</span></h3>
+    <section class="ldg-sec ldg-stables-sec">${noRoom ? `<p class="ldg-hint" id="ldgFull">Keep is full</p>` : ""}<div class="ldg-grid ldg-stall-grid ldg-stables">${stabRows}</div></section>`;
   layoutLedger();
   syncPens();
 }
@@ -3682,7 +3690,10 @@ function renderLedgerBoard(keep){
   const canSend = stable && !keepFullFor(keep, id);
   const swapAct = stable && armed ? "ledger-swap-do" : "ledger-swap";
   const swapId = stable && armed ? id : (roaming ? id : ledgerPick || "");
-  board.innerHTML = `<button type="button" class="btn" data-act="${swapAct}" data-id="${esc(swapId)}"${canSwap ? "" : " disabled"} aria-pressed="${armed && ledgerPick === id ? "true" : "false"}">Swap</button><button type="button" class="btn" data-act="ledger-send" data-id="${esc(stable ? id : "")}"${canSend ? "" : " disabled"}${!canSend && stable ? ` aria-describedby="ldgFull"` : ""}>Send to Keep</button>`;
+  const quill = `<svg viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" d="M2 10.2 3.2 7C6.2 3.2 9.2 1.2 11 1c-.2 1.8-2.2 4.8-6 7.8L1.8 10l.2.2z"/></svg>`;
+  const crown = `<span class="ldg-seal"><svg viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" d="M1.2 8.2 2.2 3.6l2.6 2.2L6 2.2l1.2 3.6 2.6-2.2 1 4.6z"/></svg></span>`;
+  const cross = `<svg class="ldg-cross" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="#e8bd5f" stroke-width="1.7" stroke-linecap="square" d="M8 2.2v11.6M3.2 6.2h9.6"/></svg>`;
+  board.innerHTML = `${cross}<button type="button" class="btn" data-act="${swapAct}" data-id="${esc(swapId)}"${canSwap ? "" : " disabled"} aria-pressed="${armed && ledgerPick === id ? "true" : "false"}">${quill}Swap</button><button type="button" class="btn" data-act="ledger-send" data-id="${esc(stable ? id : "")}"${canSend ? "" : " disabled"}${!canSend && stable ? ` aria-describedby="ldgFull"` : ""}>${crown}Send to Keep</button>`;
 }
 /* Same width fit as the Keep painting: scale to the sheet width, and grow to its height when that would leave the page short. */
 function layoutLedger(){
