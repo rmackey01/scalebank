@@ -75,6 +75,8 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-pool.is-live::before{background:radial-gradient(ellipse at 50% 55%, rgba(220,248,255,.95), rgba(90,190,255,.55) 46%, transparent 74%)}
 /* Pens are percentages of the full 1008×1792 painting, inside the same fit as the art. */
 .keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.keep-fence{position:absolute;z-index:3;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
+.keep-plates{position:absolute;z-index:4;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .keep-pen{position:absolute}
 .keep-ground{position:absolute;left:6%;right:6%;bottom:0;height:36%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(216,169,75,.2),rgba(216,169,75,0) 72%)}
 .keep-stage:has(.keep-bg.is-ok) .keep-ground{display:none}
@@ -90,7 +92,7 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-pen[data-pen="hoard"] .pen-lock{left:78%;top:34%}
 .keep-pen.is-open .pen-lock{display:none}
 /* Cleared wing on the painting. The plaque sits in the middle of that box and leaves when the wing opens. */
-.keep-wing{position:absolute;z-index:3;pointer-events:none}
+.keep-wing{position:absolute;z-index:4;pointer-events:none}
 .keep-wing.is-open{display:none}
 .pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto;transition:none}
 .pen-shadow{position:absolute;z-index:1;left:50%;bottom:0;border-radius:50%;background:rgba(0,0,0,.5);filter:blur(3px);pointer-events:none;transform:translate(-50%,45%)}
@@ -705,6 +707,8 @@ button.dexchip{cursor:pointer}
       <div class="keep-fit" id="keepFit">
         <img class="keep-bg keep-art" alt="" draggable="false">
         <div class="keep-world" id="keepWorld"></div>
+        <img class="keep-fence keep-art" id="keepFence" alt="" draggable="false" hidden>
+        <div class="keep-plates" id="keepPlates"></div>
         <div class="keep-wing" id="keepWing"><p class="wing-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span></p></div>
         <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
         <button type="button" class="keep-spot keep-pool" data-act="keep-pool" aria-label="Moon Pool" hidden></button>
@@ -2268,12 +2272,84 @@ function keepArt(img, url){
   img.addEventListener("load", () => { if (img.naturalWidth) img.classList.add("is-ok"); });
   img.src = url;
 }
+/* art/keep/manifest.json can name a front fence per background. Anything unlisted uses fence-front.webp. */
+let fenceBook = null, fenceAsked = false;
+function fenceFile(value){
+  if (typeof value === "string" && value.trim()) return value.trim();
+  if (value && typeof value === "object" && typeof value.fence === "string" && value.fence.trim()) return value.fence.trim();
+  return "";
+}
+function readFenceBook(json){
+  const map = {};
+  if (!json || typeof json !== "object" || Array.isArray(json)) return map;
+  const put = (key, value) => {
+    const file = fenceFile(value);
+    const name = String(key || "").split("?")[0].split("/").pop();
+    if (name && file) map[name] = file;
+  };
+  if (json.fences && typeof json.fences === "object" && !Array.isArray(json.fences)) Object.keys(json.fences).forEach(k => put(k, json.fences[k]));
+  const bgs = json.backgrounds;
+  if (Array.isArray(bgs)) bgs.forEach(row => { if (row && row.file) put(row.file, row); });
+  else if (bgs && typeof bgs === "object") Object.keys(bgs).forEach(k => put(k, bgs[k]));
+  if (typeof json.fence === "string" && json.fence.trim()) map["*"] = json.fence.trim();
+  return map;
+}
+function fencePath(file){
+  if (!file) return "";
+  return file.indexOf("/") >= 0 ? file : "art/keep/" + file;
+}
+function fenceForBg(src){
+  const name = String(src || "").split("?")[0].split("/").pop();
+  const book = fenceBook || {};
+  return fencePath(book[name] || book["*"] || "fence-front.webp");
+}
+function syncKeepFence(src){
+  const img = $("#keepFence");
+  if (!img || fenceBook == null) return;
+  const url = fenceForBg(src);
+  if (!url || img.dataset.file === url) return;
+  img.dataset.file = url;
+  img.hidden = true;
+  img.classList.remove("is-ok");
+  img.removeAttribute("src");
+  const probe = new Image();
+  probe.onload = () => {
+    if (img.dataset.file !== url || !probe.naturalWidth) return;
+    img.src = url;
+    img.hidden = false;
+    img.classList.add("is-ok");
+  };
+  probe.onerror = () => {
+    if (img.dataset.file !== url) return;
+    img.hidden = true;
+    img.classList.remove("is-ok");
+    img.removeAttribute("src");
+  };
+  probe.src = url;
+}
+function loadFenceBook(){
+  if (!keepOn() || fenceAsked) return;
+  fenceAsked = true;
+  fetch("art/keep/manifest.json", {cache:"no-cache"}).then(r => r.ok ? r.json() : null).catch(() => null).then(json => {
+    fenceBook = readFenceBook(json);
+    const bg = $(".keep-bg");
+    syncKeepFence(bg ? bg.getAttribute("src") : "");
+  });
+}
 function mountKeepArt(){
   if (!keepOn()) return;
-  keepArt($(".keep-bg"), "art/keep/keep-v6.webp");
+  const bg = $(".keep-bg");
+  if (bg && !bg.dataset.fence){
+    bg.dataset.fence = "1";
+    const kick = () => syncKeepFence(bg.getAttribute("src"));
+    bg.addEventListener("load", kick);
+    bg.addEventListener("error", kick);
+  }
+  keepArt(bg, "art/keep/keep-v6.webp");
   keepArt($(".tab-keep .ti.off"), "art/keep/icon_keep_inactive.png");
   keepArt($(".tab-keep .ti.on"), "art/keep/icon_keep_active.png");
   loadSpriteBook();
+  loadFenceBook();
 }
 /* Feet boxes on the 1008×1792 painting. Snow drops every box 8px. */
 const PENS = [
@@ -2548,10 +2624,10 @@ function wingBox(){
 function wingLocked(){ return true; }
 const PEN_LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span>';
 function mountPenShell(){
-  const world = $("#keepWorld");
-  if (!world || world.dataset.shell) return;
-  world.dataset.shell = "1";
-  world.innerHTML = PENS.map(p => `<div class="keep-pen" data-pen="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%"><i class="keep-ground"></i><p class="pen-lock">${PEN_LOCK}</p></div>`).join("");
+  const plates = $("#keepPlates");
+  if (!plates || plates.dataset.shell) return;
+  plates.dataset.shell = "1";
+  plates.innerHTML = PENS.map(p => `<div class="keep-pen" data-pen="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%"><i class="keep-ground"></i><p class="pen-lock">${PEN_LOCK}</p></div>`).join("");
 }
 function penLimits(pen){
   const dy = penSnow() ? 8 * 100 / KEEP_H : 0;
@@ -2710,11 +2786,12 @@ function startPenLoop(){
 function syncPens(){
   if (!keepOn() || !S || S.tab !== "keep") return;
   const world = $("#keepWorld");
-  if (!world || !measureKeepWorld()) return;
+  const plates = $("#keepPlates");
+  if (!world || !plates || !measureKeepWorld()) return;
   mountPenShell();
   const open = yardsOpen(breedCount());
   PENS.forEach((p, i) => {
-    const el = world.querySelector('.keep-pen[data-pen="' + p.id + '"]');
+    const el = plates.querySelector('.keep-pen[data-pen="' + p.id + '"]');
     if (!el) return;
     const box = penLimits(p);
     el.style.left = box.x0 + "%";
