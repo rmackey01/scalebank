@@ -153,19 +153,21 @@ html.keep-open .tabs{position:relative;z-index:2}
 .ldg-title img{display:block;width:100%;height:auto}
 .ldg-sub{margin:0}
 .ldg-verse{margin:0;padding:2px 4px;border-radius:4px;border:1px solid #6e4a22;background:linear-gradient(180deg,#f6e2b8,#e4c07a);color:#342214;font-family:"IM Fell English",var(--display);font-style:italic;font-size:11px;line-height:1.2;text-align:center}
-.ldg-rule{position:relative;display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:580/26;margin:2px 0 1px}
+.ldg-sec{display:flex;flex-direction:column;align-items:stretch;gap:6px;min-height:min-content}
+.ldg-rule{position:relative;display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:580/26;margin:8px 0 6px;clear:both}
 .ldg-rule img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none}
 .ldg-rule span{position:relative;z-index:1;font-family:"IM Fell English",var(--display);font-weight:400;font-size:13px;line-height:1;color:#342214;white-space:nowrap}
-.ldg-roam-h{display:flex;align-items:flex-end;gap:4px;margin:0;font-family:"IM Fell English",var(--display);font-weight:400;font-size:14px;line-height:1;color:#342214}
+.ldg-roam-h{display:flex;flex-flow:row nowrap;align-items:center;gap:6px;width:100%;margin:0;font-family:"IM Fell English",var(--display);font-weight:400;font-size:14px;line-height:1;color:#342214}
 .ldg-roam-h b{font-family:"Cinzel",var(--display);font-weight:700;font-size:.86em}
-.ldg-drop{flex:none;display:flex;width:calc(82 / 597 * 100%)}
-.ldg-drop img{display:block;width:100%;height:auto}
-.ldg-grid{display:grid;margin:0;padding:0;list-style:none}
-/* 0.8 of the 176×231 Keep card is 141×185 on the 597-wide writing area. */
-.ldg-roam-grid{grid-template-columns:repeat(3,calc(141 / 597 * 100%));justify-content:center;column-gap:calc(11 / 597 * 100%);row-gap:calc(8 / 597 * 100%)}
+.ldg-roam-h > span:last-child{flex:1 1 auto;min-width:0;white-space:nowrap}
+.ldg-drop{flex:0 0 22px;width:22px;height:22px;display:block}
+.ldg-drop img{display:block;width:22px;height:22px;object-fit:contain}
+.ldg-grid{display:grid;width:100%;height:auto;margin:0;padding:0;list-style:none;align-items:start}
+/* 0.8 of the 176×231 Keep card is 141×185 on the 597-wide writing area. Rows grow with the cards. */
+.ldg-roam-grid{grid-template-columns:repeat(3,calc(141 / 597 * 100%));justify-content:center;column-gap:calc(11 / 597 * 100%);row-gap:6px;margin-bottom:8px}
 .ldg-stall-grid{grid-template-columns:repeat(4,calc(144 / 597 * 100%));justify-content:center;column-gap:calc(7 / 597 * 100%);row-gap:calc(10 / 597 * 100%)}
-.ldg-pcard,.ldg-stall{position:relative;display:block;width:100%;min-width:0;margin:0;padding:0;cursor:pointer;font:inherit;line-height:1;border:0;background-color:transparent;background-repeat:no-repeat;background-position:center;background-size:100% 100%;box-shadow:none;container-type:size}
-.ldg-pcard,.ldg-slot{aspect-ratio:141/185}
+.ldg-pcard,.ldg-stall{position:relative;display:block;width:100%;min-width:0;height:auto;margin:0;padding:0;cursor:pointer;font:inherit;line-height:1;border:0;background-color:transparent;background-repeat:no-repeat;background-position:center;background-size:100% 100%;box-shadow:none;align-self:start}
+.ldg-pcard,.ldg-slot{aspect-ratio:141/185;height:auto}
 .ldg-pcard{background-image:url("art/keep/ledger-ui/card-frame.webp");color:#342214}
 .ldg-stall{aspect-ratio:144/172;background-image:url("art/keep/ledger-ui/stall-frame.webp");color:#f0e4c8}
 .ldg-pcard.is-on,.ldg-stall.is-on{box-shadow:0 0 0 2px #f4d78f,0 0 10px 2px rgba(244,215,143,.95)}
@@ -174,8 +176,8 @@ html.keep-open .tabs{position:relative;z-index:2}
 .ldg-pcard .ldg-port{top:6%;width:82%;height:48%}
 .ldg-stall .ldg-port{top:5%;width:72%;height:46%}
 .ldg-name{position:absolute;left:6%;right:6%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:"IM Fell English",var(--display);font-weight:400;text-align:center;color:#342214}
-.ldg-pcard .ldg-name{top:70%;font-size:12cqh;line-height:1}
-.ldg-stall .ldg-name{top:70%;right:30%;font-size:11cqh;line-height:1;color:#f0e4c8;text-shadow:0 1px 0 #1a0e08}
+.ldg-pcard .ldg-name{top:70%;font-size:11px;line-height:1}
+.ldg-stall .ldg-name{top:70%;right:30%;font-size:8px;line-height:1;color:#f0e4c8;text-shadow:0 1px 0 #1a0e08}
 .ldg-star{position:absolute;left:50%;width:16%;height:auto;transform:translateX(-50%);pointer-events:none}
 .ldg-pcard .ldg-star{top:86%}
 .ldg-stall .ldg-star{top:86%;width:18%}
@@ -3647,11 +3649,20 @@ function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || nu
 const LEDGER_UI = "art/keep/ledger-ui";
 const LEDGER_STAR = `<img class="ldg-star" src="${LEDGER_UI}/star.webp" alt="">`;
 const LEDGER_STAGE = ["hatchling", "juvenile", "adult", "elder"];
+const LEDGER_BREEDS = ["cinder", "inferno", "voidling", "brine", "moss", "stormling", "tempest"];
 const LEDGER_SEAL = {Common:"brown", Uncommon:"green", Rare:"blue", Epic:"purple", Legendary:"gold"};
+/* Kit files are <breed>[-<mutation>]-<stage>. Moss's green base is moss-<stage>, not a mutation file. */
+function ledgerLine(d){
+  if (d && LEDGER_BREEDS.indexOf(d.line) >= 0) return d.line;
+  const egg = d && ITEM[d.item];
+  if (egg && LEDGER_BREEDS.indexOf(egg.line) >= 0) return egg.line;
+  return d && d.line || "";
+}
 function ledgerPortrait(d){
   const stage = LEDGER_STAGE[stageIdx(d)] || "hatchling";
-  const mut = d.mut && MUTATIONS[d.mut] ? d.mut + "-" : "";
-  return `${LEDGER_UI}/portraits/${d.line}-${mut}${stage}.webp`;
+  const line = ledgerLine(d);
+  const mut = line !== "moss" && d.mut && MUTATIONS[d.mut] ? d.mut + "-" : "";
+  return `${LEDGER_UI}/portraits/${line}-${mut}${stage}.webp`;
 }
 function ledgerCard(id, kind){
   const d = ledgerDragon(id); if (!d) return "";
