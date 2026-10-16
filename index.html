@@ -2985,7 +2985,17 @@ function readSlotMap(json){
     if (!s || typeof s !== "object") return;
     const x = +s.x, y = +s.y, w = +s.w, h = +s.h, drawOrder = +s.drawOrder;
     if (![x, y, w, h, drawOrder].every(Number.isFinite) || w <= 0 || h <= 0) return;
-    slots[line] = {pen: typeof s.pen === "string" ? s.pen : "", x, y, w, h, feetY: Number.isFinite(+s.feetY) ? +s.feetY : y + h, drawOrder};
+    const stages = {};
+    if (s.stages && typeof s.stages === "object" && !Array.isArray(s.stages)){
+      Object.keys(s.stages).forEach(name => {
+        const row = s.stages[name];
+        if (!row || typeof row !== "object" || typeof row.file !== "string" || !row.file) return;
+        const sx = +row.x, sy = +row.y, sw = +row.w, sh = +row.h;
+        if (![sx, sy, sw, sh].every(Number.isFinite) || sw <= 0 || sh <= 0) return;
+        stages[name] = {file: row.file, x: sx, y: sy, w: sw, h: sh, feetY: Number.isFinite(+row.feetY) ? +row.feetY : sy + sh};
+      });
+    }
+    slots[line] = {pen: typeof s.pen === "string" ? s.pen : "", x, y, w, h, feetY: Number.isFinite(+s.feetY) ? +s.feetY : y + h, drawOrder, stages};
     n++;
   });
   if (!n) return null;
@@ -3076,18 +3086,27 @@ function slotSrc(line, d){
   askSlot(url);
   return {src: "pend", fitted};
 }
+function stageBox(slot, d){
+  if (!slot || !slot.stages || !d) return null;
+  const name = STAGES[stageIdx(d)].name.toLowerCase();
+  const row = slot.stages[name];
+  return row && row.file ? row : null;
+}
 function placeSlot(el, slot, d, fitted){
-  const grow = fitted ? (SLOT_STAGE[stageIdx(d)] || 1) : 1;
-  const w = slot.w * grow;
-  const h = slot.h * grow;
-  const feet = Number.isFinite(+slot.feetY) ? +slot.feetY : slot.y + slot.h;
-  const x = slot.x + (slot.w - w) / 2;
-  const y = feet - h;
+  const listed = stageBox(slot, d);
+  const useMap = !!(listed && !fitted);
+  const box = useMap ? listed : slot;
+  const grow = useMap || !fitted ? 1 : (SLOT_STAGE[stageIdx(d)] || 1);
+  const w = box.w * grow;
+  const h = box.h * grow;
+  const feet = Number.isFinite(+box.feetY) ? +box.feetY : box.y + box.h;
+  const x = useMap ? box.x : box.x + (box.w - w) / 2;
+  const y = useMap ? box.y : feet - h;
   el.style.left = (x / KEEP_W * 100) + "%";
   el.style.top = (y / KEEP_H * 100) + "%";
   el.style.width = (w / KEEP_W * 100) + "%";
   el.style.height = (h / KEEP_H * 100) + "%";
-  el.dataset.scale = String(grow);
+  el.dataset.scale = listed && !fitted ? "map" : String(grow);
 }
 function applySlotTint(variant){
   const row = slotMap && slotMap.tint && slotMap.tint[variant];
