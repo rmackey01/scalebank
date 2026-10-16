@@ -3649,20 +3649,11 @@ function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || nu
 const LEDGER_UI = "art/keep/ledger-ui";
 const LEDGER_STAR = `<img class="ldg-star" src="${LEDGER_UI}/star.webp" alt="">`;
 const LEDGER_STAGE = ["hatchling", "juvenile", "adult", "elder"];
-const LEDGER_BREEDS = ["cinder", "inferno", "voidling", "brine", "moss", "stormling", "tempest"];
 const LEDGER_SEAL = {Common:"brown", Uncommon:"green", Rare:"blue", Epic:"purple", Legendary:"gold"};
-/* Kit files are <breed>[-<mutation>]-<stage>. Moss's green base is moss-<stage>, not a mutation file. */
-function ledgerLine(d){
-  if (d && LEDGER_BREEDS.indexOf(d.line) >= 0) return d.line;
-  const egg = d && ITEM[d.item];
-  if (egg && LEDGER_BREEDS.indexOf(egg.line) >= 0) return egg.line;
-  return d && d.line || "";
-}
 function ledgerPortrait(d){
   const stage = LEDGER_STAGE[stageIdx(d)] || "hatchling";
-  const line = ledgerLine(d);
-  const mut = line !== "moss" && d.mut && MUTATIONS[d.mut] ? d.mut + "-" : "";
-  return `${LEDGER_UI}/portraits/${line}-${mut}${stage}.webp`;
+  const mut = d.mut && MUTATIONS[d.mut] ? d.mut + "-" : "";
+  return `${LEDGER_UI}/portraits/${d.line}-${mut}${stage}.webp`;
 }
 function ledgerCard(id, kind){
   const d = ledgerDragon(id); if (!d) return "";
