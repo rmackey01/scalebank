@@ -133,16 +133,16 @@ html.keep-open .tabs{position:relative;z-index:2}
 .pen-sprite svg{display:none;width:100%;height:100%}
 .pen-sprite.is-ph svg{display:block}
 .ledger{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
-.ledger-sheet{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--gold-lo);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,#2a241c,#14110e)}
-.ledger-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;pointer-events:none}
-.ledger-body{position:relative;z-index:1;flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:8px 10px 6px;background:linear-gradient(180deg,rgba(20,17,14,.84),rgba(12,10,8,.62) 30%,rgba(12,10,8,.8))}
+.ledger-sheet{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--gold-lo);border-radius:16px;overflow:hidden;background:radial-gradient(90% 42% at 50% 0%,rgba(216,169,75,.16),transparent 62%),linear-gradient(180deg,#2c261e,#14110e);box-shadow:inset 0 0 0 1px rgba(240,213,154,.14)}
+.ledger-body{position:relative;flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;padding:12px 12px 10px;background:transparent}
 .ledger-body h2{margin:0;text-align:center;font-family:var(--display);font-weight:600;font-size:22px;line-height:1.05;color:var(--gold-hi)}
+.ldg-verse{margin:0;padding:8px 10px;border-radius:12px;border:1px solid var(--gold-lo);background:rgba(20,16,12,.55);color:var(--fg);font-size:13px;line-height:1.35}
 .ldg-swap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:0;text-align:center;color:var(--gold-hi);font-size:12px}
 .ldg-swap .btn{min-width:0;padding:4px 8px;font-size:11px}
 .ldg-sec{min-width:0}
 .ldg-sec h3{margin:0 0 2px;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.15;color:var(--fg)}
-.ldg-stables-sec{flex:1;min-height:0;display:flex;flex-direction:column}
-.ldg-stables{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.ldg-stables-sec{flex:none;min-height:0}
+.ldg-stables{min-height:0}
 .ldg-list{list-style:none;margin:0;padding:0}
 .ldg-empty{margin:0 0 6px;color:var(--muted);font-size:13px}
 .ldg-row{display:grid;grid-template-columns:32px minmax(0,1fr);column-gap:6px;row-gap:1px;align-items:center;padding:3px 2px;border-bottom:1px solid rgba(216,169,75,.22)}
@@ -797,7 +797,6 @@ button.dexchip{cursor:pointer}
   <div class="overlay" id="ledgerOv" hidden>
     <div class="ledger" role="dialog" aria-modal="true" aria-label="Keeper's Ledger">
       <div class="ledger-sheet">
-        <img class="ledger-bg keep-art" alt="">
         <div class="ledger-body" id="ledgerBody"></div>
       </div>
       <button type="button" class="btn" data-act="close-ledger">Close</button>
@@ -3616,17 +3615,24 @@ function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || nu
 function ledgerRow(id, kind){
   const d = ledgerDragon(id); if (!d) return "";
   const picked = ledgerPick === id;
-  const full = S.keep.roaming.length >= 6;
+  const keep = normKeep(S.keep);
+  const blocked = kind !== "roam" && keepFullFor(keep, id);
   let acts;
   const care = `<button type="button" class="btn ghost" data-act="ledger-care" data-id="${esc(id)}">Care</button>`;
   if (kind === "roam"){
     acts = `<button type="button" class="btn ghost" data-act="ledger-rest" data-id="${esc(id)}">Rest</button><button type="button" class="btn ghost" data-act="ledger-swap" data-id="${esc(id)}" aria-pressed="${picked ? "true" : "false"}">Swap</button>${care}`;
   } else {
-    const send = `<button type="button" class="btn" data-act="ledger-send" data-id="${esc(id)}"${full ? ` disabled aria-describedby="ldgFull"` : ""}>Send to Keep</button>`;
+    const send = `<button type="button" class="btn" data-act="ledger-send" data-id="${esc(id)}"${blocked ? ` disabled aria-describedby="ldgFull"` : ""}>Send to Keep</button>`;
     const swap = ledgerPick ? `<button type="button" class="btn" data-act="ledger-swap-do" data-id="${esc(id)}">Swap</button>` : "";
     acts = send + swap + care;
   }
   return `<li class="ldg-row${picked ? " is-pick" : ""}"><div class="ldg-art">${dragonArt(d)}</div><div class="ldg-who"><button type="button" class="ldg-name" data-act="ledger-dragon" data-id="${esc(id)}">${esc(d.name || d.species)}</button><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div></div><div class="ldg-acts">${acts}</div></li>`;
+}
+function ledgerVerseCard(){
+  if (!verseOn()) return "";
+  const viewed = prepareHome(streakBag());
+  const rest = viewed.weekday === restDayNum();
+  return `<p class="ldg-verse">${esc(blessingLine(rest, viewed.day))}</p>`;
 }
 function renderLedger(){
   const body = $("#ledgerBody");
@@ -3634,15 +3640,16 @@ function renderLedger(){
   const keep = normKeep(S.keep);
   if (ledgerPick && keep.roaming.indexOf(ledgerPick) < 0) ledgerPick = null;
   const pick = ledgerPick && ledgerDragon(ledgerPick);
-  const full = keep.roaming.length >= 6;
+  const noRoom = keep.roaming.length >= keepCap() && keep.stables.length > 0 && keep.stables.every(id => keepFullFor(keep, id));
   const roamRows = keep.roaming.map(id => ledgerRow(id, "roam")).join("");
   const stabRows = keep.stables.map(id => ledgerRow(id, "stab")).join("");
   const opt = (act, label, on) => `<button type="button" class="ldg-opt" data-act="${act}" role="switch" aria-pressed="${on ? "true" : "false"}"><span>${label}</span><i aria-hidden="true"></i></button>`;
   body.innerHTML = `<h2>Keeper's Ledger</h2>
     <div class="ldg-opts">${opt("ledger-verse", "Morning Blessing", verseOn())}${opt("ledger-weather", "Live weather", weatherOn())}</div>
+    ${ledgerVerseCard()}
     ${pick ? `<p class="ldg-swap" role="status">Pick a dragon in the stables to swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
-    <section class="ldg-sec ldg-roam"><h3>Roaming in the Keep (${keep.roaming.length}/6)</h3>${roamRows ? `<ul class="ldg-list">${roamRows}</ul>` : `<p class="ldg-empty">No one is roaming.</p>`}</section>
-    <section class="ldg-sec ldg-stables-sec"><h3>Resting in the Stables (${keep.stables.length})</h3>${full ? `<p class="ldg-hint" id="ldgFull">Keep is full, swap instead</p>` : ""}<div class="ldg-stables">${stabRows ? `<ul class="ldg-list">${stabRows}</ul>` : `<p class="ldg-empty">The stables are empty.</p>`}</div></section>`;
+    <section class="ldg-sec ldg-roam"><h3>Roaming in the Keep (${keep.roaming.length}/${keepCap()})</h3>${roamRows ? `<ul class="ldg-list">${roamRows}</ul>` : `<p class="ldg-empty">No one is roaming.</p>`}</section>
+    <section class="ldg-sec ldg-stables-sec"><h3>Resting in the Stables (${keep.stables.length})</h3>${noRoom ? `<p class="ldg-hint" id="ldgFull">Keep is full</p>` : ""}<div class="ldg-stables">${stabRows ? `<ul class="ldg-list">${stabRows}</ul>` : `<p class="ldg-empty">The stables are empty.</p>`}</div></section>`;
   syncPens();
 }
 function openLedgerDragon(id){
@@ -3655,7 +3662,8 @@ function openLedger(){
   const ov = $("#ledgerOv");
   const prev = document.activeElement;
   ledgerReturn = prev && prev !== document.body ? prev : $(".keep-ledger");
-  keepArt(ov.querySelector(".ledger-bg"), "art/keep/ledger-v3.webp");
+  const note = $("#toast");
+  if (note) note.classList.remove("show");
   renderLedger();
   ov.hidden = false;
   const first = focusables(ov)[0];
@@ -3771,7 +3779,7 @@ function migrateV3(){
     if (!e.n) e.n = S.dragons.filter(x => x && dexKeys(x).includes(k)).length;
     e.top = Math.max(e.top | 0, stageIdx(d)); });
 }
-/* Dragon Keep. Highest stage, then highest rarity, then id. Each id once: six roaming, the rest stabled. */
+/* Dragon Keep. Highest stage, then highest rarity, then id. One roaming dragon per breed. */
 const RARITY_RANK = {Common:0, Uncommon:1, Rare:2, Epic:3, Legendary:4};
 function dragonKey(d){ return d && typeof d === "object" ? idKey(d.id) : null; }
 function rarityRank(d){
@@ -3802,9 +3810,14 @@ function migrateV4(){
         if (a.id > b.id) return 1;
         return a.i - b.i;
       });
-      const ids = owned.map(o => o.id);
-      keep.roaming = ids.slice(0, 6);
-      keep.stables = ids.slice(6);
+      const roaming = [], stables = [], seen = new Set();
+      owned.forEach(o => {
+        const line = o.d && o.d.line ? o.d.line : "";
+        if (line && !seen.has(line) && roaming.length < keepCap()){ seen.add(line); roaming.push(o.id); }
+        else stables.push(o.id);
+      });
+      keep.roaming = roaming;
+      keep.stables = stables;
       keep.zones = [];
       keep.care = {};
       keep.streak = {last:null, count:0, best:0};
@@ -3825,7 +3838,25 @@ function backupCorrupt(raw){
     if (cur == null || cur === "") localStorage.setItem(CORRUPT_KEY, raw);
   } catch(e){}
 }
-/* Owned dragon ids live in roaming (up to 6) or stables, each id once. Existing order stays. */
+function keepCap(){ return DEX_LINES.length; }
+function lineOfId(id){
+  const d = asList(S && S.dragons).find(d => dragonKey(d) === id);
+  return d && typeof d.line === "string" ? d.line : "";
+}
+function keepHasBreed(keep, line){
+  return !!(line && keep && keep.roaming.some(id => lineOfId(id) === line));
+}
+function keepFullFor(keep, id){
+  const line = lineOfId(id);
+  if (keepHasBreed(keep, line)) return false;
+  return keep.roaming.length >= keepCap();
+}
+function pinBreed(keep, line, id){
+  if (!line || id == null) return;
+  if (!keep.shown || typeof keep.shown !== "object" || Array.isArray(keep.shown)) keep.shown = {};
+  keep.shown[line] = id;
+}
+/* Owned dragon ids live in roaming or stables, each id once, and one breed in the Keep. Existing order stays. */
 function reconcileKeep(){
   try {
     const keep = normKeep(S.keep);
@@ -3840,18 +3871,25 @@ function reconcileKeep(){
     const roaming = [];
     const stables = [];
     const placed = new Set();
-    const take = (id, list) => {
+    const seen = new Set();
+    const takeRoam = id => {
+      if (!ownedSet.has(id) || placed.has(id) || roaming.length >= keepCap()) return false;
+      const line = lineOfId(id);
+      if (line && seen.has(line)) return false;
+      placed.add(id);
+      if (line) seen.add(line);
+      roaming.push(id);
+      return true;
+    };
+    keep.roaming.forEach(takeRoam);
+    keep.stables.forEach(id => {
       if (!ownedSet.has(id) || placed.has(id)) return;
       placed.add(id);
-      list.push(id);
-    };
-    keep.roaming.forEach(id => take(id, roaming));
-    keep.stables.forEach(id => take(id, stables));
+      stables.push(id);
+    });
     owned.forEach(id => {
       if (placed.has(id)) return;
-      placed.add(id);
-      if (roaming.length < 6) roaming.push(id);
-      else stables.push(id);
+      if (!takeRoam(id)){ placed.add(id); stables.push(id); }
     });
     keep.roaming = roaming;
     keep.stables = stables;
@@ -3860,7 +3898,7 @@ function reconcileKeep(){
     if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
   }
 }
-/* One write for a keep move. save() reconciles, so the two lists stay a partition of owned ids, roaming at most 6. */
+/* One write for a keep move. save() reconciles, so the lists stay a partition of owned ids, one breed in the Keep. */
 function moveKeep(op, id, other){
   const a = idKey(id), b = idKey(other);
   const keep = normKeep(S.keep);
@@ -3869,12 +3907,31 @@ function moveKeep(op, id, other){
   asList(S.dragons).forEach(d => { const k = dragonKey(d); if (k != null) owned.add(k); });
   const has = (list, k) => k != null && list.indexOf(k) >= 0;
   let nextR = roaming, nextS = stables, ok = false;
-  if (op === "send" && has(stables, a) && !has(roaming, a) && owned.has(a) && roaming.length < 6){
-    nextS = stables.filter(k => k !== a); nextR = roaming.concat(a); ok = true;
+  if (op === "send" && has(stables, a) && !has(roaming, a) && owned.has(a)){
+    const line = lineOfId(a);
+    const occupant = roaming.find(k => lineOfId(k) === line);
+    if (occupant){
+      nextR = roaming.map(k => k === occupant ? a : k);
+      nextS = stables.filter(k => k !== a).concat(occupant);
+      pinBreed(keep, line, a);
+      ok = true;
+    } else if (roaming.length < keepCap()){
+      nextS = stables.filter(k => k !== a);
+      nextR = roaming.concat(a);
+      pinBreed(keep, line, a);
+      ok = true;
+    }
   } else if (op === "rest" && has(roaming, a) && !has(stables, a) && owned.has(a)){
     nextR = roaming.filter(k => k !== a); nextS = stables.concat(a); ok = true;
   } else if (op === "swap" && a !== b && has(roaming, a) && !has(stables, a) && has(stables, b) && !has(roaming, b) && owned.has(a) && owned.has(b)){
-    nextR = roaming.map(k => k === a ? b : k); nextS = stables.map(k => k === b ? a : k); ok = true;
+    const lineB = lineOfId(b);
+    const otherBreed = roaming.find(k => k !== a && lineOfId(k) === lineB);
+    if (!otherBreed){
+      nextR = roaming.map(k => k === a ? b : k);
+      nextS = stables.map(k => k === b ? a : k);
+      pinBreed(keep, lineB, b);
+      ok = true;
+    }
   }
   if (!ok) return false;
   keep.roaming = nextR; keep.stables = nextS; S.keep = keep;
