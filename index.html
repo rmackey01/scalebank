@@ -1854,6 +1854,19 @@ function rollMutation(it){
 /* Eggs hatch the moment they're ready, on whatever screen is open. If several come due at once
    they play one after another; "Meet your dragon" waits until the last one. */
 const HQ = []; let hatchGo = null;
+let hatchTimers = [];
+function clearHatchTimers(){
+  hatchTimers.forEach(h => h.raf ? cancelAnimationFrame(h.id) : clearTimeout(h.id));
+  hatchTimers = [];
+}
+function hatchLater(fn, ms){
+  const id = setTimeout(() => { hatchTimers = hatchTimers.filter(h => h.id !== id); fn(); }, ms);
+  hatchTimers.push({id});
+}
+function hatchFrame(fn){
+  const id = requestAnimationFrame(() => { hatchTimers = hatchTimers.filter(h => h.id !== id); fn(); });
+  hatchTimers.push({id, raf:true});
+}
 function autoHatch(){
   S.eggs.filter(eggReady).forEach(e => { if (!HQ.includes(e.id)) HQ.push(e.id); });
   if ($("#hatchOv").hidden && $("#shareOv").hidden && $("#dexOv").hidden) nextHatch();
@@ -1862,8 +1875,9 @@ function nextHatch(){
   while (HQ.length){ const id = HQ.shift(); if (S.eggs.some(e => e.id === id)){ hatch(id); return; } }
 }
 function closeHatch(){
+  clearHatchTimers();
   $("#hatchOv").hidden = true; $("#hatchOv").innerHTML = "";
-  if (HQ.length){ render(); setTimeout(nextHatch, 350); return; }
+  if (HQ.length){ render(); hatchLater(nextHatch, 350); return; }
   const go = hatchGo; hatchGo = null;
   if (go) setTab(go); else render();
 }
@@ -1878,6 +1892,7 @@ function hatch(eggId){
   const toPrize = !S.prize;
   if (toPrize){ S.prize = d.id; hatchGo = "dragon"; }
   save();
+  clearHatchTimers();
   const more = HQ.filter(id => S.eggs.some(e => e.id === id)).length;
   const ov = $("#hatchOv");
   ov.innerHTML = `<div class="hatch" role="dialog" aria-modal="true" aria-label="Egg hatching">
@@ -1894,11 +1909,13 @@ function hatch(eggId){
         <button class="btn" data-act="close-hatch">${more ? `Next egg (${more} more)` : hatchGo ? "Meet your dragon" : "Done"}</button></div>
     </div>`;
   ov.hidden = false;
-  const st = $("#hstage");
-  requestAnimationFrame(() => st.classList.add("wobble"));
-  setTimeout(() => st.classList.add("cracked"), 900);
-  setTimeout(() => st.classList.add("burst"), 1350);
-  setTimeout(() => { $("#hafter").classList.add("show"); ov.querySelector("[data-act=close-hatch]").focus(); }, 1950);
+  hatchFrame(() => { const st = $("#hstage"); if (st) st.classList.add("wobble"); });
+  hatchLater(() => { const st = $("#hstage"); if (st) st.classList.add("cracked"); }, 900);
+  hatchLater(() => { const st = $("#hstage"); if (st) st.classList.add("burst"); }, 1350);
+  hatchLater(() => {
+    const after = $("#hafter"); if (after) after.classList.add("show");
+    const btn = ov.querySelector("[data-act=close-hatch]"); if (btn) btn.focus();
+  }, 1950);
 }
 function openShare(){
   const d = prizeDragon(); if (!d) return;
