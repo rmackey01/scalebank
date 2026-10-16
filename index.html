@@ -94,10 +94,10 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-forge.is-live::before{background:radial-gradient(ellipse at 50% 42%, rgba(255,226,160,.95), rgba(255,150,40,.5) 42%, transparent 72%)}
 .keep-pool.is-live::before{background:radial-gradient(ellipse at 50% 55%, rgba(220,248,255,.95), rgba(90,190,255,.55) 46%, transparent 74%)}
 /* Weather sits on the stage, above the tab bar, and does not pan with the painting. */
-.keep-weather{position:absolute;z-index:6;left:12px;bottom:36px;max-width:calc(100% - 24px);padding:6px 10px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.9);color:var(--gold-hi);font-size:12px;font-weight:700;letter-spacing:.02em;pointer-events:auto}
+.keep-weather{position:absolute;z-index:6;left:8px;bottom:calc(var(--keep-tab,16px) + 8px);max-width:calc(100% - 108px);padding:6px 10px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.9);color:var(--gold-hi);font-size:12px;font-weight:700;letter-spacing:.02em;pointer-events:auto}
 .keep-weather[aria-pressed="true"]{border-color:var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206}
 .keep-weather:active{transform:translateY(1px)}
-.keep-credit{position:absolute;z-index:6;left:12px;bottom:10px;margin:0;font-size:10px;line-height:1.2;letter-spacing:.04em;color:var(--muted);text-decoration:none;pointer-events:auto}
+.keep-credit{position:absolute;z-index:6;left:8px;bottom:calc(var(--keep-tab,16px) + 42px);margin:0;font-size:10px;line-height:1.2;letter-spacing:.04em;color:var(--muted);text-decoration:none;pointer-events:auto}
 /* Pens are percentages of the full 1008×1792 painting, inside the same fit as the art. */
 .keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .keep-fence{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
@@ -750,9 +750,9 @@ button.dexchip{cursor:pointer}
       </div>
       </div>
       </div>
-      <button type="button" class="keep-weather" data-act="keep-weather" aria-pressed="false">Show my weather</button>
-      <a class="keep-credit" id="keepCredit" href="https://open-meteo.com/" hidden>Weather by Open-Meteo</a>
     </div>
+    <button type="button" class="keep-weather" data-act="keep-weather" aria-pressed="false">Show my weather</button>
+    <a class="keep-credit" id="keepCredit" href="https://open-meteo.com/" hidden>Weather by Open-Meteo</a>
     <button type="button" class="keep-build" data-act="keep-build">Build</button>
   </main>
 
@@ -2354,7 +2354,7 @@ const WEATHER_CODE = {
   71:"snow", 73:"snow", 75:"snow", 77:"snow", 85:"snow", 86:"snow",
   95:"storm", 96:"storm", 99:"storm"
 };
-const WEATHER_SKY = {clear:"sunny", cloudy:"overcast", rain:"rain", snow:"snow", storm:"storm", fog:"fog", night:"night"};
+const WEATHER_SKY = {clear:"sunny", cloudy:"overcast", rain:"rain", snow:"snow", storm:"storm", fog:"fog"};
 let skyKind = "";
 let weatherDenied = false;
 let weatherBusy = false;
@@ -2470,21 +2470,26 @@ function skySrcIs(img, file){
   const cur = (img && img.getAttribute("src")) || "";
   return cur === file || cur.endsWith("/" + file);
 }
+function markSky(img){
+  if (img && img.naturalWidth) img.classList.add("is-ok");
+}
 function paintKeepSky(kind){
   const img = $(".keep-bg");
   if (!img || !keepOn()) return;
   let next = keepSkyFile(kind, weatherOn());
   if (next !== "art/keep/keep-v6.webp" && skyFailed.has(next)) next = "art/keep/keep-v6.webp";
-  if (skySrcIs(img, next)) return;
+  if (skySrcIs(img, next)){ markSky(img); return; }
   const asked = next;
   img.classList.remove("is-ok");
+  img.onload = () => { markSky(img); };
   img.onerror = () => {
     img.onerror = null;
     if (asked !== "art/keep/keep-v6.webp") skyFailed.add(asked);
-    if (skySrcIs(img, "art/keep/keep-v6.webp")) return;
+    if (skySrcIs(img, "art/keep/keep-v6.webp")){ markSky(img); return; }
     img.src = "art/keep/keep-v6.webp";
   };
   img.src = next;
+  if (img.complete) markSky(img);
 }
 function toggleWeather(){
   if (!keepOn() || !S) return;

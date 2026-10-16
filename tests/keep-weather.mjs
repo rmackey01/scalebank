@@ -45,6 +45,8 @@ add("mapping", t => {
   t.equal(rain.sky, "art/keep/keep-weather-rain.webp", "a reading names the sky file");
   t.equal(g.weatherSky("clear"), "art/keep/keep-weather-sunny.webp", "clear uses the sunny painting");
   t.equal(g.weatherSky("cloudy"), "art/keep/keep-weather-overcast.webp", "cloudy uses the overcast painting");
+  t.equal(g.weatherSky("night"), null, "night names no file");
+  t.equal(g.keepSkyFile("night", true), "art/keep/keep-v6.webp", "night keeps the plain painting");
   t.equal(rain.huddle, true, "night rain still huddles");
   t.equal(g.weatherResult(null), null, "a missing body is not a sky");
   t.equal(g.weatherResult({}), null, "an empty body is not a sky");
