@@ -1,0 +1,118 @@
+{
+ "tint": {
+  "v6": [
+   1,
+   1,
+   1,
+   1
+  ],
+  "rain": [
+   0.82,
+   0.88,
+   1.0,
+   0.85
+  ],
+  "snow": [
+   0.9,
+   0.95,
+   1.08,
+   0.92
+  ],
+  "fog": [
+   0.92,
+   0.94,
+   0.97,
+   0.88
+  ],
+  "storm": [
+   0.68,
+   0.72,
+   0.9,
+   0.72
+  ],
+  "sunny": [
+   1.08,
+   1.02,
+   0.9,
+   1.06
+  ],
+  "overcast": [
+   0.92,
+   0.95,
+   1.0,
+   0.88
+  ]
+ },
+ "tint_note": "per weather variant: multiply sprite RGB by [r,g,b] then by brightness (alpha unchanged). Applies to all slot sprites.",
+ "image_size": [
+  1008,
+  1792
+ ],
+ "variant": "keep-v6 (all weathers aligned)",
+ "note": "Draw back to front by drawOrder; after each pen's dragons draw fence-front-<variant>-<pen>.webp. x,y = top-left in background px.",
+ "slots": {
+  "cinder": {
+   "pen": "ember",
+   "x": 38,
+   "y": 952,
+   "w": 204,
+   "h": 120,
+   "feetY": 1072,
+   "drawOrder": 1
+  },
+  "brine": {
+   "pen": "azure",
+   "x": 106,
+   "y": 1251,
+   "w": 228,
+   "h": 159,
+   "feetY": 1410,
+   "drawOrder": 5
+  },
+  "voidling": {
+   "pen": "violet",
+   "x": 383,
+   "y": 1082,
+   "w": 255,
+   "h": 108,
+   "feetY": 1190,
+   "drawOrder": 3
+  },
+  "inferno": {
+   "pen": "ember",
+   "x": 198,
+   "y": 1016,
+   "w": 189,
+   "h": 84,
+   "feetY": 1100,
+   "drawOrder": 2
+  },
+  "moss": {
+   "pen": "pond",
+   "x": 408,
+   "y": 1400,
+   "w": 234,
+   "h": 105,
+   "feetY": 1505,
+   "drawOrder": 7
+  },
+  "stormling": {
+   "pen": "violet",
+   "x": 303,
+   "y": 1125,
+   "w": 150,
+   "h": 141,
+   "feetY": 1266,
+   "drawOrder": 4
+  },
+  "tempest": {
+   "pen": "azure",
+   "x": 363,
+   "y": 1292,
+   "w": 264,
+   "h": 120,
+   "feetY": 1412,
+   "drawOrder": 6
+  }
+ }
+}
