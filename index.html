@@ -2354,7 +2354,7 @@ const WEATHER_CODE = {
   71:"snow", 73:"snow", 75:"snow", 77:"snow", 85:"snow", 86:"snow",
   95:"storm", 96:"storm", 99:"storm"
 };
-const WEATHER_SKY = {clear:1, cloudy:1, rain:1, snow:1, storm:1, fog:1, night:1};
+const WEATHER_SKY = {clear:"sunny", cloudy:"overcast", rain:"rain", snow:"snow", storm:"storm", fog:"fog", night:"night"};
 let skyKind = "";
 let weatherDenied = false;
 let weatherBusy = false;
@@ -2377,7 +2377,7 @@ function weatherKind(code, isDay){
 }
 function weatherHuddle(kind){ return kind === "rain" || kind === "snow" || kind === "storm"; }
 function weatherSky(kind){
-  return WEATHER_SKY[kind] ? "art/keep/keep-weather-" + kind + ".webp" : null;
+  return WEATHER_SKY[kind] ? "art/keep/keep-weather-" + WEATHER_SKY[kind] + ".webp" : null;
 }
 function keepSkyFile(kind, enabled){
   if (!enabled) return "art/keep/keep-v6.webp";

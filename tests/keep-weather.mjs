@@ -43,6 +43,8 @@ add("mapping", t => {
   const rain = g.weatherResult({current:{weather_code:63, is_day:0}});
   t.equal(rain.kind, "rain", "a reading maps the code");
   t.equal(rain.sky, "art/keep/keep-weather-rain.webp", "a reading names the sky file");
+  t.equal(g.weatherSky("clear"), "art/keep/keep-weather-sunny.webp", "clear uses the sunny painting");
+  t.equal(g.weatherSky("cloudy"), "art/keep/keep-weather-overcast.webp", "cloudy uses the overcast painting");
   t.equal(rain.huddle, true, "night rain still huddles");
   t.equal(g.weatherResult(null), null, "a missing body is not a sky");
   t.equal(g.weatherResult({}), null, "an empty body is not a sky");
