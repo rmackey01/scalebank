@@ -951,6 +951,7 @@ function normKeep(k){
     if (typeof s.seen === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.seen)) base.streak.seen = s.seen;
     if (Number.isInteger(s.tz) && s.tz >= -16 * 60 && s.tz <= 16 * 60) base.streak.tz = s.tz;
     if (Number.isInteger(s.homeTz) && s.homeTz >= -16 * 60 && s.homeTz <= 16 * 60) base.streak.homeTz = s.homeTz;
+    if (typeof s.homeZone === "string" && s.homeZone) base.streak.homeZone = s.homeZone;
   }
   if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
   return base;
@@ -2908,9 +2909,10 @@ function moveKeep(op, id, other){
   return true;
 }
 /* One clock for care. Tests replace it with setCareClock; today() and now() both read it. */
-let careClock = null, zoneFn = null;
+let careClock = null, zoneFn = null, zoneNameFn = null;
 function setCareClock(fn){ careClock = typeof fn === "function" ? fn : null; }
 function setZoneOffset(fn){ zoneFn = typeof fn === "function" ? fn : null; }
+function setTimeZone(fn){ zoneNameFn = typeof fn === "function" ? fn : null; }
 function now(){ return careClock ? careClock() : Date.now(); }
 function zoneOffset(ms){
   if (zoneFn){
@@ -2925,17 +2927,57 @@ function ymdAt(ms, off){
 }
 function today(){ const ms = now(); return ymdAt(ms, zoneOffset(ms)); }
 function validOffset(n){ return Number.isInteger(n) && n >= -16 * 60 && n <= 16 * 60; }
-/* homeTz is fixed on first play. Later device zones are ignored. */
-function ensureHomeTz(streak, ms){
-  if (validOffset(streak.homeTz)) return {off: streak.homeTz, fresh: false};
-  const off = validOffset(streak.tz) ? streak.tz : zoneOffset(ms);
-  streak.homeTz = off;
-  return {off, fresh: true};
+function deviceZone(){
+  try {
+    if (typeof zoneNameFn === "function"){
+      const z = zoneNameFn();
+      if (typeof z === "string" && z) return z;
+    }
+    const z = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return typeof z === "string" ? z : "";
+  } catch (e) {
+    return "";
+  }
+}
+const WEEKDAY = {Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6};
+function zonedStamp(ms, timeZone){
+  try {
+    if (typeof timeZone !== "string" || !timeZone) throw new Error("zone");
+    const dateFmt = new Intl.DateTimeFormat("en-CA", {timeZone: timeZone, year: "numeric", month: "2-digit", day: "2-digit"});
+    const weekFmt = new Intl.DateTimeFormat("en-US", {timeZone: timeZone, weekday: "short"});
+    const parts = {};
+    dateFmt.formatToParts(new Date(ms)).forEach(p => { if (p.type !== "literal") parts[p.type] = p.value; });
+    const day = parts.year + "-" + parts.month + "-" + parts.day;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new Error("day");
+    const weekday = WEEKDAY[String(weekFmt.format(new Date(ms))).slice(0, 3)];
+    if (weekday == null) throw new Error("week");
+    return {day, weekday};
+  } catch (e) {
+    return null;
+  }
+}
+/* homeZone is fixed on first play. homeTz is only the fallback offset. */
+function ensureHome(streak, ms){
+  let fresh = false;
+  if (typeof streak.homeZone !== "string" || !streak.homeZone){
+    const z = deviceZone();
+    if (z){ streak.homeZone = z; fresh = true; }
+  }
+  if (!validOffset(streak.homeTz)){
+    streak.homeTz = validOffset(streak.tz) ? streak.tz : zoneOffset(ms);
+    fresh = true;
+  }
+  return fresh;
 }
 function prepareHome(streak){
   const ms = now();
-  const home = ensureHomeTz(streak, ms);
-  return {day: ymdAt(ms, home.off), fresh: home.fresh};
+  const fresh = ensureHome(streak, ms);
+  const zoned = zonedStamp(ms, streak.homeZone);
+  if (zoned) return {day: zoned.day, weekday: zoned.weekday, fresh};
+  const off = validOffset(streak.homeTz) ? streak.homeTz : zoneOffset(ms);
+  const day = ymdAt(ms, off);
+  const dt = isoDay(day);
+  return {day, weekday: dt ? dt.getDay() : new Date(ms).getDay(), fresh};
 }
 const SABBATH_NOTE = "Sabbath rest. No chores required.";
 const STREAK_PRIZES = [{at:30, steps:300}, {at:14, steps:140}, {at:7, steps:70}, {at:3, steps:30}, {at:1, steps:10}];
@@ -2956,10 +2998,6 @@ function daysBetween(a, b){
 function restDayNum(){
   const n = S.keep && S.keep.restDay;
   return Number.isInteger(n) && n >= 0 && n <= 6 ? n : 0;
-}
-function isRestDay(iso){
-  const dt = isoDay(iso) || new Date(now());
-  return dt.getDay() === restDayNum();
 }
 function gapMissesWeekday(last, day){
   const gap = daysBetween(last, day);
@@ -2989,7 +3027,7 @@ function visitKeep(){
   const streak = streakBag();
   const home = prepareHome(streak);
   const day = home.day;
-  const rest = isRestDay(day);
+  const rest = home.weekday === restDayNum();
   const note = rest ? SABBATH_NOTE : "";
   const held = {fresh:false, clamped:false, rest, note, blessing:false, day, count:streak.count, best:streak.best};
   const keepHome = () => { if (home.fresh) save(); };
@@ -3049,7 +3087,7 @@ function renderStreak(){
   const viewed = prepareHome(streak);
   if (viewed.fresh) save();
   const day = viewed.day;
-  const rest = isRestDay(day);
+  const rest = viewed.weekday === restDayNum();
   const prize = streakPrize(streak.count);
   const blocked = !claimable(streak);
   const note = rest ? `<p class="ks-note">${SABBATH_NOTE}</p>` : "";

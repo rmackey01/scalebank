@@ -66,6 +66,7 @@ export function boot(raw, opts){
     if (typeof today === "function") __api.today = today;
     if (typeof setCareClock === "function") __api.setCareClock = setCareClock;
     if (typeof setZoneOffset === "function") __api.setZoneOffset = setZoneOffset;
+    if (typeof setTimeZone === "function") __api.setTimeZone = setTimeZone;
     if (typeof careAct === "function") __api.careAct = careAct;
     if (typeof careRecord === "function") __api.careRecord = careRecord;
     if (typeof keeperNotes === "function") __api.keeperNotes = keeperNotes;
