@@ -3,7 +3,7 @@
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&family=Lato:wght@400;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&family=IM+Fell+English:ital@0;1&family=Lato:wght@400;700;900&display=swap">
 <style>
 /* Layout: one-column phone app, three screens over a fixed bottom tab bar; vendors swipe sideways with scroll-snap. */
 :root{
@@ -142,9 +142,9 @@ html.keep-open .tabs{position:relative;z-index:2}
 .ledger-body{position:absolute;z-index:1;left:calc(235 / 1008 * 100%);top:calc(140 / 1792 * 100%);width:calc(597 / 1008 * 100%);height:calc(1150 / 1792 * 100%);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:3px;padding:0 1px 2px;background:transparent;color:#2a160c}
 /* Wooden board y1425–1545. Left and width are the visible sheet, set in layoutLedger. */
 .ledger-board{position:absolute;z-index:2;top:calc(1425 / 1792 * 100%);height:calc(120 / 1792 * 100%);display:flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;pointer-events:none}
-.ldg-cross{width:18px;height:auto;flex:none;filter:drop-shadow(0 1px 0 #3a2412)}
+.ldg-cross{width:auto;height:66%;max-height:40px;flex:none;filter:drop-shadow(0 1px 0 #3a2412)}
 .ledger-board .btn{pointer-events:auto;flex:0 1 auto;min-width:0;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:4px;background:none;color:#f0d59a;box-shadow:none}
-.ledger-board .btn img{display:block;height:32px;width:auto}
+.ledger-board .btn img{display:block;height:78%;width:auto;max-height:46px}
 .ledger-board .btn[disabled]{background:none;opacity:.78;box-shadow:none}
 .ldg-seal{width:13px;height:13px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#e2583e,#7a1e14);box-shadow:inset 0 1px 0 rgba(255,200,180,.45),0 0 0 1px #4a140e}
 .ldg-seal svg{width:8px;height:8px}
@@ -152,28 +152,34 @@ html.keep-open .tabs{position:relative;z-index:2}
 .ldg-title{position:relative;margin:0;text-align:center}
 .ldg-title img{display:block;width:100%;height:auto}
 .ldg-sub{margin:0}
-.ldg-verse{margin:0;padding:2px 4px;border-radius:4px;border:1px solid #6e4a22;background:linear-gradient(180deg,#f6e2b8,#e4c07a);color:#2a160c;font-family:var(--display);font-style:italic;font-size:10px;line-height:1.2;text-align:center}
-.ldg-rule{position:relative;display:flex;align-items:center;justify-content:center;min-height:16px;margin:1px 0}
+.ldg-verse{margin:0;padding:2px 4px;border-radius:4px;border:1px solid #6e4a22;background:linear-gradient(180deg,#f6e2b8,#e4c07a);color:#342214;font-family:"IM Fell English",var(--display);font-style:italic;font-size:11px;line-height:1.2;text-align:center}
+.ldg-rule{position:relative;display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:580/26;margin:2px 0 1px}
 .ldg-rule img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none}
-.ldg-rule span{position:relative;z-index:1;font-family:var(--display);font-weight:700;font-size:11px;line-height:1;color:#2a160c;white-space:nowrap}
-.ldg-roam-h{display:flex;align-items:center;gap:4px;margin:0;font-family:var(--display);font-weight:700;font-size:12px;line-height:1;color:#2a160c}
-.ldg-drop{flex:none;display:flex;width:18px}
+.ldg-rule span{position:relative;z-index:1;font-family:"IM Fell English",var(--display);font-weight:400;font-size:13px;line-height:1;color:#342214;white-space:nowrap}
+.ldg-roam-h{display:flex;align-items:flex-end;gap:4px;margin:0;font-family:"IM Fell English",var(--display);font-weight:400;font-size:14px;line-height:1;color:#342214}
+.ldg-roam-h b{font-family:"Cinzel",var(--display);font-weight:700;font-size:.86em}
+.ldg-drop{flex:none;display:flex;width:calc(82 / 597 * 100%)}
 .ldg-drop img{display:block;width:100%;height:auto}
-.ldg-grid{display:grid;gap:3px;margin:0;padding:0;list-style:none}
-.ldg-roam-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-.ldg-stall-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.ldg-pcard,.ldg-stall{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;width:100%;min-width:0;margin:0;padding:2px 2px 1px;cursor:pointer;font:inherit;line-height:1;border:0;background-color:transparent;background-repeat:no-repeat;background-size:100% 100%;box-shadow:none}
-.ldg-pcard{height:72px;border-radius:5px;background-image:url("art/keep/ledger-ui/card-frame.webp");color:#2a160c}
-.ldg-stall{position:relative;height:68px;border-radius:18px 18px 3px 3px;background-image:url("art/keep/ledger-ui/stall-frame.webp");color:#f0e4c8}
+.ldg-grid{display:grid;margin:0;padding:0;list-style:none}
+/* 0.8 of the 176×231 Keep card is 141×185 on the 597-wide writing area. */
+.ldg-roam-grid{grid-template-columns:repeat(3,calc(141 / 597 * 100%));justify-content:center;column-gap:calc(11 / 597 * 100%);row-gap:calc(8 / 597 * 100%)}
+.ldg-stall-grid{grid-template-columns:repeat(4,calc(144 / 597 * 100%));justify-content:center;column-gap:calc(7 / 597 * 100%);row-gap:calc(10 / 597 * 100%)}
+.ldg-pcard,.ldg-stall{position:relative;display:block;width:100%;min-width:0;margin:0;padding:0;cursor:pointer;font:inherit;line-height:1;border:0;background-color:transparent;background-repeat:no-repeat;background-position:center;background-size:100% 100%;box-shadow:none;container-type:size}
+.ldg-pcard,.ldg-slot{aspect-ratio:141/185}
+.ldg-pcard{background-image:url("art/keep/ledger-ui/card-frame.webp");color:#342214}
+.ldg-stall{aspect-ratio:144/172;background-image:url("art/keep/ledger-ui/stall-frame.webp");color:#f0e4c8}
 .ldg-pcard.is-on,.ldg-stall.is-on{box-shadow:0 0 0 2px #f4d78f,0 0 10px 2px rgba(244,215,143,.95)}
-.ldg-slot{border:0;border-radius:5px;background:url("art/keep/ledger-ui/card-empty.webp") center / 100% 100% no-repeat}
-.ldg-pcard .dart,.ldg-stall .dart{width:58%;height:28px;aspect-ratio:auto;border-radius:2px;background:transparent;box-shadow:none}
-.ldg-pcard .dart::after,.ldg-stall .dart::after{box-shadow:none}
-.ldg-pcard .dart > img,.ldg-stall .dart > img{object-fit:contain;-webkit-mask:none;mask:none}
-.ldg-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--display);font-weight:700;font-size:9px;line-height:1.05;text-align:center;color:inherit}
-.ldg-stall .ldg-name{width:100%;margin-top:0;font-size:7px;padding:0 1px;color:#f0e4c8;text-shadow:0 1px 0 #1a0e08}
-.ldg-star{width:9px;height:9px;display:block;flex:none}
-.ldg-gem{position:absolute;top:3px;right:2px;width:7px;height:7px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.6),inset 0 -1px 1px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.4)}
+.ldg-slot{border:0;background:url("art/keep/ledger-ui/card-empty.webp") center / 100% 100% no-repeat}
+.ldg-port{position:absolute;left:50%;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;pointer-events:none}
+.ldg-pcard .ldg-port{top:6%;width:82%;height:48%}
+.ldg-stall .ldg-port{top:5%;width:72%;height:46%}
+.ldg-name{position:absolute;left:6%;right:6%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:"IM Fell English",var(--display);font-weight:400;text-align:center;color:#342214}
+.ldg-pcard .ldg-name{top:70%;font-size:12cqh;line-height:1}
+.ldg-stall .ldg-name{top:70%;right:30%;font-size:11cqh;line-height:1;color:#f0e4c8;text-shadow:0 1px 0 #1a0e08}
+.ldg-star{position:absolute;left:50%;width:16%;height:auto;transform:translateX(-50%);pointer-events:none}
+.ldg-pcard .ldg-star{top:86%}
+.ldg-stall .ldg-star{top:86%;width:18%}
+.ldg-wax{position:absolute;left:66%;top:64%;width:28%;height:auto;pointer-events:none}
 .ldg-swap{margin:0;text-align:center;color:#3a2412;font-family:var(--display);font-size:10px;line-height:1.2}
 .ldg-swap .btn{min-width:0;padding:1px 5px;font-size:10px}
 .ldg-hint{margin:0;color:#6b3e12;font-size:10px;line-height:1.2;text-align:center}
@@ -3640,17 +3646,24 @@ function trapTab(ev, root){
 function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || null; }
 const LEDGER_UI = "art/keep/ledger-ui";
 const LEDGER_STAR = `<img class="ldg-star" src="${LEDGER_UI}/star.webp" alt="">`;
-const BREED_GEM = {cinder:"#c23b2e", inferno:"#d3541a", brine:"#2f6fbf", moss:"#3d8a45", stormling:"#3a62c4", voidling:"#6a3d9a", tempest:"#7a4ea3"};
+const LEDGER_STAGE = ["hatchling", "juvenile", "adult", "elder"];
+const LEDGER_SEAL = {Common:"brown", Uncommon:"green", Rare:"blue", Epic:"purple", Legendary:"gold"};
+function ledgerPortrait(d){
+  const stage = LEDGER_STAGE[stageIdx(d)] || "hatchling";
+  const mut = d.mut && MUTATIONS[d.mut] ? d.mut + "-" : "";
+  return `${LEDGER_UI}/portraits/${d.line}-${mut}${stage}.webp`;
+}
 function ledgerCard(id, kind){
   const d = ledgerDragon(id); if (!d) return "";
   const on = ledgerFocus === id || ledgerPick === id;
   const name = d.name || d.species;
   const pressed = ledgerFocus === id ? "true" : "false";
+  const port = `<img class="ldg-port" src="${ledgerPortrait(d)}" alt="" draggable="false">`;
   if (kind === "roam"){
-    return `<button type="button" class="ldg-pcard${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}">${dragonArt(d)}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
+    return `<button type="button" class="ldg-pcard${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}">${port}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
   }
-  const gem = BREED_GEM[d.line] || "#8a6a3a";
-  return `<button type="button" class="ldg-stall${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}"><i class="ldg-gem" style="background:${gem}" aria-hidden="true"></i>${dragonArt(d)}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
+  const seal = LEDGER_SEAL[rarityOf(d)] || "grey";
+  return `<button type="button" class="ldg-stall${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}">${port}<img class="ldg-wax" src="${LEDGER_UI}/seals/seal-${seal}.webp" alt="" draggable="false"><span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
 }
 function ledgerVerseCard(){
   if (!verseOn()) return "";
@@ -3677,7 +3690,7 @@ function renderLedger(){
     <div class="ldg-opts">${opt("ledger-verse", "Morning Blessing", verseOn())}${opt("ledger-weather", "Live weather", weatherOn())}</div>
     ${ledgerVerseCard()}
     ${pick ? `<p class="ldg-swap" role="status">Swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
-    <section class="ldg-sec ldg-roam"><h3 class="ldg-roam-h"><span class="ldg-drop" aria-hidden="true"><img src="${LEDGER_UI}/capital-T.webp" alt=""></span><span>Roaming in the Keep (${keep.roaming.length}/${keepCap()})</span></h3><div class="ldg-grid ldg-roam-grid">${roamRows}${emptySlots}</div></section>
+    <section class="ldg-sec ldg-roam"><h3 class="ldg-roam-h"><span class="ldg-drop" aria-hidden="true"><img src="${LEDGER_UI}/capital-T.webp" alt=""></span><span>Roaming in the Keep (<b>${keep.roaming.length}/${keepCap()}</b>)</span></h3><div class="ldg-grid ldg-roam-grid">${roamRows}${emptySlots}</div></section>
     <h3 class="ldg-rule"><img src="${LEDGER_UI}/divider.webp" alt=""><span>Resting in the Stables</span></h3>
     <section class="ldg-sec ldg-stables-sec">${noRoom ? `<p class="ldg-hint" id="ldgFull">Keep is full</p>` : ""}<div class="ldg-grid ldg-stall-grid ldg-stables">${stabRows}</div></section>`;
   layoutLedger();
