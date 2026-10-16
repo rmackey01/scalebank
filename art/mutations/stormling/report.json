@@ -1,0 +1,226 @@
+{
+ "1_hatchling_moonlit": {
+  "mismatch": 13.5,
+  "method": "pingpong",
+  "seam_jump": 4.58,
+  "median_step": 6.15,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 344235,
+   ".webm": 305611,
+   "-poster.webp": 26722,
+   ".webp": 30590
+  }
+ },
+ "1_hatchling_obsidian": {
+  "mismatch": 23.6,
+  "method": "pingpong",
+  "seam_jump": 3.14,
+  "median_step": 7.01,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 569983,
+   ".webm": 555727,
+   "-poster.webp": 40460,
+   ".webp": 44526
+  }
+ },
+ "1_hatchling_gilded": {
+  "mismatch": 15.2,
+  "method": "pingpong",
+  "seam_jump": 4.55,
+  "median_step": 7.95,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 556240,
+   ".webm": 573469,
+   "-poster.webp": 43290,
+   ".webp": 48348
+  }
+ },
+ "1_hatchling_aurora": {
+  "mismatch": 14.9,
+  "method": "pingpong",
+  "seam_jump": 5.5,
+  "median_step": 5.89,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 444847,
+   ".webm": 378807,
+   "-poster.webp": 29356,
+   ".webp": 33250
+  }
+ },
+ "2_juvenile_moonlit": {
+  "mismatch": 12.1,
+  "method": "pingpong",
+  "seam_jump": 5.71,
+  "median_step": 9.32,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 497296,
+   ".webm": 468859,
+   "-poster.webp": 43214,
+   ".webp": 50840
+  }
+ },
+ "2_juvenile_obsidian": {
+  "mismatch": 35.5,
+  "method": "pingpong",
+  "seam_jump": 7.7,
+  "median_step": 11.64,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 946667,
+   ".webm": 904164,
+   "-poster.webp": 65550,
+   ".webp": 73678
+  }
+ },
+ "2_juvenile_gilded": {
+  "mismatch": 28.8,
+  "method": "pingpong",
+  "seam_jump": 13.82,
+  "median_step": 13.07,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 831444,
+   ".webm": 783922,
+   "-poster.webp": 66534,
+   ".webp": 73770
+  }
+ },
+ "2_juvenile_aurora": {
+  "mismatch": 16.8,
+  "method": "pingpong",
+  "seam_jump": 5.52,
+  "median_step": 6.24,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 552960,
+   ".webm": 505190,
+   "-poster.webp": 43578,
+   ".webp": 49810
+  }
+ },
+ "3_adult_moonlit": {
+  "mismatch": 22.5,
+  "method": "pingpong",
+  "seam_jump": 4.52,
+  "median_step": 7.25,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 438941,
+   ".webm": 362858,
+   "-poster.webp": 50630,
+   ".webp": 59366
+  }
+ },
+ "3_adult_obsidian": {
+  "mismatch": 35.1,
+  "method": "pingpong",
+  "seam_jump": 5.73,
+  "median_step": 11.11,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 912772,
+   ".webm": 898518,
+   "-poster.webp": 83890,
+   ".webp": 95220
+  }
+ },
+ "3_adult_gilded": {
+  "mismatch": 31.9,
+  "method": "pingpong",
+  "seam_jump": 6.96,
+  "median_step": 8.92,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 772518,
+   ".webm": 804581,
+   "-poster.webp": 73746,
+   ".webp": 81622
+  }
+ },
+ "3_adult_aurora": {
+  "mismatch": 24.6,
+  "method": "pingpong",
+  "seam_jump": 3.79,
+  "median_step": 6.21,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 543243,
+   ".webm": 571038,
+   "-poster.webp": 57698,
+   ".webp": 67476
+  }
+ },
+ "4_elder_moonlit": {
+  "mismatch": 17.1,
+  "method": "pingpong",
+  "seam_jump": 3.98,
+  "median_step": 8.42,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 646105,
+   ".webm": 624402,
+   "-poster.webp": 68440,
+   ".webp": 78824
+  }
+ },
+ "4_elder_obsidian": {
+  "mismatch": 30.2,
+  "method": "pingpong",
+  "seam_jump": 9.19,
+  "median_step": 14.56,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 1162501,
+   ".webm": 1155127,
+   "-poster.webp": 100150,
+   ".webp": 109868
+  }
+ },
+ "4_elder_gilded": {
+  "mismatch": 34.2,
+  "method": "pingpong",
+  "seam_jump": 6.77,
+  "median_step": 10.39,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 921731,
+   ".webm": 923614,
+   "-poster.webp": 100598,
+   ".webp": 113432
+  }
+ },
+ "4_elder_aurora": {
+  "mismatch": 24.9,
+  "method": "pingpong",
+  "seam_jump": 4.93,
+  "median_step": 10.19,
+  "ghost": 0.0,
+  "frames": 144,
+  "sizes": {
+   ".mp4": 836939,
+   ".webm": 899127,
+   "-poster.webp": 91238,
+   ".webp": 105704
+  }
+ }
+}
