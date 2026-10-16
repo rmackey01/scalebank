@@ -54,11 +54,12 @@ html.keep-on .tab-keep .ti{object-fit:contain}
 .keep-art{visibility:hidden}
 .keep-art.is-ok{visibility:visible}
 html.keep-on #keep{position:relative;overflow:hidden;background:var(--ink)}
-/* The scene fills the keep down to the tab ornament. Art and every overlay share .keep-fit. */
-html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;right:0;top:0;bottom:var(--keep-tab,16px);overflow:hidden}
+/* The scene scrolls inside the keep, above the one real tab bar. Art and every overlay share .keep-fit. */
+html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;right:0;top:0;bottom:var(--keep-tab,16px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background:#070708}
 html.keep-open .tabs{position:relative;z-index:2}
-.keep-fit{position:absolute;pointer-events:none}
-.keep-fill{position:absolute;left:0;right:0;pointer-events:none;background:linear-gradient(180deg,#070708 0%,#10141a 100%)}
+.keep-scroll{position:relative;width:100%}
+.keep-clip{position:relative;width:100%;overflow:hidden}
+.keep-fit{position:absolute;left:0;top:0;pointer-events:none}
 .keep-bg{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
 /* Slim one-line pill in the sky band under the painted header. It does not grow over the castle. */
 .keep-streak{position:absolute;z-index:5;display:flex;flex-flow:row nowrap;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;overflow:hidden;padding:0 8px;border-radius:999px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);pointer-events:auto}
@@ -77,6 +78,7 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .keep-fence{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
 .keep-plates{position:absolute;z-index:4;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.pen-plaques{position:absolute;z-index:5;inset:0;pointer-events:none}
 .keep-pen{position:absolute}
 .keep-ground{position:absolute;left:6%;right:6%;bottom:0;height:36%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(216,169,75,.2),rgba(216,169,75,0) 72%)}
 .keep-stage:has(.keep-bg.is-ok) .keep-ground{display:none}
@@ -85,10 +87,7 @@ html.keep-open .tabs{position:relative;z-index:2}
 .pen-lock svg,.wing-lock svg{width:14px;height:14px;flex:none;display:block}
 .pen-lock b,.wing-lock b{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
 .pen-lock small,.wing-lock small{display:block;margin-top:1px;font-size:9px;letter-spacing:.03em;font-weight:600}
-.keep-pen[data-pen="red"] .pen-lock{left:66%;top:70%}
-.keep-pen[data-pen="purple"] .pen-lock{left:32%;top:58%}
-.keep-pen[data-pen="blue"] .pen-lock{left:30%;top:52%}
-.keep-pen[data-pen="green"] .pen-lock{left:38%;top:12%}
+.keep-pen .pen-lock{display:none}
 .keep-pen.is-open .pen-lock{display:none}
 /* Cleared wing on the painting. The plaque sits in the middle of that box and leaves when the wing opens. */
 .keep-wing{position:absolute;z-index:4;pointer-events:none}
@@ -702,7 +701,8 @@ button.dexchip{cursor:pointer}
 
   <main id="keep" class="screen" aria-label="Keep" hidden>
     <div class="keep-stage">
-      <div class="keep-fill" id="keepFill"></div>
+      <div class="keep-scroll" id="keepScroll">
+      <div class="keep-clip" id="keepClip">
       <div class="keep-fit" id="keepFit">
         <img class="keep-bg keep-art" alt="" draggable="false">
         <div class="keep-world" id="keepWorld"></div>
@@ -713,6 +713,8 @@ button.dexchip{cursor:pointer}
         <button type="button" class="keep-spot keep-build" data-act="keep-build" aria-label="Build"></button>
         <div class="keep-streak" id="keepStreak" hidden></div>
         <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"></button>
+      </div>
+      </div>
       </div>
     </div>
   </main>
@@ -2261,9 +2263,21 @@ function syncKeepCover(){
   const cover = app.getBoundingClientRect().bottom - tabs.getBoundingClientRect().top;
   if (cover > 0) app.style.setProperty("--keep-cover", Math.ceil(cover) + "px");
   if (!keep || typeof getComputedStyle !== "function") return;
-  const ornament = parseFloat(getComputedStyle(tabs, "::before").top);
-  const lift = isFinite(ornament) && ornament < 0 ? Math.ceil(-ornament) : 8;
-  keep.style.setProperty("--keep-tab", Math.max(8, lift) + "px");
+  const frame = getComputedStyle(tabs, "::before");
+  const ornament = parseFloat(frame.top);
+  const border = parseFloat(frame.borderTopWidth);
+  const lift = (isFinite(ornament) && ornament < 0 ? -ornament : 0) + (isFinite(border) ? border : 0);
+  keep.style.setProperty("--keep-tab", Math.max(8, Math.ceil(lift)) + "px");
+}
+function keepScrollPad(){
+  const tabs = $(".tabs");
+  if (!tabs || typeof getComputedStyle !== "function") return 16;
+  const rect = tabs.getBoundingClientRect();
+  const frame = getComputedStyle(tabs, "::before");
+  const ornament = parseFloat(frame.top);
+  const border = parseFloat(frame.borderTopWidth);
+  const lift = (isFinite(ornament) && ornament < 0 ? -ornament : 0) + (isFinite(border) ? border : 0);
+  return Math.ceil(rect.height + lift + 16);
 }
 function keepArt(img, url){
   if (!img || img.getAttribute("src")) return;
@@ -2366,6 +2380,8 @@ const PENS = [
   {id:"green", x:45.14, y:83.15, w:26.79, h:8.37, at:5}
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
+/* The painting's bottom strip is a second tab bar. The scene stops above it. */
+const KEEP_PLAY_H = 1584;
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
 const KEEP_LEDGER = {x:62.6, y:42.5, w:19.2, h:7.8};
 const KEEP_BUILD = {x:88.6, y:81.4, w:8.8, h:5.2};
@@ -2586,22 +2602,21 @@ function placeKeepBox(el, box){
 }
 function measureKeepWorld(){
   const stage = $(".keep-stage"), fit = $("#keepFit"), world = $("#keepWorld");
-  if (!stage || !fit || !world) return false;
+  const scroll = $("#keepScroll"), clip = $("#keepClip");
+  if (!stage || !fit || !world || !scroll || !clip) return false;
   const availW = stage.clientWidth, availH = stage.clientHeight;
   if (availW < 20 || availH < 20) return false;
-  /* Width fit: the whole painting stays on screen across, and extra height below it is ground. */
+  /* Width fit. The painted tab bar is clipped, and the rest can scroll clear of the real one. */
   const scale = availW / KEEP_W;
-  const rw = availW, rh = KEEP_H * scale;
+  const rw = availW, rh = KEEP_H * scale, sceneH = KEEP_PLAY_H * scale;
+  const pad = keepScrollPad();
   fit.style.width = rw + "px";
   fit.style.height = rh + "px";
   fit.style.left = "0px";
   fit.style.top = "0px";
-  const fill = $("#keepFill");
-  if (fill){
-    const gap = Math.max(0, availH - rh);
-    fill.style.top = Math.min(rh, availH) + "px";
-    fill.style.height = gap + "px";
-  }
+  clip.style.height = sceneH + "px";
+  scroll.style.height = (sceneH + pad) + "px";
+  scroll.style.paddingBottom = pad + "px";
   world.style.left = "0";
   world.style.top = "0";
   world.style.width = "100%";
@@ -2626,6 +2641,108 @@ function mountPenShell(){
 }
 function penLimits(pen){
   return {x0: pen.x, x1: pen.x + pen.w, y0: pen.y, y1: pen.y + pen.h};
+}
+function spotCentroid(id){
+  const spots = penSpots(id);
+  if (!spots.length) return null;
+  let x = 0, y = 0;
+  spots.forEach(s => { x += s.x; y += s.y; });
+  return {x: x / spots.length / KEEP_W * 100, y: y / spots.length / KEEP_H * 100};
+}
+function plaqueOverlap(a, b, gap){
+  return a.left < b.right + gap && a.right > b.left - gap && a.top < b.bottom + gap && a.bottom > b.top - gap;
+}
+function nudgePlaque(el, dx, dy, fit){
+  const left = parseFloat(el.style.left) + dx / fit.width * 100;
+  const top = parseFloat(el.style.top) + dy / fit.height * 100;
+  const scene = KEEP_PLAY_H / KEEP_H * 100;
+  el.style.left = Math.max(6, Math.min(94, left)).toFixed(3) + "%";
+  el.style.top = Math.max(2, Math.min(scene - 2, top)).toFixed(3) + "%";
+}
+function layoutPlaques(){
+  const plates = $("#keepPlates");
+  const fit = $("#keepFit");
+  if (!plates || !fit) return;
+  plates.querySelectorAll(".keep-pen .pen-lock").forEach(el => { el.hidden = true; });
+  let host = $("#penPlaques");
+  if (!host){
+    host = document.createElement("div");
+    host.id = "penPlaques";
+    host.className = "pen-plaques";
+    plates.appendChild(host);
+  }
+  const open = yardsOpen(breedCount());
+  const locked = PENS.filter((_, i) => i >= open);
+  host.innerHTML = locked.map(p => {
+    const c = spotCentroid(p.id) || {x: p.x + p.w / 2, y: p.y + p.h / 2};
+    return `<p class="pen-lock" data-pen="${p.id}" style="left:${c.x.toFixed(3)}%;top:${c.y.toFixed(3)}%">${PEN_LOCK}</p>`;
+  }).join("");
+  settlePlaques(host, fit);
+  settleWing(host, fit);
+}
+function settlePlaques(host, fit){
+  const nodes = [...host.querySelectorAll(".pen-lock")];
+  if (nodes.length < 2) return;
+  const fitRect = () => fit.getBoundingClientRect();
+  for (let pass = 0; pass < 8; pass++){
+    const box = fitRect();
+    const rects = nodes.filter(el => el.isConnected).map(el => el.getBoundingClientRect());
+    const live = nodes.filter(el => el.isConnected);
+    let moved = false;
+    for (let i = 0; i < live.length; i++){
+      for (let j = i + 1; j < live.length; j++){
+        if (!plaqueOverlap(rects[i], rects[j], 8)) continue;
+        const overlap = Math.min(rects[i].bottom, rects[j].bottom) - Math.max(rects[i].top, rects[j].top) + 8;
+        const upper = rects[i].top <= rects[j].top ? live[i] : live[j];
+        const lower = upper === live[i] ? live[j] : live[i];
+        nudgePlaque(upper, 0, -overlap / 2, box);
+        nudgePlaque(lower, 0, overlap / 2, box);
+        moved = true;
+        break;
+      }
+      if (moved) break;
+    }
+    if (!moved) break;
+  }
+  let guard = 0;
+  while (guard++ < 4){
+    const live = [...host.querySelectorAll(".pen-lock")];
+    const rects = live.map(el => el.getBoundingClientRect());
+    let pair = null;
+    for (let i = 0; i < live.length && !pair; i++){
+      for (let j = i + 1; j < live.length; j++){
+        if (plaqueOverlap(rects[i], rects[j], 4)){ pair = [live[i], live[j], rects[i], rects[j]]; break; }
+      }
+    }
+    if (!pair) break;
+    const box = fitRect();
+    const cx = (pair[2].left + pair[2].right + pair[3].left + pair[3].right) / 4;
+    const cy = (pair[2].top + pair[2].bottom + pair[3].top + pair[3].bottom) / 4;
+    pair[0].dataset.pen = pair[0].dataset.pen + " " + pair[1].dataset.pen;
+    pair[0].style.left = ((cx - box.left) / box.width * 100).toFixed(3) + "%";
+    pair[0].style.top = ((cy - box.top) / box.height * 100).toFixed(3) + "%";
+    pair[1].remove();
+  }
+}
+function settleWing(host, fit){
+  const wing = $("#keepWing");
+  const lock = wing && wing.querySelector(".wing-lock");
+  if (!wing || !lock || wing.classList.contains("is-open")) return;
+  lock.style.left = "";
+  lock.style.top = "";
+    const home = wing.getBoundingClientRect();
+  for (let pass = 0; pass < 6; pass++){
+    const wr = lock.getBoundingClientRect();
+    const hit = [...host.querySelectorAll(".pen-lock")].find(el => plaqueOverlap(wr, el.getBoundingClientRect(), 6));
+    if (!hit) return;
+    const hr = hit.getBoundingClientRect();
+    const dx = wr.left < hr.right && wr.right > hr.left ? (wr.left + wr.width / 2 < hr.left + hr.width / 2 ? -1 : 1) * (Math.min(wr.right, hr.right) - Math.max(wr.left, hr.left) + 8) : 0;
+    const dy = wr.top < hr.bottom && wr.bottom > hr.top ? (wr.top < hr.top ? -1 : 1) * (Math.min(wr.bottom, hr.bottom) - Math.max(wr.top, hr.top) + 8) : 0;
+    const left = (parseFloat(lock.style.left) || 50) + (home.width ? dx / home.width * 100 : 0);
+    const top = (parseFloat(lock.style.top) || 50) + (home.height ? dy / home.height * 100 : 0);
+    lock.style.left = Math.max(8, Math.min(92, left)).toFixed(3) + "%";
+    lock.style.top = Math.max(8, Math.min(92, top)).toFixed(3) + "%";
+  }
 }
 /* Animator names in pen-spots.json, in pen order. */
 const PEN_NAME = {ember:"red", violet:"purple", azure:"blue", pond:"green", red:"red", purple:"purple", blue:"blue", green:"green"};
@@ -2806,6 +2923,7 @@ function syncPens(){
   });
   const wing = $("#keepWing");
   if (wing) wing.classList.toggle("is-open", !wingLocked());
+  layoutPlaques();
   const roaming = normKeep(S.keep).roaming;
   const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
     + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
