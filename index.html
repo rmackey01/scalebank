@@ -79,6 +79,11 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-stage:has(.keep-bg.is-ok) .keep-ground{display:none}
 .pen-lock{position:absolute;left:50%;top:50%;width:88%;transform:translate(-50%,-50%);margin:0;padding:4px 6px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.86);color:var(--gold-hi);font-size:11px;font-weight:700;line-height:1.25;text-align:center}
 .keep-pen.is-open .pen-lock{display:none}
+/* Cleared wing on the painting. The plaque sits in the middle of that box and leaves when the wing opens. */
+.keep-wing{position:absolute;z-index:3;pointer-events:none}
+.wing-lock{position:absolute;left:50%;top:50%;width:88%;max-width:100%;box-sizing:border-box;transform:translate(-50%,-50%);margin:0;padding:6px 8px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);color:var(--gold-hi);font-size:12px;font-weight:700;line-height:1.25;text-align:center}
+.wing-lock span{display:block;margin-top:2px;font-size:11px;font-weight:700}
+.keep-wing.is-open{display:none}
 .pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto}
 .pen-dragon:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:10px}
 .pen-sprite{position:relative;display:block;background-repeat:no-repeat;background-position:left center}
@@ -691,6 +696,7 @@ button.dexchip{cursor:pointer}
         <img class="keep-bg keep-art" alt="" draggable="false">
         <div class="keep-world" id="keepWorld"></div>
       </div>
+      <div class="keep-wing" id="keepWing"><p class="wing-lock">Locked wing<span>Unlocks with a new dragon</span></p></div>
       <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
       <button type="button" class="keep-spot keep-pool" data-act="keep-pool" aria-label="Moon Pool" hidden></button>
       <button type="button" class="keep-spot keep-build" data-act="keep-build" aria-label="Build"></button>
@@ -2268,6 +2274,9 @@ const KEEP_BUILD = {x:88.6, y:81.4, w:8.8, h:5.2};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
 const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
 const KEEP_STREAK = {x:22, y:4.15, w:52};
+/* Cleared stone where the painted lock was. Snow art sits 8px lower. */
+const KEEP_WING = {x:68.5, y:60.9, w:31.2, h:20.3};
+const KEEP_WING_SNOW_Y = 61.4;
 const PEN_TALL = [32, 36, 40, 44];
 let spriteBook = null, spriteAsked = false;
 const spriteMode = new Map();
@@ -2459,8 +2468,15 @@ function measureKeepWorld(){
   placeKeepBox($(".keep-forge"), rw, rh, KEEP_FORGE);
   placeKeepBox($(".keep-pool"), rw, rh, KEEP_POOL);
   placeKeepBox($("#keepStreak"), rw, rh, KEEP_STREAK);
+  placeKeepBox($("#keepWing"), rw, rh, wingBox());
   return true;
 }
+function wingBox(){
+  const snow = typeof skyKind === "string" && skyKind === "snow";
+  return {x:KEEP_WING.x, y:snow ? KEEP_WING_SNOW_Y : KEEP_WING.y, w:KEEP_WING.w, h:KEEP_WING.h};
+}
+/* The wing is not a pen. It stays locked, and the plaque hides if that ever changes. */
+function wingLocked(){ return true; }
 function mountPenShell(){
   const world = $("#keepWorld");
   if (!world || world.dataset.shell) return;
@@ -2582,6 +2598,8 @@ function syncPens(){
     const el = world.querySelector('.keep-pen[data-pen="' + p.id + '"]');
     if (el) el.classList.toggle("is-open", i < open);
   });
+  const wing = $("#keepWing");
+  if (wing) wing.classList.toggle("is-open", !wingLocked());
   const roaming = normKeep(S.keep).roaming;
   const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
     + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
