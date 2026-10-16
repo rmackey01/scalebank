@@ -2462,6 +2462,7 @@ function setSkyKind(kind){
   const flip = weatherHuddle(skyKind) !== weatherHuddle(next);
   skyKind = next;
   paintKeepSky(next);
+  if (S && S.tab === "keep") measureKeepWorld();
   if (flip) penActors.forEach(actor => { actor.mode = "idle"; actor.until = 0; });
   if (S && S.tab === "keep"){ penSig = ""; syncPens(); }
 }
