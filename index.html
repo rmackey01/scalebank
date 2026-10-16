@@ -133,11 +133,16 @@ html.keep-open .tabs{position:relative;z-index:2}
 .pen-sprite svg{display:none;width:100%;height:100%}
 .pen-sprite.is-ph svg{display:block}
 .ledger{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
-.ledger-sheet{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid #6e4a1c;border-radius:16px;overflow:hidden;background:radial-gradient(120% 70% at 50% 0%,rgba(255,236,196,.5),transparent 58%),linear-gradient(180deg,#f0d7a2,#e0bc78 42%,#c4984e);box-shadow:inset 0 0 0 1px rgba(255,244,214,.55),inset 0 0 36px rgba(90,50,12,.14)}
-/* The painting is the whole book. Shift it so the blank page, not the binding, fills the sheet. */
-.ledger-bg{position:absolute;left:-32.1%;top:-3.2%;width:154.8%;height:132.5%;max-width:none;object-fit:fill;pointer-events:none;opacity:0;transition:none}
+.ledger-sheet{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #6e4a1c;border-radius:16px;background:radial-gradient(120% 70% at 50% 0%,rgba(255,236,196,.5),transparent 58%),linear-gradient(180deg,#f0d7a2,#e0bc78 42%,#c4984e);box-shadow:inset 0 0 0 1px rgba(255,244,214,.55)}
+.ledger-fit{position:absolute;top:0}
+.ledger-bg{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none;opacity:0;transition:none}
 .ledger-bg.is-ok{opacity:1}
-.ledger-body{position:relative;z-index:1;flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;padding:12px 12px 10px;background:transparent;color:#2a160c}
+/* Writing area on the 1008×1792 page: x235 y140 w597 h1150. */
+.ledger-body{position:absolute;z-index:1;left:calc(235 / 1008 * 100%);top:calc(140 / 1792 * 100%);width:calc(597 / 1008 * 100%);height:calc(1150 / 1792 * 100%);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;padding:2px 1px 4px;background:transparent;color:#2a160c}
+/* Wooden board: y1425–1545. Swap and Send sit on the plank, clear of the clasp. */
+.ledger-board{position:absolute;z-index:2;left:4%;width:92%;top:calc(1425 / 1792 * 100%);height:calc(120 / 1792 * 100%);display:flex;align-items:center;justify-content:space-evenly;pointer-events:none}
+.ledger-board .btn{pointer-events:auto;min-width:0;padding:3px 8px;border-radius:8px;font-size:11px;line-height:1.1}
+.ledger-board .btn[disabled]{background:#3a2a18;border-color:#6b4a28;color:#c4a57a}
 .ledger-body h2{margin:0;text-align:center;font-family:var(--display);font-weight:600;font-size:22px;line-height:1.05;color:#2a160c}
 .ldg-verse{margin:0;padding:8px 10px;border-radius:12px;border:1px solid #8a5a1c;background:rgba(255,244,214,.42);color:#2a160c;font-size:13px;line-height:1.35}
 .ldg-swap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:0;text-align:center;color:#3a2412;font-size:12px}
@@ -150,7 +155,8 @@ html.keep-open .tabs{position:relative;z-index:2}
 .ldg-empty{margin:0 0 6px;color:#6b4e2e;font-size:13px}
 .ldg-row{display:grid;grid-template-columns:32px minmax(0,1fr);column-gap:6px;row-gap:1px;align-items:center;padding:3px 2px;border-bottom:1px solid rgba(90,50,16,.28)}
 .ldg-row.is-pick{background:rgba(216,169,75,.2);border-radius:10px;box-shadow:inset 0 0 0 1px var(--gold)}
-.ldg-art{grid-column:1;grid-row:1 / span 2;width:32px;height:32px}
+.ldg-art{grid-column:1;grid-row:1 / span 2;width:32px;height:32px;min-width:0;padding:0;border:0;background:transparent;line-height:0;cursor:pointer}
+.ldg-art[aria-pressed="true"]{border-radius:7px;box-shadow:0 0 0 2px #6b3e12}
 .ldg-art .dart{width:32px;height:32px;aspect-ratio:auto;border-radius:7px}
 .ldg-who{grid-column:2;grid-row:1;min-width:0;display:flex;flex-direction:column;gap:0}
 .ldg-name{justify-self:start;max-width:100%;background:none;border:0;padding:0;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.05;color:#2a160c;text-align:left}
@@ -806,8 +812,11 @@ button.dexchip{cursor:pointer}
   <div class="overlay" id="ledgerOv" hidden>
     <div class="ledger" role="dialog" aria-modal="true" aria-label="Keeper's Ledger">
       <div class="ledger-sheet">
-        <img class="ledger-bg" alt="">
-        <div class="ledger-body" id="ledgerBody"></div>
+        <div class="ledger-fit" id="ledgerFit">
+          <img class="ledger-bg" alt="">
+          <div class="ledger-body" id="ledgerBody"></div>
+          <div class="ledger-board" id="ledgerBoard"></div>
+        </div>
       </div>
       <button type="button" class="btn" data-act="close-ledger">Close</button>
     </div>
@@ -2290,6 +2299,7 @@ document.addEventListener("click", ev => {
   else if (a === "streak-claim"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "keep-ledger") openLedger();
   else if (a === "close-ledger") closeLedger();
+  else if (a === "ledger-focus"){ ledgerFocus = b.dataset.id; renderLedger(); }
   else if (a === "ledger-dragon" || a === "pen-dragon") openLedgerDragon(b.dataset.id);
   else if (a === "ledger-rest"){ if (moveKeep("rest", b.dataset.id) && ledgerPick === b.dataset.id) ledgerPick = null; renderLedger(); }
   else if (a === "ledger-send"){ if (moveKeep("send", b.dataset.id)) renderLedger(); }
@@ -3607,7 +3617,7 @@ document.addEventListener("visibilitychange", () => {
 });
 const penMotion = matchMedia("(prefers-reduced-motion: reduce)");
 if (penMotion.addEventListener) penMotion.addEventListener("change", () => { penSig = ""; stopPenLoop(); syncPens(); });
-let ledgerPick = null, ledgerReturn = null;
+let ledgerPick = null, ledgerFocus = null, ledgerReturn = null;
 function focusables(root){
   if (!root) return [];
   return [...root.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])")].filter(el => {
@@ -3628,19 +3638,11 @@ function trapTab(ev, root){
 function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || null; }
 function ledgerRow(id, kind){
   const d = ledgerDragon(id); if (!d) return "";
-  const picked = ledgerPick === id;
-  const keep = normKeep(S.keep);
-  const blocked = kind !== "roam" && keepFullFor(keep, id);
-  let acts;
+  const picked = ledgerPick === id || ledgerFocus === id;
   const care = `<button type="button" class="btn ghost" data-act="ledger-care" data-id="${esc(id)}">Care</button>`;
-  if (kind === "roam"){
-    acts = `<button type="button" class="btn ghost" data-act="ledger-rest" data-id="${esc(id)}">Rest</button><button type="button" class="btn ghost" data-act="ledger-swap" data-id="${esc(id)}" aria-pressed="${picked ? "true" : "false"}">Swap</button>${care}`;
-  } else {
-    const send = `<button type="button" class="btn" data-act="ledger-send" data-id="${esc(id)}"${blocked ? ` disabled aria-describedby="ldgFull"` : ""}>Send to Keep</button>`;
-    const swap = ledgerPick ? `<button type="button" class="btn" data-act="ledger-swap-do" data-id="${esc(id)}">Swap</button>` : "";
-    acts = send + swap + care;
-  }
-  return `<li class="ldg-row${picked ? " is-pick" : ""}"><div class="ldg-art">${dragonArt(d)}</div><div class="ldg-who"><button type="button" class="ldg-name" data-act="ledger-dragon" data-id="${esc(id)}">${esc(d.name || d.species)}</button><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div></div><div class="ldg-acts">${acts}</div></li>`;
+  const rest = kind === "roam" ? `<button type="button" class="btn ghost" data-act="ledger-rest" data-id="${esc(id)}">Rest</button>` : "";
+  const art = `<button type="button" class="ldg-art" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${ledgerFocus === id ? "true" : "false"}" aria-label="Choose ${esc(d.name || d.species)}">${dragonArt(d)}</button>`;
+  return `<li class="ldg-row${picked ? " is-pick" : ""}">${art}<div class="ldg-who"><button type="button" class="ldg-name" data-act="ledger-dragon" data-id="${esc(id)}">${esc(d.name || d.species)}</button><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div></div><div class="ldg-acts">${rest}${care}</div></li>`;
 }
 function ledgerVerseCard(){
   if (!verseOn()) return "";
@@ -3658,13 +3660,45 @@ function renderLedger(){
   const roamRows = keep.roaming.map(id => ledgerRow(id, "roam")).join("");
   const stabRows = keep.stables.map(id => ledgerRow(id, "stab")).join("");
   const opt = (act, label, on) => `<button type="button" class="ldg-opt" data-act="${act}" role="switch" aria-pressed="${on ? "true" : "false"}"><span>${label}</span><i aria-hidden="true"></i></button>`;
+  if (ledgerFocus && keep.roaming.indexOf(ledgerFocus) < 0 && keep.stables.indexOf(ledgerFocus) < 0) ledgerFocus = null;
+  renderLedgerBoard(keep);
   body.innerHTML = `<h2>Keeper's Ledger</h2>
     <div class="ldg-opts">${opt("ledger-verse", "Morning Blessing", verseOn())}${opt("ledger-weather", "Live weather", weatherOn())}</div>
     ${ledgerVerseCard()}
     ${pick ? `<p class="ldg-swap" role="status">Pick a dragon in the stables to swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
     <section class="ldg-sec ldg-roam"><h3>Roaming in the Keep (${keep.roaming.length}/${keepCap()})</h3>${roamRows ? `<ul class="ldg-list">${roamRows}</ul>` : `<p class="ldg-empty">No one is roaming.</p>`}</section>
     <section class="ldg-sec ldg-stables-sec"><h3>Resting in the Stables (${keep.stables.length})</h3>${noRoom ? `<p class="ldg-hint" id="ldgFull">Keep is full</p>` : ""}<div class="ldg-stables">${stabRows ? `<ul class="ldg-list">${stabRows}</ul>` : `<p class="ldg-empty">The stables are empty.</p>`}</div></section>`;
+  layoutLedger();
   syncPens();
+}
+function renderLedgerBoard(keep){
+  const board = $("#ledgerBoard");
+  if (!board) return;
+  const id = ledgerFocus;
+  const roaming = !!(id && keep.roaming.indexOf(id) >= 0);
+  const stable = !!(id && keep.stables.indexOf(id) >= 0);
+  const armed = !!(ledgerPick && keep.roaming.indexOf(ledgerPick) >= 0);
+  const canSwap = roaming || (stable && armed && ledgerPick !== id);
+  const canSend = stable && !keepFullFor(keep, id);
+  const swapAct = stable && armed ? "ledger-swap-do" : "ledger-swap";
+  const swapId = stable && armed ? id : (roaming ? id : ledgerPick || "");
+  board.innerHTML = `<button type="button" class="btn" data-act="${swapAct}" data-id="${esc(swapId)}"${canSwap ? "" : " disabled"} aria-pressed="${armed && ledgerPick === id ? "true" : "false"}">Swap</button><button type="button" class="btn" data-act="ledger-send" data-id="${esc(stable ? id : "")}"${canSend ? "" : " disabled"}${!canSend && stable ? ` aria-describedby="ldgFull"` : ""}>Send to Keep</button>`;
+}
+/* Same width fit as the Keep painting: scale to the sheet width, and grow to its height when that would leave the page short. */
+function layoutLedger(){
+  const sheet = $(".ledger-sheet"), fit = $("#ledgerFit");
+  if (!sheet || !fit || !keepOn()) return;
+  const ov = $("#ledgerOv");
+  if (!ov || ov.hidden) return;
+  const availW = sheet.clientWidth, availH = sheet.clientHeight;
+  if (availW < 20 || availH < 20) return;
+  let scale = availW / KEEP_W;
+  if (KEEP_H * scale < availH - 0.5) scale = availH / KEEP_H;
+  const rw = KEEP_W * scale, rh = KEEP_H * scale;
+  fit.style.width = rw + "px";
+  fit.style.height = rh + "px";
+  fit.style.left = ((availW - rw) / 2) + "px";
+  fit.style.top = "0px";
 }
 function openLedgerDragon(id){
   if (!keepOn()) return;
@@ -3681,6 +3715,7 @@ function openLedger(){
   renderLedger();
   ov.hidden = false;
   void ov.offsetWidth;
+  layoutLedger();
   keepArt(ov.querySelector(".ledger-bg"), LEDGER_BG);
   const first = focusables(ov)[0];
   if (first) first.focus();
@@ -3689,6 +3724,7 @@ function closeLedger(opts){
   const ov = $("#ledgerOv");
   if (!ov || ov.hidden) return;
   ledgerPick = null;
+  ledgerFocus = null;
   ov.hidden = true;
   const back = ledgerReturn;
   ledgerReturn = null;
@@ -3696,7 +3732,7 @@ function closeLedger(opts){
   if (back && back.isConnected) back.focus();
   else { const hot = $(".keep-ledger"); if (hot && !$("#keep").hidden) hot.focus(); }
 }
-window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); penSig = ""; syncPens(); });
+window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); layoutLedger(); penSig = ""; syncPens(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncKeepCover);
 mountKeepArt();
 
