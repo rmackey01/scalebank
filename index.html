@@ -1,5 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<script>try{var kq=new URLSearchParams(location.search);if(kq.get("keep")==="1")sessionStorage.setItem("scalebank.keep","1");if(kq.get("keep")==="1"||sessionStorage.getItem("scalebank.keep")==="1")document.documentElement.classList.add("keep-on");}catch(e){}</script>
+<!doctype html><html lang="en" class="keep-on"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 </head><body>
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,13 +45,13 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .tab-ul{position:absolute;z-index:1;top:-4.2px;left:calc((var(--ti,0) + .5) * 25%);width:50px;height:12px;margin-left:-25px;pointer-events:none;background:url(art/nest/nav_active_underline.webp) center/100% 100% no-repeat;transition:left .25s cubic-bezier(.65,0,.35,1)}
 .tab .dot{position:absolute;top:-2px;left:calc(50% + 5px);width:20px;height:20px;animation:dotpulse 1.6s ease-in-out infinite}
 @keyframes dotpulse{0%,100%{opacity:.7}50%{opacity:1}}
-/* Keep is off unless html.keep-on (?keep=1, remembered in sessionStorage). */
+/* Keep is on for every visit. html.keep-on is the layout hook, not a flag. */
 .tab-keep{display:none!important}
 html.keep-on .tabs{grid-template-columns:repeat(5,1fr)}
 html.keep-on .tab-ul{left:calc((var(--ti,0) + .5) * 20%)}
 html.keep-on .tab-keep{display:flex!important}
 html.keep-on .tab-keep .ti{object-fit:contain}
-/* Keep art is assigned from script only while the flag is on, so these files are never requested otherwise. */
+/* Keep paintings stay hidden until they load, then the still or silhouette stands in if a sprite is missing. */
 .keep-art{visibility:hidden}
 .keep-art.is-ok{visibility:visible}
 html.keep-on #keep{position:relative;overflow:visible;background:var(--ink)}
@@ -1434,7 +1433,7 @@ function artRoostVideo(){ return sceneVideo("roost", "A hooded stranger crouches
 
 /* ================= screens ================= */
 function setTab(t, sub){
-  if (t === "keep" && !document.documentElement.classList.contains("keep-on")) t = "bank";
+  if (t === "keep" && !keepOn()) t = "bank";
   closeCare({restore:false});
   document.documentElement.classList.toggle("keep-open", t === "keep");
   S.tab = t;
@@ -1776,7 +1775,7 @@ function renderDragon(){
         <div class="growth"><div class="growth-head"><span class="stage-pill">${st.name}</span><span class="growth-note">Steps you add while it\u2019s your prize grow it</span></div>${growth}${replayKey ? `<button class="reset replay-reveal" data-act="replay-reveal" data-id="${p.id}" hidden>Watch it grow again</button>` : ""}</div>
       </div>
       <button class="btn share-btn" data-act="share">Make share card</button>
-      ${document.documentElement.classList.contains("keep-on") ? `<button class="btn ghost" data-act="care" data-id="${esc(p.id)}">Care</button>` : ""}
+      ${keepOn() ? `<button class="btn ghost" data-act="care" data-id="${esc(p.id)}">Care</button>` : ""}
       ${bstEntry()}
       <div class="section"><h2>Customize</h2>
         <div class="custom">
@@ -1827,8 +1826,8 @@ function render(){
   if (S.tab === "vendors") renderVendors();
   if (S.tab === "nest") renderNest();
   if (S.tab === "dragon"){ if (DSUB === "bestiary") renderBestiary(); else renderDragon(); }
-  if (document.documentElement.classList.contains("keep-on") && !$("#ledgerOv").hidden) renderLedger();
-  if (document.documentElement.classList.contains("keep-on") && S.tab === "keep") syncPens();
+  if (keepOn() && !$("#ledgerOv").hidden) renderLedger();
+  if (keepOn() && S.tab === "keep") syncPens();
 }
 
 function dexRecord(d){
@@ -2232,7 +2231,7 @@ document.addEventListener("keydown", ev => {
   else if (!$("#hatchOv").hidden && $("#hafter")?.classList.contains("show")) closeHatch();
 });
 function syncKeepCover(){
-  if (!document.documentElement.classList.contains("keep-on")) return;
+  if (!keepOn()) return;
   const tabs = $(".tabs"), app = $("#app");
   if (!tabs || !app) return;
   const cover = app.getBoundingClientRect().bottom - tabs.getBoundingClientRect().top;
@@ -2244,7 +2243,7 @@ function keepArt(img, url){
   img.src = url;
 }
 function mountKeepArt(){
-  if (!document.documentElement.classList.contains("keep-on")) return;
+  if (!keepOn()) return;
   keepArt($(".keep-bg"), "art/keep/keep-v6.webp");
   keepArt($(".tab-keep .ti.off"), "art/keep/icon_keep_inactive.png");
   keepArt($(".tab-keep .ti.on"), "art/keep/icon_keep_active.png");
@@ -2264,13 +2263,7 @@ const penActors = new Map();
 const penEls = new Map();
 let penMetrics = {rw:0, rh:0, cw:0};
 let penSig = "", penRaf = 0, penLast = 0, penFrames = 0;
-function keepOn(){
-  try {
-    if (new URLSearchParams(location.search).get("keep") === "1") return true;
-    if (sessionStorage.getItem("scalebank.keep") === "1") return true;
-  } catch (e) {}
-  return document.documentElement.classList.contains("keep-on");
-}
+function keepOn(){ return true; }
 function penStill(){ return matchMedia("(prefers-reduced-motion: reduce)").matches; }
 function penNow(){ return typeof performance !== "undefined" ? performance.now() : Date.now(); }
 function pensOpen(n){
@@ -2676,7 +2669,7 @@ function ledgerRow(id, kind){
 }
 function renderLedger(){
   const body = $("#ledgerBody");
-  if (!body || !document.documentElement.classList.contains("keep-on")) return;
+  if (!body || !keepOn()) return;
   const keep = normKeep(S.keep);
   if (ledgerPick && keep.roaming.indexOf(ledgerPick) < 0) ledgerPick = null;
   const pick = ledgerPick && ledgerDragon(ledgerPick);
@@ -2690,12 +2683,12 @@ function renderLedger(){
   syncPens();
 }
 function openLedgerDragon(id){
-  if (!document.documentElement.classList.contains("keep-on")) return;
+  if (!keepOn()) return;
   const d = ledgerDragon(id); if (!d) return;
   S.prize = d.id; ledgerPick = null; setTab("dragon");
 }
 function openLedger(){
-  if (!document.documentElement.classList.contains("keep-on")) return;
+  if (!keepOn()) return;
   const ov = $("#ledgerOv");
   const prev = document.activeElement;
   ledgerReturn = prev && prev !== document.body ? prev : $(".keep-hot");
@@ -3231,7 +3224,7 @@ function careAct(id, kind){
 }
 let careFor = null, careReturn = null;
 function openCare(id){
-  if (!document.documentElement.classList.contains("keep-on")) return;
+  if (!keepOn()) return;
   const d = S.dragons.find(x => dragonKey(x) === idKey(id));
   if (!d) return;
   careFor = dragonKey(d);

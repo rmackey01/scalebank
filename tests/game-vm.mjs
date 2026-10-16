@@ -37,6 +37,7 @@ function element(){
     querySelector(){ return element(); },
     querySelectorAll(){ return []; },
     getClientRects(){ return []; },
+    getBoundingClientRect(){ return {top:0, bottom:800, left:0, right:390, width:390, height:800, x:0, y:0}; },
     closest(){ return null; }
   };
   return el;
