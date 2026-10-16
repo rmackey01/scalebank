@@ -88,11 +88,26 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-filters{position:absolute;width:0;height:0;overflow:hidden}
 .keep-slot{position:absolute;margin:0;padding:0;border:0;background:transparent;line-height:0;pointer-events:auto}
 .keep-slot img{width:100%;height:100%;display:block;object-fit:fill;pointer-events:none}
+.keep-ledger{z-index:6;display:flex;align-items:center;justify-content:center;border-radius:999px;background:transparent;color:#f0d59a;filter:none}
+.keep-ledger span{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;height:100%;margin:0;border-radius:999px;border:1.5px solid #c9a15a;background:#140e0a;box-shadow:inset 0 0 0 1px rgba(240,213,154,.25);font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.12em;line-height:1;text-transform:uppercase;color:#f0d59a;pointer-events:none}
+.keep-ledger svg{width:12px;height:12px;flex:none}
+.keep-ledger img{display:none;width:100%;height:100%;object-fit:fill;pointer-events:none;filter:none}
+.keep-ledger.is-art{border-radius:999px}
+.keep-ledger.is-art span{display:none}
+.keep-ledger.is-art img{display:block}
 .keep-spot:focus{outline:none}
 .keep-spot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
 .keep-spot.is-live::before{content:"";position:absolute;inset:-35%;border-radius:50%;pointer-events:none;mix-blend-mode:screen}
 .keep-forge.is-live::before{background:radial-gradient(ellipse at 50% 42%, rgba(255,226,160,.95), rgba(255,150,40,.5) 42%, transparent 72%)}
 .keep-pool.is-live::before{background:radial-gradient(ellipse at 50% 55%, rgba(220,248,255,.95), rgba(90,190,255,.55) 46%, transparent 74%)}
+.keep-credit{position:absolute;z-index:6;left:8px;bottom:calc(var(--keep-tab,16px) + 8px);margin:0;max-width:calc(100% - 108px);font-size:10px;line-height:1.2;letter-spacing:.04em;color:var(--muted);text-decoration:none;pointer-events:auto}
+.ldg-opts{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:0}
+.ldg-opt{display:inline-flex;align-items:center;gap:6px;margin:0;padding:3px 4px 3px 8px;border-radius:999px;border:1px solid #8a5a1c;background:rgba(255,244,214,.45);color:#3a2412;font-size:11px;font-weight:700;letter-spacing:.01em;line-height:1.2;cursor:pointer}
+.ldg-opt i{position:relative;width:22px;height:12px;border-radius:999px;background:#2a241c;border:1px solid var(--gold-lo);flex:none}
+.ldg-opt i::after{content:"";position:absolute;top:1px;left:1px;width:8px;height:8px;border-radius:50%;background:#8a8070}
+.ldg-opt[aria-pressed="true"]{border-color:var(--gold);background:rgba(216,169,75,.16)}
+.ldg-opt[aria-pressed="true"] i{background:linear-gradient(180deg,#e8bd5f,#b9862e);border-color:#8a5a1c}
+.ldg-opt[aria-pressed="true"] i::after{transform:translateX(10px);background:#1b1206}
 /* Pens are percentages of the full 1008×1792 painting, inside the same fit as the art. */
 .keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .keep-fence{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
@@ -118,36 +133,47 @@ html.keep-open .tabs{position:relative;z-index:2}
 .pen-sprite svg{display:none;width:100%;height:100%}
 .pen-sprite.is-ph svg{display:block}
 .ledger{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
-.ledger-sheet{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--gold-lo);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,#2a241c,#14110e)}
-.ledger-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;pointer-events:none}
-.ledger-body{position:relative;z-index:1;flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:8px 10px 6px;background:linear-gradient(180deg,rgba(20,17,14,.84),rgba(12,10,8,.62) 30%,rgba(12,10,8,.8))}
-.ledger-body h2{margin:0;text-align:center;font-family:var(--display);font-weight:600;font-size:22px;line-height:1.05;color:var(--gold-hi)}
-.ldg-swap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:0;text-align:center;color:var(--gold-hi);font-size:12px}
-.ldg-swap .btn{min-width:0;padding:4px 8px;font-size:11px}
-.ldg-sec{min-width:0}
-.ldg-sec h3{margin:0 0 2px;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.15;color:var(--fg)}
-.ldg-stables-sec{flex:1;min-height:0;display:flex;flex-direction:column}
-.ldg-stables{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
-.ldg-list{list-style:none;margin:0;padding:0}
-.ldg-empty{margin:0 0 6px;color:var(--muted);font-size:13px}
-.ldg-row{display:grid;grid-template-columns:32px minmax(0,1fr);column-gap:6px;row-gap:1px;align-items:center;padding:3px 2px;border-bottom:1px solid rgba(216,169,75,.22)}
-.ldg-row.is-pick{background:rgba(216,169,75,.2);border-radius:10px;box-shadow:inset 0 0 0 1px var(--gold)}
-.ldg-art{grid-column:1;grid-row:1 / span 2;width:32px;height:32px}
-.ldg-art .dart{width:32px;height:32px;aspect-ratio:auto;border-radius:7px}
-.ldg-who{grid-column:2;grid-row:1;min-width:0;display:flex;flex-direction:column;gap:0}
-.ldg-name{justify-self:start;max-width:100%;background:none;border:0;padding:0;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.05;color:var(--gold-hi);text-align:left}
-.ldg-name:hover{text-decoration:underline}
-.ldg-meta{font-size:11px;line-height:1.15;color:var(--muted)}
-.ldg-meta .r{font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
-.ldg-acts{grid-column:2;grid-row:2;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-.ldg-acts .btn,.ldg-swap .btn{min-width:0;padding:3px 7px;border-radius:8px;font-size:11px;white-space:nowrap}
-.ldg-roam .ldg-row{grid-template-columns:26px minmax(0,1fr) auto;align-items:center;padding:1px 0}
-.ldg-roam .ldg-art{grid-row:1;width:26px;height:26px}
-.ldg-roam .ldg-art .dart{width:26px;height:26px}
-.ldg-roam .ldg-who{grid-row:1;flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:6px}
-.ldg-roam .ldg-name{font-size:14px}
-.ldg-roam .ldg-acts{grid-column:3;grid-row:1}
-.ldg-hint{margin:0 0 2px;color:var(--gold-hi);font-size:11px;line-height:1.2}
+.ledger-sheet{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #6e4a1c;border-radius:16px;background:radial-gradient(120% 70% at 50% 0%,rgba(255,236,196,.5),transparent 58%),linear-gradient(180deg,#f0d7a2,#e0bc78 42%,#c4984e);box-shadow:inset 0 0 0 1px rgba(255,244,214,.55)}
+.ledger-fit{position:absolute;top:0}
+.ledger-bg{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none;opacity:0;transition:none}
+.ledger-bg.is-ok{opacity:1}
+/* Writing area on the 1008×1792 page: x235 y140 w597 h1150. */
+.ledger-body{position:absolute;z-index:1;left:calc(235 / 1008 * 100%);top:calc(140 / 1792 * 100%);width:calc(597 / 1008 * 100%);height:calc(1150 / 1792 * 100%);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;padding:2px 1px 4px;background:transparent;color:#2a160c}
+/* Wooden board: y1425–1545. Swap and Send sit on the plank, clear of the clasp. */
+.ledger-board{position:absolute;z-index:2;left:3%;width:94%;top:calc(1425 / 1792 * 100%);height:calc(120 / 1792 * 100%);display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:0 2% 0 4%;box-sizing:border-box;pointer-events:none}
+.ldg-cross{width:16px;height:16px;flex:none;filter:drop-shadow(0 1px 0 #3a2412)}
+.ledger-board .btn{pointer-events:auto;flex:1;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:3px 6px;border-radius:8px;border:1px solid #6b4420;background:linear-gradient(180deg,#f0d7a2,#d7b56a 42%,#a67c3d);color:#3a2412;font-family:var(--display);font-weight:700;font-size:12px;line-height:1.05;letter-spacing:.01em;text-shadow:0 1px 0 rgba(255,248,230,.65);box-shadow:inset 0 1px 0 rgba(255,248,230,.85),inset 0 -2px 0 #6b4420,0 1px 1px rgba(0,0,0,.45)}
+.ledger-board .btn svg{width:12px;height:12px;flex:none}
+.ledger-board .btn[disabled]{background:linear-gradient(180deg,#e6c98a,#c4a15a 46%,#8f6a38);color:#5c4330;border-color:#6b4420;box-shadow:inset 0 1px 0 rgba(255,248,230,.7),inset 0 -2px 0 #6b4420}
+.ldg-seal{width:13px;height:13px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#e2583e,#7a1e14);box-shadow:inset 0 1px 0 rgba(255,200,180,.45),0 0 0 1px #4a140e}
+.ldg-seal svg{width:8px;height:8px}
+.ldg-title{margin:0;text-align:center;font-family:var(--display);font-weight:700;font-size:20px;line-height:1;color:#e8bd5f;text-shadow:0 1px 0 #6b3e12,0 2px 0 #3a2412,0 0 8px rgba(216,169,75,.4)}
+.ldg-sub{margin:1px 0 0;text-align:center;font-family:var(--display);font-style:italic;font-weight:600;font-size:10px;line-height:1.15;color:#3a2412}
+.ldg-verse{margin:0;padding:4px 6px;border-radius:4px;border:1px solid #8a5a1c;background:linear-gradient(180deg,rgba(255,248,230,.62),rgba(224,188,120,.28));color:#2a160c;font-family:var(--display);font-style:italic;font-size:11px;line-height:1.3;text-align:center}
+.ldg-rule{display:flex;align-items:center;gap:5px;margin:1px 0}
+.ldg-rule::before,.ldg-rule::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#7a5420 12%,#e8bd5f,#7a5420 88%,transparent)}
+.ldg-rule i{width:5px;height:5px;flex:none;background:#e8bd5f;transform:rotate(45deg);box-shadow:0 0 0 1px #6b3e12}
+.ldg-rule span{font-family:var(--display);font-weight:700;font-size:12px;line-height:1;color:#2a160c;white-space:nowrap}
+.ldg-roam-h{display:flex;align-items:center;gap:6px;margin:0;font-family:var(--display);font-weight:700;font-size:13px;line-height:1;color:#2a160c}
+.ldg-drop{flex:none;font-family:var(--display);font-weight:700;font-size:30px;line-height:.75;color:#e8bd5f;text-shadow:0 1px 0 #6b3e12,0 2px 0 #3a2412}
+.ldg-grid{display:grid;gap:4px;margin:0;padding:0;list-style:none}
+.ldg-roam-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ldg-stall-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ldg-pcard,.ldg-stall{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;width:100%;min-width:0;margin:0;padding:3px 2px 2px;cursor:pointer;font:inherit;line-height:1}
+.ldg-pcard{min-height:62px;border:1px solid #6e4a22;border-radius:3px;background:linear-gradient(180deg,rgba(255,248,230,.7),rgba(224,188,120,.28));color:#2a160c;box-shadow:inset 0 0 0 1px rgba(255,244,214,.45)}
+.ldg-stall{position:relative;min-height:58px;border:1px solid #1a0e08;border-radius:46% 46% 4px 4px;background:linear-gradient(180deg,#6b4630 0%,#3a2416 42%,#24160e);color:#f3e0b8;box-shadow:inset 0 0 0 1px #a07848,inset 0 8px 6px rgba(0,0,0,.28)}
+.ldg-pcard.is-on,.ldg-stall.is-on{box-shadow:0 0 0 2px #f4d78f,0 0 16px 3px rgba(244,215,143,.95);outline:1px solid #f4d78f}
+.ldg-slot{min-height:62px;border:1px dashed #8a6840;border-radius:3px;background:transparent}
+.ldg-pcard .dart,.ldg-stall .dart{width:78%;aspect-ratio:3/4;border-radius:2px;background:transparent;box-shadow:none}
+.ldg-pcard .dart::after,.ldg-stall .dart::after{box-shadow:none}
+.ldg-pcard .dart > img,.ldg-stall .dart > img{object-fit:contain;-webkit-mask:none;mask:none}
+.ldg-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--display);font-weight:700;font-size:10px;line-height:1.05;text-align:center;color:inherit}
+.ldg-stall .ldg-name{font-size:8px}
+.ldg-star{width:9px;height:9px;display:block;flex:none}
+.ldg-gem{position:absolute;top:3px;right:2px;width:7px;height:7px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.6),inset 0 -1px 1px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.4)}
+.ldg-swap{margin:0;text-align:center;color:#3a2412;font-family:var(--display);font-size:10px;line-height:1.2}
+.ldg-swap .btn{min-width:0;padding:1px 5px;font-size:10px}
+.ldg-hint{margin:0;color:#6b3e12;font-size:10px;line-height:1.2;text-align:center}
 .ledger > .btn{align-self:center;min-width:140px;padding:8px 16px}
 .care{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
 .care-ov{z-index:24}
@@ -741,11 +767,12 @@ button.dexchip{cursor:pointer}
         <div class="keep-wing" id="keepWing"><p class="wing-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span></p></div>
         <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
         <button type="button" class="keep-spot keep-pool" data-act="keep-pool" aria-label="Moon Pool" hidden></button>
-        <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"></button>
+        <button type="button" class="keep-spot keep-ledger" data-act="keep-ledger" aria-label="Ledger"><span><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M3 2.5h4.2c.7 0 1.3.2 1.8.6.5-.4 1.1-.6 1.8-.6H15v10.2h-4.2c-.7 0-1.3.2-1.8.6-.5-.4-1.1-.6-1.8-.6H3V2.5zm1.2 1.1v7.8h2.6c.6 0 1.1.1 1.5.4V4.2c-.4-.2-.9-.4-1.5-.4H4.2zm6.5 0c-.6 0-1.1.2-1.5.4v7.6c.4-.3.9-.4 1.5-.4h2.6V3.6h-2.6z"/></svg>Ledger</span><img alt="" draggable="false"></button>
       </div>
       </div>
       </div>
     </div>
+    <a class="keep-credit" id="keepCredit" href="https://open-meteo.com/" hidden>Weather by Open-Meteo</a>
     <button type="button" class="keep-build" data-act="keep-build">Build</button>
   </main>
 
@@ -781,8 +808,11 @@ button.dexchip{cursor:pointer}
   <div class="overlay" id="ledgerOv" hidden>
     <div class="ledger" role="dialog" aria-modal="true" aria-label="Keeper's Ledger">
       <div class="ledger-sheet">
-        <img class="ledger-bg keep-art" alt="">
-        <div class="ledger-body" id="ledgerBody"></div>
+        <div class="ledger-fit" id="ledgerFit">
+          <img class="ledger-bg" alt="">
+          <div class="ledger-body" id="ledgerBody"></div>
+          <div class="ledger-board" id="ledgerBoard"></div>
+        </div>
       </div>
       <button type="button" class="btn" data-act="close-ledger">Close</button>
     </div>
@@ -1007,6 +1037,7 @@ function normKeep(k){
     if (typeof s.homeZone === "string" && s.homeZone) base.streak.homeZone = s.homeZone;
   }
   if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
+  if (k.verse === false) base.verse = false;
   base.shown = {};
   const shown = k.shown;
   if (shown && typeof shown === "object" && !Array.isArray(shown)){
@@ -1015,6 +1046,8 @@ function normKeep(k){
       if (id) base.shown[line] = id;
     });
   }
+  const weather = normWeather(k.weather);
+  if (weather) base.weather = weather;
   return base;
 }
 function hydrate(obj){
@@ -1507,6 +1540,8 @@ function setTab(t, sub){
     requestAnimationFrame(() => { syncKeepCover(); syncPens(); startPenLoop(); });
     noteDailyVisit();
     renderStreak();
+    syncWeatherChrome();
+    refreshWeather();
   }
   document.querySelectorAll(".tab").forEach((b, i) => { if (b.dataset.tab === t){ b.setAttribute("aria-current","page"); $(".tabs").style.setProperty("--ti", i); } else b.removeAttribute("aria-current"); });
   if (t === "vendors") requestAnimationFrame(() => scrollToScene(S.scene, false));
@@ -2255,9 +2290,15 @@ document.addEventListener("click", ev => {
   else if (a === "keep-build") toast("Coming soon");
   else if (a === "keep-forge"){ if (b.dataset.id) openCare(b.dataset.id); }
   else if (a === "keep-pool"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
+  else if (a === "ledger-weather") toggleWeather();
+  else if (a === "ledger-verse"){ toggleVerse(); if (!$("#ledgerOv").hidden) renderLedger(); }
   else if (a === "streak-claim"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
   else if (a === "keep-ledger") openLedger();
   else if (a === "close-ledger") closeLedger();
+  else if (a === "ledger-focus"){
+    if (ledgerFocus === b.dataset.id) openLedgerDragon(b.dataset.id);
+    else { ledgerFocus = b.dataset.id; renderLedger(); }
+  }
   else if (a === "ledger-dragon" || a === "pen-dragon") openLedgerDragon(b.dataset.id);
   else if (a === "ledger-rest"){ if (moveKeep("rest", b.dataset.id) && ledgerPick === b.dataset.id) ledgerPick = null; renderLedger(); }
   else if (a === "ledger-send"){ if (moveKeep("send", b.dataset.id)) renderLedger(); }
@@ -2330,10 +2371,227 @@ function keepScrollPad(){
   const lift = (isFinite(ornament) && ornament < 0 ? -ornament : 0) + (isFinite(border) ? border : 0);
   return Math.ceil(rect.height + lift + 16);
 }
+/* Opt-in local sky. Rounded coordinates and the reading live on keep.weather; the key stays absent until the keeper asks. */
+const WEATHER_MS = 30 * 60 * 1000;
+const WEATHER_CODE = {
+  0:"clear", 1:"clear",
+  2:"cloudy", 3:"cloudy",
+  45:"fog", 48:"fog",
+  51:"rain", 53:"rain", 55:"rain", 56:"rain", 57:"rain",
+  61:"rain", 63:"rain", 65:"rain", 66:"rain", 67:"rain",
+  80:"rain", 81:"rain", 82:"rain",
+  71:"snow", 73:"snow", 75:"snow", 77:"snow", 85:"snow", 86:"snow",
+  95:"storm", 96:"storm", 99:"storm"
+};
+const WEATHER_SKY = {clear:"sunny", cloudy:"overcast", rain:"rain", snow:"snow", storm:"storm", fog:"fog"};
+let skyKind = "";
+let weatherDenied = false;
+let weatherBusy = false;
+let weatherGen = 0;
+const skyFailed = new Set();
+function roundWeatherCoord(n){
+  if (n == null || n === "") return null;
+  const x = +n;
+  if (!Number.isFinite(x)) return null;
+  const r = Math.round(x * 10) / 10;
+  return Object.is(r, -0) ? 0 : r;
+}
+function weatherKind(code, isDay){
+  const named = WEATHER_CODE[+code];
+  const night = isDay === 0 || isDay === false;
+  if (named === "rain" || named === "snow" || named === "storm" || named === "fog") return named;
+  if (night) return "night";
+  if (named === "clear" || named === "cloudy") return named;
+  return "clear";
+}
+function weatherHuddle(kind){ return kind === "rain" || kind === "snow" || kind === "storm"; }
+function weatherSky(kind){
+  return WEATHER_SKY[kind] ? "art/keep/keep-weather-" + WEATHER_SKY[kind] + ".webp" : null;
+}
+function keepSkyFile(kind, enabled){
+  if (!enabled) return "art/keep/keep-v6.webp";
+  return weatherSky(kind) || "art/keep/keep-v6.webp";
+}
+function weatherUrl(lat, lon){
+  const la = roundWeatherCoord(lat), lo = roundWeatherCoord(lon);
+  if (la == null || lo == null || la < -90 || la > 90 || lo < -180 || lo > 180) return null;
+  return "https://api.open-meteo.com/v1/forecast?latitude=" + la + "&longitude=" + lo + "&current=weather_code,is_day";
+}
+function weatherCacheRecord(lat, lon, code, day, ms){
+  const la = roundWeatherCoord(lat), lo = roundWeatherCoord(lon);
+  if (la == null || lo == null || !Number.isFinite(+code) || !Number.isFinite(+ms)) return null;
+  if (weatherUrl(la, lo) == null) return null;
+  return {on:true, at:+ms, lat:la, lon:lo, code:+code, day:(day === 0 || day === false) ? 0 : 1};
+}
+function weatherCached(w, ms){
+  if (!w || typeof w !== "object" || Array.isArray(w)) return false;
+  if (!Number.isFinite(+w.at) || !Number.isFinite(+ms)) return false;
+  const age = +ms - +w.at;
+  if (!(age >= 0 && age < WEATHER_MS)) return false;
+  if (roundWeatherCoord(w.lat) == null || roundWeatherCoord(w.lon) == null) return false;
+  if (!Number.isFinite(+w.code)) return false;
+  if (w.day !== 0 && w.day !== 1 && w.day !== true && w.day !== false) return false;
+  return true;
+}
+function weatherFresh(w, lat, lon, ms){
+  if (!weatherCached(w, ms)) return false;
+  return roundWeatherCoord(w.lat) === roundWeatherCoord(lat) && roundWeatherCoord(w.lon) === roundWeatherCoord(lon);
+}
+function weatherResult(json){
+  const cur = json && json.current;
+  if (!cur || !Number.isFinite(+cur.weather_code)) return null;
+  const code = +cur.weather_code;
+  const day = cur.is_day === 0 || cur.is_day === false ? 0 : 1;
+  const kind = weatherKind(code, day);
+  return {code, day, kind, sky:weatherSky(kind), huddle:weatherHuddle(kind)};
+}
+function weatherDecision(o){
+  const none = () => ({request:"none", url:null, sky:null, kind:null, huddle:false});
+  const fromCache = w => {
+    const kind = weatherKind(w.code, w.day);
+    return {request:"none", url:null, sky:weatherSky(kind), kind, huddle:weatherHuddle(kind)};
+  };
+  o = o || {};
+  if (!o.keepOn || !o.toggle) return none();
+  const placed = o.lat != null || o.lon != null;
+  if (!placed && o.cache && weatherCached(o.cache, o.now)) return fromCache(o.cache);
+  const lat = o.lat == null ? null : roundWeatherCoord(o.lat);
+  const lon = o.lon == null ? null : roundWeatherCoord(o.lon);
+  if (lat != null && lon != null && o.cache && weatherFresh(o.cache, lat, lon, o.now)) return fromCache(o.cache);
+  if (o.denied || o.failed) return none();
+  if (!placed) return {request:"geo", url:null, sky:null, kind:null, huddle:false};
+  if (lat == null || lon == null || weatherUrl(lat, lon) == null) return none();
+  return {request:"fetch", url:weatherUrl(lat, lon), sky:null, kind:null, huddle:false, lat, lon};
+}
+function normWeather(w){
+  if (!w || typeof w !== "object" || Array.isArray(w) || (w.on !== true && w.on !== false)) return null;
+  const rec = weatherCacheRecord(w.lat, w.lon, w.code, w.day, w.at);
+  if (!rec) return {on:w.on === true};
+  rec.on = w.on === true;
+  return rec;
+}
+function storeWeather(w){
+  if (!S || !S.keep) return null;
+  const n = normWeather(w);
+  if (n) S.keep.weather = n;
+  else delete S.keep.weather;
+  save();
+  return S.keep && S.keep.weather ? S.keep.weather : null;
+}
+function weatherOn(){ return !!(S && S.keep && S.keep.weather && S.keep.weather.on === true); }
+function syncWeatherChrome(){
+  const credit = $("#keepCredit");
+  const on = !!(keepOn() && weatherOn());
+  if (credit) credit.hidden = !on;
+  const btn = document.querySelector("[data-act=ledger-weather]");
+  if (btn) btn.setAttribute("aria-pressed", on ? "true" : "false");
+}
+function setSkyKind(kind){
+  const next = kind || "";
+  const flip = weatherHuddle(skyKind) !== weatherHuddle(next);
+  skyKind = next;
+  paintKeepSky(next);
+  if (S && S.tab === "keep") measureKeepWorld();
+  if (flip) penActors.forEach(actor => { actor.mode = "idle"; actor.until = 0; });
+  if (S && S.tab === "keep"){ penSig = ""; syncPens(); }
+}
+function skySrcIs(img, file){
+  const cur = (img && img.getAttribute("src")) || "";
+  return cur === file || cur.endsWith("/" + file);
+}
+function markSky(img){
+  if (img && img.naturalWidth) img.classList.add("is-ok");
+}
+function paintKeepSky(kind){
+  const img = $(".keep-bg");
+  if (!img || !keepOn()) return;
+  let next = keepSkyFile(kind, weatherOn());
+  if (next !== "art/keep/keep-v6.webp" && skyFailed.has(next)) next = "art/keep/keep-v6.webp";
+  if (skySrcIs(img, next)){ markSky(img); return; }
+  const asked = next;
+  img.classList.remove("is-ok");
+  img.onload = () => { markSky(img); };
+  img.onerror = () => {
+    img.onerror = null;
+    if (asked !== "art/keep/keep-v6.webp") skyFailed.add(asked);
+    if (skySrcIs(img, "art/keep/keep-v6.webp")){ markSky(img); return; }
+    img.src = "art/keep/keep-v6.webp";
+  };
+  img.src = next;
+  if (img.complete) markSky(img);
+}
+function toggleWeather(){
+  if (!keepOn() || !S) return;
+  if (!S.keep || typeof S.keep !== "object") S.keep = freshKeep();
+  if (weatherOn()){
+    weatherGen++;
+    weatherBusy = false;
+    weatherDenied = false;
+    const prev = S.keep.weather;
+    const rec = weatherCacheRecord(prev.lat, prev.lon, prev.code, prev.day, prev.at);
+    S.keep.weather = rec ? Object.assign({}, rec, {on:false}) : {on:false};
+    save();
+    setSkyKind("");
+    syncWeatherChrome();
+    if (!$("#ledgerOv").hidden) renderLedger();
+    return;
+  }
+  const prev = S.keep.weather && typeof S.keep.weather === "object" ? S.keep.weather : {};
+  S.keep.weather = Object.assign({}, prev, {on:true});
+  save();
+  syncWeatherChrome();
+  refreshWeather();
+  if (!$("#ledgerOv").hidden) renderLedger();
+}
+function refreshWeather(){
+  if (!keepOn() || !weatherOn()) return;
+  const w = S.keep.weather;
+  const ms = now();
+  if (weatherCached(w, ms)){ setSkyKind(weatherKind(w.code, w.day)); return; }
+  if (weatherDenied){ setSkyKind(""); return; }
+  if (weatherBusy) return;
+  const geo = typeof navigator !== "undefined" && navigator.geolocation;
+  if (!geo || typeof geo.getCurrentPosition !== "function"){ setSkyKind(""); return; }
+  const gen = weatherGen;
+  weatherBusy = true;
+  geo.getCurrentPosition(pos => {
+    if (gen !== weatherGen) return;
+    weatherBusy = false;
+    if (!keepOn() || !weatherOn()) return;
+    const coords = pos && pos.coords;
+    const lat = roundWeatherCoord(coords && coords.latitude);
+    const lon = roundWeatherCoord(coords && coords.longitude);
+    if (lat == null || lon == null){ setSkyKind(""); return; }
+    const cur = S.keep.weather;
+    if (weatherFresh(cur, lat, lon, now())){ setSkyKind(weatherKind(cur.code, cur.day)); return; }
+    const url = weatherUrl(lat, lon);
+    if (!url){ setSkyKind(""); return; }
+    fetch(url).then(r => r && r.ok ? r.json() : Promise.reject(new Error("weather"))).then(j => {
+      if (gen !== weatherGen || !keepOn() || !weatherOn()) return;
+      const read = weatherResult(j);
+      const rec = read && weatherCacheRecord(lat, lon, read.code, read.day, now());
+      if (!rec){ setSkyKind(""); return; }
+      S.keep.weather = rec;
+      save();
+      setSkyKind(read.kind);
+    }).catch(() => {
+      if (gen !== weatherGen || !keepOn() || !weatherOn()) return;
+      setSkyKind("");
+    });
+  }, () => {
+    if (gen !== weatherGen) return;
+    weatherBusy = false;
+    weatherDenied = true;
+    if (!keepOn() || !weatherOn()) return;
+    setSkyKind("");
+  }, {enableHighAccuracy:false, maximumAge:WEATHER_MS, timeout:10000});
+}
 function keepArt(img, url){
   if (!img || img.getAttribute("src")) return;
-  img.addEventListener("load", () => { if (img.naturalWidth) img.classList.add("is-ok"); });
+  const mark = () => { if (img.naturalWidth) img.classList.add("is-ok"); };
+  img.addEventListener("load", mark);
   img.src = url;
+  if (img.complete) mark();
 }
 /* One front fence per pen, art/keep/fence-front-<variant>-<pen>.webp. A miss is remembered. */
 const FENCE_PENS = [
@@ -2434,7 +2692,10 @@ const PENS = [
 ];
 const KEEP_W = 1008, KEEP_H = 1792;
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
-const KEEP_LEDGER = {x:62.6, y:42.5, w:19.2, h:7.8};
+/* Plaque pixels on the 1008×1792 painting. ledgerPlaque wins, then plaques.ledger. */
+const LEDGER_PLAQUE = {file:"ledger-plaque.webp", x:653, y:836, w:166, h:49};
+/* Blank ledger page. One path: a clean file at this address replaces the CSS parchment. */
+const LEDGER_BG = "art/keep/ledger-v3.webp";
 const KEEP_BUILD = {x:70, y:88.2, w:26, h:3.6};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
 const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
@@ -2645,6 +2906,48 @@ function markPenReady(){
   });
   world.dataset.ready = ok ? "1" : "0";
 }
+let ledgerArt = "";
+function ledgerPlaqueRow(){
+  const picked = (slotMap && slotMap.ledgerPlaque) || (slotMap && slotMap.plaques && slotMap.plaques.ledger);
+  if (picked && picked.file && [picked.x, picked.y, picked.w, picked.h].every(Number.isFinite) && picked.w > 0 && picked.h > 0) return picked;
+  return {file:LEDGER_PLAQUE.file, x:LEDGER_PLAQUE.x, y:LEDGER_PLAQUE.y, w:LEDGER_PLAQUE.w, h:LEDGER_PLAQUE.h};
+}
+function placeLedgerPlaque(){
+  const el = $(".keep-ledger");
+  if (!el) return;
+  const mapped = ledgerPlaqueRow();
+  const row = ledgerArt === "miss" ? {file:LEDGER_PLAQUE.file, x:LEDGER_PLAQUE.x, y:LEDGER_PLAQUE.y, w:LEDGER_PLAQUE.w, h:LEDGER_PLAQUE.h} : mapped;
+  const url = "art/keep/" + mapped.file;
+  const img = el.querySelector("img");
+  const fit = el.parentElement;
+  if (fit && fit.lastElementChild !== el) fit.appendChild(el);
+  const paint = art => {
+    el.classList.toggle("is-art", !!art);
+    if (img) img.hidden = !art;
+    el.style.filter = "none";
+    if (img) img.style.filter = "none";
+    placeKeepBox(el, {x: row.x / KEEP_W * 100, y: row.y / KEEP_H * 100, w: row.w / KEEP_W * 100, h: row.h / KEEP_H * 100});
+  };
+  if (ledgerArt === "miss"){ paint(false); return; }
+  if (ledgerArt === "ok"){ paint(true); return; }
+  paint(false);
+  if (!img || img.dataset.ask === url) return;
+  img.dataset.ask = url;
+  img.onload = () => {
+    if (!img.naturalWidth){ ledgerArt = "miss"; placeLedgerPlaque(); return; }
+    ledgerArt = "ok";
+    placeLedgerPlaque();
+  };
+  img.onerror = () => {
+    ledgerArt = "miss";
+    img.onload = null;
+    img.onerror = null;
+    img.removeAttribute("src");
+    placeLedgerPlaque();
+  };
+  img.src = url;
+  if (img.complete && img.naturalWidth){ ledgerArt = "ok"; paint(true); }
+}
 function placeKeepBox(el, box){
   if (!el || !box) return;
   el.style.left = box.x + "%";
@@ -2680,7 +2983,7 @@ function measureKeepWorld(){
   world.style.width = "100%";
   world.style.height = "100%";
   penMetrics = {rw, rh, cw: availW, ch: availH, scale};
-  placeKeepBox($(".keep-ledger"), KEEP_LEDGER);
+  placeLedgerPlaque();
   placeKeepBox($(".keep-forge"), KEEP_FORGE);
   placeKeepBox($(".keep-pool"), KEEP_POOL);
   placeKeepBox($("#keepWing"), KEEP_WING);
@@ -3022,7 +3325,19 @@ function readSlotMap(json){
       if (Array.isArray(row) && row.length >= 4 && row.slice(0, 4).every(v => Number.isFinite(+v))) tint[key] = row.slice(0, 4).map(Number);
     });
   }
-  return {slots, tint};
+  const readPlaque = row => {
+    if (!row || typeof row !== "object") return null;
+    const x = +row.x, y = +row.y, w = +row.w, h = +row.h;
+    if (![x, y, w, h].every(Number.isFinite) || w <= 0 || h <= 0) return null;
+    const file = typeof row.file === "string" ? row.file.split("/").pop() : "";
+    if (!file) return null;
+    return {file, x, y, w, h};
+  };
+  const ledgerPlaque = readPlaque(json.ledgerPlaque);
+  const plaques = {};
+  const ledger = readPlaque(json.plaques && json.plaques.ledger);
+  if (ledger) plaques.ledger = ledger;
+  return {slots, tint, ledgerPlaque, plaques};
 }
 function slotLines(){
   if (!slotMap || !slotMap.slots) return [];
@@ -3301,7 +3616,7 @@ document.addEventListener("visibilitychange", () => {
 });
 const penMotion = matchMedia("(prefers-reduced-motion: reduce)");
 if (penMotion.addEventListener) penMotion.addEventListener("change", () => { penSig = ""; stopPenLoop(); syncPens(); });
-let ledgerPick = null, ledgerReturn = null;
+let ledgerPick = null, ledgerFocus = null, ledgerReturn = null;
 function focusables(root){
   if (!root) return [];
   return [...root.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])")].filter(el => {
@@ -3320,20 +3635,24 @@ function trapTab(ev, root){
   return true;
 }
 function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || null; }
-function ledgerRow(id, kind){
+const LEDGER_STAR = `<svg class="ldg-star" viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" stroke="#6b3e12" stroke-width=".5" d="M6 .7 7.5 4.2l3.8.3-2.9 2.4.9 3.6L6 8.6 2.7 10.5l.9-3.6L.7 4.5l3.8-.3z"/></svg>`;
+const BREED_GEM = {cinder:"#c23b2e", inferno:"#d3541a", brine:"#2f6fbf", moss:"#3d8a45", stormling:"#3a62c4", voidling:"#6a3d9a", tempest:"#7a4ea3"};
+function ledgerCard(id, kind){
   const d = ledgerDragon(id); if (!d) return "";
-  const picked = ledgerPick === id;
-  const full = S.keep.roaming.length >= 6;
-  let acts;
-  const care = `<button type="button" class="btn ghost" data-act="ledger-care" data-id="${esc(id)}">Care</button>`;
+  const on = ledgerFocus === id || ledgerPick === id;
+  const name = d.name || d.species;
+  const pressed = ledgerFocus === id ? "true" : "false";
   if (kind === "roam"){
-    acts = `<button type="button" class="btn ghost" data-act="ledger-rest" data-id="${esc(id)}">Rest</button><button type="button" class="btn ghost" data-act="ledger-swap" data-id="${esc(id)}" aria-pressed="${picked ? "true" : "false"}">Swap</button>${care}`;
-  } else {
-    const send = `<button type="button" class="btn" data-act="ledger-send" data-id="${esc(id)}"${full ? ` disabled aria-describedby="ldgFull"` : ""}>Send to Keep</button>`;
-    const swap = ledgerPick ? `<button type="button" class="btn" data-act="ledger-swap-do" data-id="${esc(id)}">Swap</button>` : "";
-    acts = send + swap + care;
+    return `<button type="button" class="ldg-pcard${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}">${dragonArt(d)}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
   }
-  return `<li class="ldg-row${picked ? " is-pick" : ""}"><div class="ldg-art">${dragonArt(d)}</div><div class="ldg-who"><button type="button" class="ldg-name" data-act="ledger-dragon" data-id="${esc(id)}">${esc(d.name || d.species)}</button><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div></div><div class="ldg-acts">${acts}</div></li>`;
+  const gem = BREED_GEM[d.line] || "#8a6a3a";
+  return `<button type="button" class="ldg-stall${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}"><i class="ldg-gem" style="background:${gem}" aria-hidden="true"></i>${dragonArt(d)}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
+}
+function ledgerVerseCard(){
+  if (!verseOn()) return "";
+  const viewed = prepareHome(streakBag());
+  const rest = viewed.weekday === restDayNum();
+  return `<p class="ldg-verse">${esc(blessingLine(rest, viewed.day))}</p>`;
 }
 function renderLedger(){
   const body = $("#ledgerBody");
@@ -3341,14 +3660,56 @@ function renderLedger(){
   const keep = normKeep(S.keep);
   if (ledgerPick && keep.roaming.indexOf(ledgerPick) < 0) ledgerPick = null;
   const pick = ledgerPick && ledgerDragon(ledgerPick);
-  const full = keep.roaming.length >= 6;
-  const roamRows = keep.roaming.map(id => ledgerRow(id, "roam")).join("");
-  const stabRows = keep.stables.map(id => ledgerRow(id, "stab")).join("");
-  body.innerHTML = `<h2>Keeper's Ledger</h2>
-    ${pick ? `<p class="ldg-swap" role="status">Pick a dragon in the stables to swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
-    <section class="ldg-sec ldg-roam"><h3>Roaming in the Keep (${keep.roaming.length}/6)</h3>${roamRows ? `<ul class="ldg-list">${roamRows}</ul>` : `<p class="ldg-empty">No one is roaming.</p>`}</section>
-    <section class="ldg-sec ldg-stables-sec"><h3>Resting in the Stables (${keep.stables.length})</h3>${full ? `<p class="ldg-hint" id="ldgFull">Keep is full, swap instead</p>` : ""}<div class="ldg-stables">${stabRows ? `<ul class="ldg-list">${stabRows}</ul>` : `<p class="ldg-empty">The stables are empty.</p>`}</div></section>`;
+  const noRoom = keep.roaming.length >= keepCap() && keep.stables.length > 0 && keep.stables.every(id => keepFullFor(keep, id));
+  const roamRows = keep.roaming.map(id => ledgerCard(id, "roam")).join("");
+  const empties = Math.max(0, keepCap() - keep.roaming.length);
+  const emptySlots = Array.from({length: empties}, () => `<div class="ldg-slot" aria-hidden="true"></div>`).join("");
+  const stabRows = keep.stables.map(id => ledgerCard(id, "stab")).join("");
+  const opt = (act, label, on) => `<button type="button" class="ldg-opt" data-act="${act}" role="switch" aria-pressed="${on ? "true" : "false"}"><span>${label}</span><i aria-hidden="true"></i></button>`;
+  if (ledgerFocus && keep.roaming.indexOf(ledgerFocus) < 0 && keep.stables.indexOf(ledgerFocus) < 0) ledgerFocus = null;
+  renderLedgerBoard(keep);
+  body.innerHTML = `<h2 class="ldg-title">The Keeper's Ledger</h2>
+    <p class="ldg-sub">Stewards of every creature entrusted to us</p>
+    <div class="ldg-opts">${opt("ledger-verse", "Morning Blessing", verseOn())}${opt("ledger-weather", "Live weather", weatherOn())}</div>
+    ${ledgerVerseCard()}
+    ${pick ? `<p class="ldg-swap" role="status">Swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
+    <section class="ldg-sec ldg-roam"><h3 class="ldg-roam-h"><span class="ldg-drop" aria-hidden="true">T</span><span>Roaming in the Keep (${keep.roaming.length}/${keepCap()})</span></h3><div class="ldg-grid ldg-roam-grid">${roamRows}${emptySlots}</div></section>
+    <h3 class="ldg-rule"><span>Resting in the Stables</span></h3>
+    <section class="ldg-sec ldg-stables-sec">${noRoom ? `<p class="ldg-hint" id="ldgFull">Keep is full</p>` : ""}<div class="ldg-grid ldg-stall-grid ldg-stables">${stabRows}</div></section>`;
+  layoutLedger();
   syncPens();
+}
+function renderLedgerBoard(keep){
+  const board = $("#ledgerBoard");
+  if (!board) return;
+  const id = ledgerFocus;
+  const roaming = !!(id && keep.roaming.indexOf(id) >= 0);
+  const stable = !!(id && keep.stables.indexOf(id) >= 0);
+  const armed = !!(ledgerPick && keep.roaming.indexOf(ledgerPick) >= 0);
+  const canSwap = roaming || (stable && armed && ledgerPick !== id);
+  const canSend = stable && !keepFullFor(keep, id);
+  const swapAct = stable && armed ? "ledger-swap-do" : "ledger-swap";
+  const swapId = stable && armed ? id : (roaming ? id : ledgerPick || "");
+  const quill = `<svg viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" d="M2 10.2 3.2 7C6.2 3.2 9.2 1.2 11 1c-.2 1.8-2.2 4.8-6 7.8L1.8 10l.2.2z"/></svg>`;
+  const crown = `<span class="ldg-seal"><svg viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" d="M1.2 8.2 2.2 3.6l2.6 2.2L6 2.2l1.2 3.6 2.6-2.2 1 4.6z"/></svg></span>`;
+  const cross = `<svg class="ldg-cross" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="#e8bd5f" stroke-width="1.7" stroke-linecap="square" d="M8 2.2v11.6M3.2 6.2h9.6"/></svg>`;
+  board.innerHTML = `${cross}<button type="button" class="btn" data-act="${swapAct}" data-id="${esc(swapId)}"${canSwap ? "" : " disabled"} aria-pressed="${armed && ledgerPick === id ? "true" : "false"}">${quill}Swap</button><button type="button" class="btn" data-act="ledger-send" data-id="${esc(stable ? id : "")}"${canSend ? "" : " disabled"}${!canSend && stable ? ` aria-describedby="ldgFull"` : ""}>${crown}Send to Keep</button>`;
+}
+/* Same width fit as the Keep painting: scale to the sheet width, and grow to its height when that would leave the page short. */
+function layoutLedger(){
+  const sheet = $(".ledger-sheet"), fit = $("#ledgerFit");
+  if (!sheet || !fit || !keepOn()) return;
+  const ov = $("#ledgerOv");
+  if (!ov || ov.hidden) return;
+  const availW = sheet.clientWidth, availH = sheet.clientHeight;
+  if (availW < 20 || availH < 20) return;
+  let scale = availW / KEEP_W;
+  if (KEEP_H * scale < availH - 0.5) scale = availH / KEEP_H;
+  const rw = KEEP_W * scale, rh = KEEP_H * scale;
+  fit.style.width = rw + "px";
+  fit.style.height = rh + "px";
+  fit.style.left = ((availW - rw) / 2) + "px";
+  fit.style.top = "0px";
 }
 function openLedgerDragon(id){
   if (!keepOn()) return;
@@ -3360,9 +3721,13 @@ function openLedger(){
   const ov = $("#ledgerOv");
   const prev = document.activeElement;
   ledgerReturn = prev && prev !== document.body ? prev : $(".keep-ledger");
-  keepArt(ov.querySelector(".ledger-bg"), "art/keep/ledger-v3.webp");
+  const note = $("#toast");
+  if (note) note.classList.remove("show");
   renderLedger();
   ov.hidden = false;
+  void ov.offsetWidth;
+  layoutLedger();
+  keepArt(ov.querySelector(".ledger-bg"), LEDGER_BG);
   const first = focusables(ov)[0];
   if (first) first.focus();
 }
@@ -3370,6 +3735,7 @@ function closeLedger(opts){
   const ov = $("#ledgerOv");
   if (!ov || ov.hidden) return;
   ledgerPick = null;
+  ledgerFocus = null;
   ov.hidden = true;
   const back = ledgerReturn;
   ledgerReturn = null;
@@ -3377,7 +3743,7 @@ function closeLedger(opts){
   if (back && back.isConnected) back.focus();
   else { const hot = $(".keep-ledger"); if (hot && !$("#keep").hidden) hot.focus(); }
 }
-window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); penSig = ""; syncPens(); });
+window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); layoutLedger(); penSig = ""; syncPens(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncKeepCover);
 mountKeepArt();
 
@@ -3476,7 +3842,7 @@ function migrateV3(){
     if (!e.n) e.n = S.dragons.filter(x => x && dexKeys(x).includes(k)).length;
     e.top = Math.max(e.top | 0, stageIdx(d)); });
 }
-/* Dragon Keep. Highest stage, then highest rarity, then id. Each id once: six roaming, the rest stabled. */
+/* Dragon Keep. Highest stage, then highest rarity, then id. One roaming dragon per breed. */
 const RARITY_RANK = {Common:0, Uncommon:1, Rare:2, Epic:3, Legendary:4};
 function dragonKey(d){ return d && typeof d === "object" ? idKey(d.id) : null; }
 function rarityRank(d){
@@ -3507,9 +3873,14 @@ function migrateV4(){
         if (a.id > b.id) return 1;
         return a.i - b.i;
       });
-      const ids = owned.map(o => o.id);
-      keep.roaming = ids.slice(0, 6);
-      keep.stables = ids.slice(6);
+      const roaming = [], stables = [], seen = new Set();
+      owned.forEach(o => {
+        const line = o.d && o.d.line ? o.d.line : "";
+        if (line && !seen.has(line) && roaming.length < keepCap()){ seen.add(line); roaming.push(o.id); }
+        else stables.push(o.id);
+      });
+      keep.roaming = roaming;
+      keep.stables = stables;
       keep.zones = [];
       keep.care = {};
       keep.streak = {last:null, count:0, best:0};
@@ -3530,7 +3901,25 @@ function backupCorrupt(raw){
     if (cur == null || cur === "") localStorage.setItem(CORRUPT_KEY, raw);
   } catch(e){}
 }
-/* Owned dragon ids live in roaming (up to 6) or stables, each id once. Existing order stays. */
+function keepCap(){ return DEX_LINES.length; }
+function lineOfId(id){
+  const d = asList(S && S.dragons).find(d => dragonKey(d) === id);
+  return d && typeof d.line === "string" ? d.line : "";
+}
+function keepHasBreed(keep, line){
+  return !!(line && keep && keep.roaming.some(id => lineOfId(id) === line));
+}
+function keepFullFor(keep, id){
+  const line = lineOfId(id);
+  if (keepHasBreed(keep, line)) return false;
+  return keep.roaming.length >= keepCap();
+}
+function pinBreed(keep, line, id){
+  if (!line || id == null) return;
+  if (!keep.shown || typeof keep.shown !== "object" || Array.isArray(keep.shown)) keep.shown = {};
+  keep.shown[line] = id;
+}
+/* Owned dragon ids live in roaming or stables, each id once, and one breed in the Keep. Existing order stays. */
 function reconcileKeep(){
   try {
     const keep = normKeep(S.keep);
@@ -3545,18 +3934,25 @@ function reconcileKeep(){
     const roaming = [];
     const stables = [];
     const placed = new Set();
-    const take = (id, list) => {
+    const seen = new Set();
+    const takeRoam = id => {
+      if (!ownedSet.has(id) || placed.has(id) || roaming.length >= keepCap()) return false;
+      const line = lineOfId(id);
+      if (line && seen.has(line)) return false;
+      placed.add(id);
+      if (line) seen.add(line);
+      roaming.push(id);
+      return true;
+    };
+    keep.roaming.forEach(takeRoam);
+    keep.stables.forEach(id => {
       if (!ownedSet.has(id) || placed.has(id)) return;
       placed.add(id);
-      list.push(id);
-    };
-    keep.roaming.forEach(id => take(id, roaming));
-    keep.stables.forEach(id => take(id, stables));
+      stables.push(id);
+    });
     owned.forEach(id => {
       if (placed.has(id)) return;
-      placed.add(id);
-      if (roaming.length < 6) roaming.push(id);
-      else stables.push(id);
+      if (!takeRoam(id)){ placed.add(id); stables.push(id); }
     });
     keep.roaming = roaming;
     keep.stables = stables;
@@ -3565,7 +3961,7 @@ function reconcileKeep(){
     if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
   }
 }
-/* One write for a keep move. save() reconciles, so the two lists stay a partition of owned ids, roaming at most 6. */
+/* One write for a keep move. save() reconciles, so the lists stay a partition of owned ids, one breed in the Keep. */
 function moveKeep(op, id, other){
   const a = idKey(id), b = idKey(other);
   const keep = normKeep(S.keep);
@@ -3574,12 +3970,31 @@ function moveKeep(op, id, other){
   asList(S.dragons).forEach(d => { const k = dragonKey(d); if (k != null) owned.add(k); });
   const has = (list, k) => k != null && list.indexOf(k) >= 0;
   let nextR = roaming, nextS = stables, ok = false;
-  if (op === "send" && has(stables, a) && !has(roaming, a) && owned.has(a) && roaming.length < 6){
-    nextS = stables.filter(k => k !== a); nextR = roaming.concat(a); ok = true;
+  if (op === "send" && has(stables, a) && !has(roaming, a) && owned.has(a)){
+    const line = lineOfId(a);
+    const occupant = roaming.find(k => lineOfId(k) === line);
+    if (occupant){
+      nextR = roaming.map(k => k === occupant ? a : k);
+      nextS = stables.filter(k => k !== a).concat(occupant);
+      pinBreed(keep, line, a);
+      ok = true;
+    } else if (roaming.length < keepCap()){
+      nextS = stables.filter(k => k !== a);
+      nextR = roaming.concat(a);
+      pinBreed(keep, line, a);
+      ok = true;
+    }
   } else if (op === "rest" && has(roaming, a) && !has(stables, a) && owned.has(a)){
     nextR = roaming.filter(k => k !== a); nextS = stables.concat(a); ok = true;
   } else if (op === "swap" && a !== b && has(roaming, a) && !has(stables, a) && has(stables, b) && !has(roaming, b) && owned.has(a) && owned.has(b)){
-    nextR = roaming.map(k => k === a ? b : k); nextS = stables.map(k => k === b ? a : k); ok = true;
+    const lineB = lineOfId(b);
+    const otherBreed = roaming.find(k => k !== a && lineOfId(k) === lineB);
+    if (!otherBreed){
+      nextR = roaming.map(k => k === a ? b : k);
+      nextS = stables.map(k => k === b ? a : k);
+      pinBreed(keep, lineB, b);
+      ok = true;
+    }
   }
   if (!ok) return false;
   keep.roaming = nextR; keep.stables = nextS; S.keep = keep;
@@ -3658,6 +4073,59 @@ function prepareHome(streak){
   return {day, weekday: dt ? dt.getDay() : new Date(ms).getDay(), fresh};
 }
 const SABBATH_NOTE = "Sabbath rest. No chores required.";
+/* Public-domain KJV. The morning blessing is chosen from the home-zone date, with no network. */
+const BLESSINGS = [
+  ["This is the day which the LORD hath made; we will rejoice and be glad in it.", "Psalm 118:24"],
+  ["My voice shalt thou hear in the morning, O LORD; in the morning will I direct my prayer unto thee, and will look up.", "Psalm 5:3"],
+  ["O satisfy us early with thy mercy; that we may rejoice and be glad all our days.", "Psalm 90:14"],
+  ["It is of the LORD's mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness.", "Lamentations 3:22-23"],
+  ["For his anger endureth but a moment; in his favour is life: weeping may endure for a night, but joy cometh in the morning.", "Psalm 30:5"],
+  ["Cause me to hear thy lovingkindness in the morning; for in thee do I trust: cause me to know the way wherein I should walk; for I lift up my soul unto thee.", "Psalm 143:8"],
+  ["The LORD bless thee, and keep thee.", "Numbers 6:24"],
+  ["The LORD make his face shine upon thee, and be gracious unto thee.", "Numbers 6:25"],
+  ["The LORD lift up his countenance upon thee, and give thee peace.", "Numbers 6:26"],
+  ["The LORD is my shepherd; I shall not want.", "Psalm 23:1"],
+  ["The LORD is my light and my salvation; whom shall I fear? the LORD is the strength of my life; of whom shall I be afraid?", "Psalm 27:1"],
+  ["God is our refuge and strength, a very present help in trouble.", "Psalm 46:1"],
+  ["What time I am afraid, I will trust in thee.", "Psalm 56:3"],
+  ["For the LORD is good; his mercy is everlasting; and his truth endureth to all generations.", "Psalm 100:5"],
+  ["O give thanks unto the LORD, for he is good: for his mercy endureth for ever.", "Psalm 107:1"],
+  ["Thy word is a lamp unto my feet, and a light unto my path.", "Psalm 119:105"],
+  ["My help cometh from the LORD, which made heaven and earth.", "Psalm 121:2"],
+  ["The LORD shall preserve thy going out and thy coming in from this time forth, and even for evermore.", "Psalm 121:8"],
+  ["I have set the LORD always before me: because he is at my right hand, I shall not be moved.", "Psalm 16:8"],
+  ["O taste and see that the LORD is good: blessed is the man that trusteth in him.", "Psalm 34:8"],
+  ["Commit thy way unto the LORD; trust also in him; and he shall bring it to pass.", "Psalm 37:5"],
+  ["Cast thy burden upon the LORD, and he shall sustain thee: he shall never suffer the righteous to be moved.", "Psalm 55:22"],
+  ["Trust in him at all times; ye people, pour out your heart before him: God is a refuge for us. Selah.", "Psalm 62:8"],
+  ["For the LORD God is a sun and shield: the LORD will give grace and glory: no good thing will he withhold from them that walk uprightly.", "Psalm 84:11"],
+  ["The LORD is good to all: and his tender mercies are over all his works.", "Psalm 145:9"],
+  ["Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.", "Proverbs 3:5-6"],
+  ["Commit thy works unto the LORD, and thy thoughts shall be established.", "Proverbs 16:3"],
+  ["Thou wilt keep him in perfect peace, whose mind is stayed on thee: because he trusteth in thee.", "Isaiah 26:3"],
+  ["For I the LORD thy God will hold thy right hand, saying unto thee, Fear not; I will help thee.", "Isaiah 41:13"],
+  ["The LORD is good, a strong hold in the day of trouble; and he knoweth them that trust in him.", "Nahum 1:7"],
+  ["Come unto me, all ye that labour and are heavy laden, and I will give you rest.", "Matthew 11:28"],
+  ["Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid.", "John 14:27"],
+  ["Rejoice in the Lord alway: and again I say, Rejoice.", "Philippians 4:4"],
+  ["I can do all things through Christ which strengtheneth me.", "Philippians 4:13"],
+  ["Casting all your care upon him; for he careth for you.", "1 Peter 5:7"],
+  ["And the LORD, he it is that doth go before thee; he will be with thee, he will not fail thee, neither forsake thee: fear not, neither be dismayed.", "Deuteronomy 31:8"],
+  ["Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.", "Joshua 1:9"],
+  ["I will both lay me down in peace, and sleep: for thou, LORD, only makest me dwell in safety.", "Psalm 4:8"],
+  ["Jesus Christ the same yesterday, and to day, and for ever.", "Hebrews 13:8"],
+  ["For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.", "2 Timothy 1:7"]
+];
+function morningVerse(day){
+  const dt = isoDay(typeof day === "string" ? day : "");
+  const n = dt ? Math.floor(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate()) / 86400000) : 0;
+  const i = ((n % BLESSINGS.length) + BLESSINGS.length) % BLESSINGS.length;
+  return BLESSINGS[i][0] + " (" + BLESSINGS[i][1] + ")";
+}
+function blessingLine(rest, day){
+  const verse = morningVerse(day);
+  return rest ? SABBATH_NOTE + " " + verse : verse;
+}
 const STREAK_PRIZES = [{at:30, steps:300}, {at:14, steps:140}, {at:7, steps:70}, {at:3, steps:30}, {at:1, steps:10}];
 function isoDay(s){
   if (typeof s !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
@@ -3707,7 +4175,8 @@ function visitKeep(){
   const day = home.day;
   const rest = home.weekday === restDayNum();
   const note = rest ? SABBATH_NOTE : "";
-  const held = {fresh:false, clamped:false, rest, note, blessing:false, day, count:streak.count, best:streak.best};
+  const verse = morningVerse(day);
+  const held = {fresh:false, clamped:false, rest, note, verse, blessing:false, day, count:streak.count, best:streak.best};
   const keepHome = () => { if (home.fresh) save(); };
   if (dayAfter(streak.last, day)){ keepHome(); return Object.assign(held, {clamped:true}); }
   if (rest){
@@ -3724,7 +4193,7 @@ function visitKeep(){
   streak.count = count;
   streak.best = best;
   save();
-  return {fresh:true, clamped:false, rest, note, blessing:true, day, count, best};
+  return {fresh:true, clamped:false, rest, note, verse, blessing:true, day, count, best};
 }
 function claimedDayOf(streak){
   if (isoDay(streak && streak.claimedDay)) return streak.claimedDay;
@@ -3751,10 +4220,18 @@ function claimStreak(){
   save();
   return steps;
 }
+function verseOn(){ return !(S && S.keep && S.keep.verse === false); }
+function toggleVerse(){
+  if (!keepOn() || !S) return;
+  if (!S.keep || typeof S.keep !== "object") S.keep = freshKeep();
+  if (verseOn()) S.keep.verse = false;
+  else delete S.keep.verse;
+  save();
+}
 function noteDailyVisit(){
   if (!keepOn()) return null;
   const v = visitKeep();
-  if (v.fresh) toast(v.rest ? SABBATH_NOTE : "A blessing for this day.");
+  if (v.fresh && verseOn()) toast(blessingLine(v.rest, v.day));
   return v;
 }
 function renderStreak(){

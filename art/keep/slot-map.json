@@ -366,5 +366,12 @@
    "alias_of": "elder",
    "drawOrder": 6
   }
+ },
+ "ledgerPlaque": {
+  "file": "ledger-plaque.webp",
+  "x": 653,
+  "y": 836,
+  "w": 166,
+  "h": 49
  }
 }

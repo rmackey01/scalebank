@@ -92,8 +92,8 @@ const cases = [
       t.equal(s.eggs[0].item, "tide", "v1 chain still maps frost eggs onto tide");
       t.equal(s.dex.cinder.n, 2, "v1 chain rebuilds the base count from owned dragons");
       t.equal(s.dex["cinder:moonlit"].n, 1, "v1 chain records the mutation");
-      t.deepEqual(s.keep.roaming, ["ash", "moon"], "juvenile outranks the moonlit hatchling");
-      t.deepEqual(s.keep.stables, [], "stables");
+      t.deepEqual(s.keep.roaming, ["ash"], "one cinder in the keep, the juvenile");
+      t.deepEqual(s.keep.stables, ["moon"], "the other cinder rests");
       t.keepDefaults(s);
     }
   },
@@ -135,8 +135,8 @@ const cases = [
       t.equal(s.dex.brine.n, 4, "brine count");
       t.equal(s.dex.cinder.n, 6, "cinder count");
       t.equal(s.dex["voidling:moonlit"].n, 3, "mutation count");
-      t.deepEqual(s.keep.roaming, ["inf-elder", "moss-elder", "a-tide", "z-tide", "void-adult", "storm-juv"], "six highest stage, then rarity, then id");
-      t.deepEqual(s.keep.stables, ["temp-hatch", "ember-hatch"], "the rest stabled, legendary hatchling included");
+      t.deepEqual(s.keep.roaming, ["inf-elder", "moss-elder", "a-tide", "void-adult", "storm-juv", "temp-hatch", "ember-hatch"], "one per breed, highest stage then id");
+      t.deepEqual(s.keep.stables, ["z-tide"], "the other brine rests");
       t.ok(new Set([...s.keep.roaming, ...s.keep.stables]).size === 8, "each id once");
       t.keepDefaults(s);
       t.equal(t.balance, "4,321", "bank still shows the same coins");
@@ -251,8 +251,8 @@ const cases = [
     check(s, t) {
       t.equal(s.ver, 4, "ver 4");
       t.equal(s.bank, 9, "coins");
-      t.deepEqual(s.keep.roaming, ["b", "a"], "already-migrated order is not resorted");
-      t.deepEqual(s.keep.stables, [], "stables");
+      t.deepEqual(s.keep.roaming, ["b"], "one cinder stays, the first in the keep");
+      t.deepEqual(s.keep.stables, ["a"], "the other cinder rests");
       t.deepEqual(s.keep.zones, ["meadow"], "zones");
       t.deepEqual(s.keep.care, {b: 1}, "care");
       t.ok(visitedStreak(s.keep.streak, 3, {last: "yesterday", count: 4, best: 6}), "app load records today without dropping best");
@@ -278,8 +278,8 @@ const cases = [
       t.equal(s.lifetime, 6000, "lifetime");
       t.deepEqual(s.dragons.map(d => d.id), ["old", "drg8"], "hatched dragon kept");
       t.deepEqual(s.eggs, [], "egg consumed");
-      t.deepEqual(s.keep.roaming, ["old", "drg8"], "new dragon joined roaming");
-      t.deepEqual(s.keep.stables, [], "stables");
+      t.deepEqual(s.keep.roaming, ["old"], "the breed already in the keep stays");
+      t.deepEqual(s.keep.stables, ["drg8"], "the new cinder rests");
       t.equal(s.dex.cinder.n, 2, "hatch count");
     }
   },
@@ -298,8 +298,8 @@ const cases = [
     check(s, t) {
       t.equal(s.bank, 40, "coins");
       t.deepEqual(s.dragons.map(d => d.id), ["d1", "d2", "d3", "d4", "d5", "d6", "drg20"], "seventh dragon kept");
-      t.deepEqual(s.keep.roaming, ["d1", "d2", "d3", "d4", "d5", "d6"], "roaming stays the first six");
-      t.deepEqual(s.keep.stables, ["drg20"], "seventh goes to stables");
+      t.deepEqual(s.keep.roaming, ["d1"], "one cinder stays in the keep");
+      t.deepEqual(s.keep.stables, ["d2", "d3", "d4", "d5", "d6", "drg20"], "the other cinders rest");
     }
   },
   {
@@ -315,8 +315,8 @@ const cases = [
     check(s, t) {
       t.equal(s.bank, 15, "coins");
       t.deepEqual(s.dragons.map(d => d.id), ["r1", "r2", "r3", "r4", "r5", "r6", "extra"], "owned dragons unchanged");
-      t.deepEqual(s.keep.roaming, ["r1", "r2", "r3", "r4", "r5", "r6"], "missing id filled the open roaming slot");
-      t.deepEqual(s.keep.stables, ["extra"], "the rest go to stables, stale ids dropped");
+      t.deepEqual(s.keep.roaming, ["r1"], "one brine stays in the keep");
+      t.deepEqual(s.keep.stables, ["r2", "r3", "r4", "r5", "r6", "extra"], "the other brines rest, stale ids dropped");
     }
   }
 ];
@@ -414,7 +414,7 @@ try {
       const ids = new Set();
       const placed = [...(s.keep.roaming || []), ...(s.keep.stables || [])];
       placed.forEach(id => { if (ids.has(id)) problems.push("duplicate id " + id); ids.add(id); });
-      if ((s.keep.roaming || []).length > 6) problems.push("roaming has more than 6");
+      if ((s.keep.roaming || []).length > 7) problems.push("roaming has more than 7");
     }
     if (problems.length) {
       failed++;

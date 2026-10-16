@@ -1,5 +1,5 @@
 /**
- * Checks moveKeep: one save write, no lost or duplicate ids, roaming max 6.
+ * Checks moveKeep: one save write, no lost or duplicate ids, one dragon per breed.
  * The function is evaluated from index.html. There is no window hook.
  * Run from the repo root: node tests/keep-moves.mjs
  */
@@ -17,8 +17,9 @@ function save(dragons, roaming, stables) {
     keep: {roaming, stables, zones: ["meadow"], care: {note: 1}, streak: {last: "yesterday", count: 2, best: 4}, restDay: 1}
   });
 }
-const six = ["r1","r2","r3","r4","r5","r6"].map(id => dragon(id, "ember", 0));
-const extra = dragon("s1", "tide", 0);
+const breeds = ["ember","tide","forest","inferno","storm","void","tempest"];
+const seven = breeds.map((item, i) => dragon("k" + i, item, 0));
+const dup = dragon("dup", "ember", 120000);
 
 const cases = [
   {
@@ -70,22 +71,19 @@ const cases = [
     }
   },
   {
-    name: "full",
-    raw: save(six.concat(extra), six.map(d => d.id), ["s1"]),
+    name: "breed",
+    raw: save(seven.concat(dup), seven.map(d => d.id), ["dup"]),
     run(g) {
-      const send = g.moveKeep("send", "s1");
-      const sendWrites = g.writes();
-      const swap = g.moveKeep("swap", "r6", "s1");
-      return {send, sendWrites, swap, swapWrites: g.writes() - sendWrites};
+      const send = g.moveKeep("send", "dup");
+      return {send, writes: g.writes()};
     },
     check(r, t) {
-      t.equal(r.send, false, "send refused while roaming is full");
-      t.equal(r.sendWrites, 0, "refused send does not write");
-      t.equal(r.swap, true, "swap still works when the keep is full");
-      t.equal(r.swapWrites, 1, "the swap is the only write");
-      t.deepEqual(r.keep.roaming, ["r1","r2","r3","r4","r5","s1"], "roaming stays at six");
-      t.deepEqual(r.keep.stables, ["r6"], "the displaced dragon rests");
-      t.ok(r.keep.roaming.length <= 6, "roaming max 6");
+      t.equal(r.send, true, "a duplicate breed swaps into that slot");
+      t.equal(r.writes, 1, "one save write");
+      t.deepEqual(r.keep.roaming, ["dup","k1","k2","k3","k4","k5","k6"], "the breed's keep dragon is replaced");
+      t.deepEqual(r.keep.stables, ["k0"], "the other one rests");
+      t.equal(r.keep.shown && r.keep.shown.cinder, "dup", "the arrival is that breed's ledger pick");
+      t.ok(r.keep.roaming.length <= 7, "roaming max 7");
       t.sameDragons(r);
     }
   },
@@ -160,7 +158,7 @@ for (const c of cases) {
     const placed = [...snap.keep.roaming, ...snap.keep.stables];
     const set = new Set(placed);
     if (set.size !== placed.length) problems.push("duplicate id");
-    if (snap.keep.roaming.length > 6) problems.push("roaming over 6");
+    if (snap.keep.roaming.length > 7) problems.push("roaming over 7");
     const expect = new Set(owned());
     if (set.size !== expect.size || [...set].some(id => !expect.has(id))) problems.push("ids lost or invented: " + JSON.stringify(placed));
   } catch (e) {

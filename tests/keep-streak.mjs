@@ -590,6 +590,49 @@ add("dst-fall", t => {
   t.equal(g.visitKeep().fresh, false, "the same Chicago night does not add another day");
 });
 
+add("morning-verse", t => {
+  const g = boot(save());
+  t.equal(g.morningVerse("2026-10-16"), g.morningVerse("2026-10-16"), "a date keeps its verse");
+  t.ok(g.morningVerse("2026-10-16") !== g.morningVerse("2026-10-17"), "the next date has another verse");
+  t.ok(/\([^)]+\)$/.test(g.morningVerse("2026-10-16")), "the verse ends with its reference");
+  t.equal(g.blessingLine(false, "2026-10-16"), g.morningVerse("2026-10-16"), "a weekday blessing is the verse");
+  t.ok(g.blessingLine(false, "2026-10-16").indexOf("A blessing for this day.") < 0, "the plain blessing line is gone");
+  const sundayLine = g.blessingLine(true, "2026-10-18");
+  t.ok(sundayLine.indexOf("Sabbath rest. No chores required.") === 0, "Sunday still begins with the Sabbath note");
+  t.ok(sundayLine.indexOf(g.morningVerse("2026-10-18")) > 0, "Sunday keeps that day's verse with the note");
+
+  let zone = "America/Chicago";
+  let off = 300;
+  let clock = Date.UTC(2026, 9, 16, 15, 0, 0);
+  g.setCareClock(() => clock);
+  g.setTimeZone(() => zone);
+  g.setZoneOffset(() => off);
+  const morning = g.visitKeep();
+  t.equal(morning.day, "2026-10-16", "morning is the Chicago date");
+  t.equal(morning.verse, g.morningVerse("2026-10-16"), "the visit carries that date's verse");
+  t.equal(morning.blessing, true, "a new weekday still carries a blessing");
+  clock = Date.UTC(2026, 9, 16, 23, 0, 0);
+  const evening = g.visitKeep();
+  t.equal(evening.fresh, false, "later the same home day is not a new visit");
+  t.equal(evening.verse, morning.verse, "the verse stays through the home day");
+  zone = "Asia/Tokyo";
+  off = -540;
+  clock = Date.UTC(2026, 9, 16, 20, 0, 0);
+  const trip = g.visitKeep();
+  t.equal(trip.day, "2026-10-16", "a device zone change keeps the home date");
+  t.equal(trip.verse, morning.verse, "the verse follows the home date, not the device date");
+  clock = Date.UTC(2026, 9, 17, 15, 0, 0);
+  const next = g.visitKeep();
+  t.equal(next.day, "2026-10-17", "the next Chicago morning is a new date");
+  t.ok(next.verse !== morning.verse, "the new home date has a new verse");
+  clock = Date.UTC(2026, 9, 18, 15, 0, 0);
+  const sun = g.visitKeep();
+  t.equal(sun.rest, true, "Sunday is still the rest day");
+  t.equal(sun.blessing, false, "Sunday does not use the weekday blessing flag");
+  t.ok(sun.note.indexOf("Sabbath rest") >= 0, "Sunday still names Sabbath rest");
+  t.equal(sun.verse, g.morningVerse("2026-10-18"), "Sunday carries the verse beside the note");
+});
+
 add("dst-spring", t => {
   let zone = "America/Chicago";
   let clock = Date.UTC(2026, 2, 7, 21, 0, 0);
