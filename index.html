@@ -1,4 +1,6 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<script>try{var kq=new URLSearchParams(location.search);if(kq.get("keep")==="1")sessionStorage.setItem("scalebank.keep","1");if(kq.get("keep")==="1"||sessionStorage.getItem("scalebank.keep")==="1")document.documentElement.classList.add("keep-on");}catch(e){}</script>
+</head><body>
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,6 +46,102 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .tab-ul{position:absolute;z-index:1;top:-4.2px;left:calc((var(--ti,0) + .5) * 25%);width:50px;height:12px;margin-left:-25px;pointer-events:none;background:url(art/nest/nav_active_underline.webp) center/100% 100% no-repeat;transition:left .25s cubic-bezier(.65,0,.35,1)}
 .tab .dot{position:absolute;top:-2px;left:calc(50% + 5px);width:20px;height:20px;animation:dotpulse 1.6s ease-in-out infinite}
 @keyframes dotpulse{0%,100%{opacity:.7}50%{opacity:1}}
+/* Keep is off unless html.keep-on (?keep=1, remembered in sessionStorage). */
+.tab-keep{display:none!important}
+html.keep-on .tabs{grid-template-columns:repeat(5,1fr)}
+html.keep-on .tab-ul{left:calc((var(--ti,0) + .5) * 20%)}
+html.keep-on .tab-keep{display:flex!important}
+html.keep-on .tab-keep .ti{object-fit:contain}
+/* Keep art is assigned from script only while the flag is on, so these files are never requested otherwise. */
+.keep-art{visibility:hidden}
+.keep-art.is-ok{visibility:visible}
+html.keep-on #keep{position:relative;overflow:visible;background:var(--ink)}
+html.keep-on #keep .keep-stage{position:absolute;z-index:0;left:0;top:0;right:0;height:calc(100% + var(--keep-cover,96px));overflow:hidden}
+html.keep-open #app::before{content:"";position:absolute;z-index:1;left:0;right:0;bottom:0;height:var(--keep-cover,96px);background:var(--ink);pointer-events:none}
+html.keep-open .tabs{position:relative;z-index:2}
+.keep-bg{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
+.keep-build{position:absolute;z-index:3;top:12px;right:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--gold);background:linear-gradient(180deg,#e8bd5f,#b9862e);color:#1b1206;font-size:12px;font-weight:700;letter-spacing:.06em;box-shadow:inset 0 1px 0 rgba(255,240,200,.5),0 2px 0 #5c3d0c}
+.keep-streak{position:absolute;z-index:5;top:72px;left:12px;width:min(200px,calc(100% - 24px));padding:8px 10px 10px;border-radius:14px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.9);pointer-events:auto}
+.keep-streak .ks-day{margin:0;font-family:var(--display);font-weight:600;font-size:22px;line-height:1;color:var(--gold-hi)}
+.keep-streak .ks-best{margin:2px 0 0;font-size:11px;letter-spacing:.06em;color:var(--muted)}
+.keep-streak .ks-note{margin:6px 0 0;font-size:12px;line-height:1.3;color:var(--gold-hi)}
+.keep-streak .btn{min-width:0;width:100%;margin-top:8px;padding:7px 8px;font-size:12px}
+.keep-build:active{transform:translateY(1px)}
+/* Lectern hotspot, fractions of the full painting (1008×1792, tab strip included). */
+.keep-hot{position:absolute;z-index:3;left:27%;top:70%;width:46%;height:14%;padding:0;border:0;background:transparent;color:var(--gold-hi)}
+.keep-hot span{position:absolute;left:50%;bottom:10%;transform:translateX(-50%);padding:5px 12px;border-radius:999px;background:rgba(12,16,21,.82);border:1px solid var(--gold-lo);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.keep-hot:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:12px}
+/* Pens sit on the painting in scene percentages. The world box is the covered image, so they scale with it. */
+.keep-world{position:absolute;z-index:2;pointer-events:none}
+.keep-pen{position:absolute}
+.keep-ground{position:absolute;left:6%;right:6%;bottom:0;height:36%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(216,169,75,.2),rgba(216,169,75,0) 72%)}
+.pen-lock{position:absolute;left:50%;top:42%;width:90%;transform:translate(-50%,-50%);margin:0;padding:5px 6px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.86);color:var(--gold-hi);font-size:11px;font-weight:700;line-height:1.25;text-align:center}
+.keep-pen.is-open .pen-lock{display:none}
+.keep-keeper{position:absolute;left:15%;top:63%;width:8.5%;aspect-ratio:2/3;z-index:4}
+.kk-cloak{position:absolute;left:14%;right:14%;top:32%;bottom:0;border-radius:46% 46% 14% 14%;background:linear-gradient(180deg,#c4925a,#5c3b24)}
+.kk-hood{position:absolute;left:18%;right:18%;top:0;height:38%;border-radius:48% 48% 42% 42%;background:linear-gradient(180deg,#d7a56a,#6e4a30)}
+.kk-hood::after{content:"";position:absolute;left:22%;right:22%;top:46%;height:36%;border-radius:42%;background:#f0d2b0}
+.pen-dragon{position:absolute;padding:0;border:0;background:transparent;line-height:0;transform:translate(-50%,-100%);pointer-events:auto}
+.pen-dragon:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px;border-radius:10px}
+.pen-sprite{position:relative;display:block;background-repeat:no-repeat;background-position:left center}
+.pen-sprite svg{display:none;width:100%;height:100%}
+.pen-sprite.is-ph svg{display:block}
+.ledger{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
+.ledger-sheet{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--gold-lo);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,#2a241c,#14110e)}
+.ledger-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;pointer-events:none}
+.ledger-body{position:relative;z-index:1;flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:8px 10px 6px;background:linear-gradient(180deg,rgba(20,17,14,.84),rgba(12,10,8,.62) 30%,rgba(12,10,8,.8))}
+.ledger-body h2{margin:0;text-align:center;font-family:var(--display);font-weight:600;font-size:22px;line-height:1.05;color:var(--gold-hi)}
+.ldg-swap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:0;text-align:center;color:var(--gold-hi);font-size:12px}
+.ldg-swap .btn{min-width:0;padding:4px 8px;font-size:11px}
+.ldg-sec{min-width:0}
+.ldg-sec h3{margin:0 0 2px;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.15;color:var(--fg)}
+.ldg-stables-sec{flex:1;min-height:0;display:flex;flex-direction:column}
+.ldg-stables{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.ldg-list{list-style:none;margin:0;padding:0}
+.ldg-empty{margin:0 0 6px;color:var(--muted);font-size:13px}
+.ldg-row{display:grid;grid-template-columns:32px minmax(0,1fr);column-gap:6px;row-gap:1px;align-items:center;padding:3px 2px;border-bottom:1px solid rgba(216,169,75,.22)}
+.ldg-row.is-pick{background:rgba(216,169,75,.2);border-radius:10px;box-shadow:inset 0 0 0 1px var(--gold)}
+.ldg-art{grid-column:1;grid-row:1 / span 2;width:32px;height:32px}
+.ldg-art .dart{width:32px;height:32px;aspect-ratio:auto;border-radius:7px}
+.ldg-who{grid-column:2;grid-row:1;min-width:0;display:flex;flex-direction:column;gap:0}
+.ldg-name{justify-self:start;max-width:100%;background:none;border:0;padding:0;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.05;color:var(--gold-hi);text-align:left}
+.ldg-name:hover{text-decoration:underline}
+.ldg-meta{font-size:11px;line-height:1.15;color:var(--muted)}
+.ldg-meta .r{font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+.ldg-acts{grid-column:2;grid-row:2;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.ldg-acts .btn,.ldg-swap .btn{min-width:0;padding:3px 7px;border-radius:8px;font-size:11px;white-space:nowrap}
+.ldg-roam .ldg-row{grid-template-columns:26px minmax(0,1fr) auto;align-items:center;padding:1px 0}
+.ldg-roam .ldg-art{grid-row:1;width:26px;height:26px}
+.ldg-roam .ldg-art .dart{width:26px;height:26px}
+.ldg-roam .ldg-who{grid-row:1;flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:6px}
+.ldg-roam .ldg-name{font-size:14px}
+.ldg-roam .ldg-acts{grid-column:3;grid-row:1}
+.ldg-hint{margin:0 0 2px;color:var(--gold-hi);font-size:11px;line-height:1.2}
+.ledger > .btn{align-self:center;min-width:140px;padding:8px 16px}
+.care{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
+.care-ov{z-index:24}
+.care-sheet{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;border:1px solid var(--gold-lo);border-radius:16px;background:linear-gradient(180deg,#2a241c,#14110e);padding:12px 12px 14px}
+.care-top{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:center}
+.care-top .dart{width:72px;border-radius:10px}
+.care-name{margin:0;font-family:var(--display);font-weight:600;font-size:24px;line-height:1.05;color:var(--gold-hi)}
+.care-top .bond{margin-top:8px}
+.bond{height:10px;border-radius:999px;background:#1b160f;border:1px solid var(--gold-lo);overflow:hidden}
+.bond i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi))}
+.bond-n{margin-top:3px;font-size:11px;letter-spacing:.08em;color:var(--gold-hi)}
+.wax-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.wax{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;position:relative;font-family:var(--display);font-weight:700;font-size:14px;color:#2a160c;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.55),transparent 42%),radial-gradient(circle at 70% 78%,rgba(0,0,0,.2),transparent 46%),var(--mut-acc,var(--gold));box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.45),0 1px 1px rgba(0,0,0,.35);border:2px solid rgba(70,28,10,.4)}
+.wax::after{content:"";position:absolute;inset:3px;border-radius:50%;border:1px dashed rgba(60,20,8,.4);pointer-events:none}
+.care-pleased{margin:8px 0 0;text-align:center;color:var(--gold-hi);font-size:13px}
+.care-acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+.care-acts .btn{min-width:0;padding:8px 4px;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.1}
+.care-acts .btn small{font-weight:600;font-size:10px;letter-spacing:.04em}
+.care-sheet h3{margin:14px 0 6px;font-family:var(--display);font-weight:600;font-size:18px;color:var(--fg)}
+.care-note{margin:0 0 8px;font-size:13px;line-height:1.35;color:var(--fg)}
+.care-note.locked{color:var(--muted);font-style:italic}
+.care > .btn{align-self:center;min-width:140px;padding:8px 16px}
+@keyframes careHop{0%{transform:translateY(0)}35%{transform:translateY(-10px)}70%{transform:translateY(0)}85%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+.care-top.is-happy .dart{animation:careHop .7s ease}
+@media (prefers-reduced-motion:reduce){.care-top.is-happy .dart{animation:none}}
 
 /* ---------- shared bits ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
@@ -588,6 +686,16 @@ button.dexchip{cursor:pointer}
     <div id="dragonBody"></div>
   </main>
 
+  <main id="keep" class="screen" aria-label="Keep" hidden>
+    <div class="keep-stage">
+      <img class="keep-bg keep-art" alt="" draggable="false">
+      <div class="keep-world" id="keepWorld"></div>
+      <button type="button" class="keep-build" data-act="keep-build">Build</button>
+      <div class="keep-streak" id="keepStreak" hidden></div>
+      <button type="button" class="keep-hot" data-act="keep-ledger" aria-label="Ledger"><span>Ledger</span></button>
+    </div>
+  </main>
+
   <main id="bestiary" class="screen bst-journal" aria-label="Bestiary" hidden>
     <div class="bst-scroll">
       <div class="bst-frame">
@@ -609,6 +717,7 @@ button.dexchip{cursor:pointer}
     <button class="tab" data-tab="vendors"><img class="ti off" src="art/nest/icon_vendors_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_vendors_active.webp" alt="">Vendors</button>
     <button class="tab" data-tab="nest"><img class="ti off" src="art/nest/icon_nest_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_nest_active.webp" alt="">Nest<img class="dot" id="readyDot" src="art/nest/nav_notification_dot.webp" alt="" hidden></button>
     <button class="tab" data-tab="dragon"><img class="ti off" src="art/nest/icon_dragon_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_dragon_active.webp" alt="">Dragon</button>
+    <button class="tab tab-keep" data-tab="keep"><img class="ti off keep-art" alt=""><img class="ti on keep-art" alt="">Keep</button>
     <i class="tab-ul" aria-hidden="true"></i>
   </nav>
 
@@ -616,6 +725,21 @@ button.dexchip{cursor:pointer}
   <div class="overlay" id="shareOv" hidden></div>
   <div class="overlay bst-journal" id="dexOv" hidden></div>
   <div class="overlay reveal-ov" id="revealOv" hidden></div>
+  <div class="overlay" id="ledgerOv" hidden>
+    <div class="ledger" role="dialog" aria-modal="true" aria-label="Keeper's Ledger">
+      <div class="ledger-sheet">
+        <img class="ledger-bg keep-art" alt="">
+        <div class="ledger-body" id="ledgerBody"></div>
+      </div>
+      <button type="button" class="btn" data-act="close-ledger">Close</button>
+    </div>
+  </div>
+  <div class="overlay care-ov" id="careOv" hidden>
+    <div class="care" role="dialog" aria-modal="true" aria-label="Care">
+      <div class="care-sheet" id="careBody"></div>
+      <button type="button" class="btn" data-act="close-care">Close</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -712,7 +836,9 @@ const SCENES = [
   {id:"roost", name:"Cliff Roost", keeper:"A stranger \u00B7 storm eggs and night trails", quip:"Sells what the storm leaves behind. Doesn\u2019t haggle.", art:artRoostVideo, keys:["storm","tsparks"]}
 ];
 const KEY = "scalebank.v1";
-const SAVE_VER = 3;
+const BAK_KEY = "scalebank.bak.v3";
+const CORRUPT_KEY = "scalebank.corrupt";
+const SAVE_VER = 4;
 const DEX_LINES = ITEMS.filter(i => i.kind === "egg").map(i => i.line);
 const MUT_KEYS = Object.keys(MUTATIONS);
 const DEX_KEYS = DEX_LINES.flatMap(l => [l, ...MUT_KEYS.map(m => l + ":" + m)]);
@@ -787,9 +913,49 @@ function loadMutArt(){
 }
 
 /* ================= state ================= */
-function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1, dex:{}, ver:SAVE_VER}; }
+/* restDay 0 is Sunday. */
+function freshKeep(){ return {roaming:[], stables:[], zones:[], care:{}, streak:{last:null, count:0, best:0}, restDay:0}; }
+function fresh(){ return {bank:0, lifetime:0, owned:{}, bought:{}, opened:{}, eggs:[], dragons:[], prize:null, scene:0, tab:"bank", seq:1, dex:{}, keep:freshKeep(), ver:SAVE_VER}; }
 function asList(v){ return Array.isArray(v) ? v : []; }
 function asMap(v){ return v && typeof v === "object" && !Array.isArray(v) ? v : {}; }
+function asIdList(v){
+  if (!Array.isArray(v)) return [];
+  const out = [], seen = new Set();
+  v.forEach(id => {
+    const k = idKey(id);
+    if (k == null || seen.has(k)) return;
+    seen.add(k); out.push(k);
+  });
+  return out;
+}
+function idKey(id){
+  if (typeof id === "string" && id) return id;
+  if (typeof id === "number" && Number.isFinite(id)) return String(id);
+  return null;
+}
+function normKeep(k){
+  const base = freshKeep();
+  if (!k || typeof k !== "object" || Array.isArray(k)) return base;
+  base.roaming = asIdList(k.roaming);
+  base.stables = asIdList(k.stables);
+  base.zones = Array.isArray(k.zones) ? k.zones.slice() : [];
+  base.care = (k.care && typeof k.care === "object" && !Array.isArray(k.care)) ? k.care : {};
+  const s = k.streak;
+  if (s && typeof s === "object" && !Array.isArray(s)){
+    base.streak.last = (s.last == null || typeof s.last === "string" || typeof s.last === "number") ? (s.last ?? null) : null;
+    base.streak.count = Number.isFinite(+s.count) ? +s.count : 0;
+    base.streak.best = Number.isFinite(+s.best) ? +s.best : 0;
+    if (typeof s.claimedDay === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.claimedDay)) base.streak.claimedDay = s.claimedDay;
+    else if (typeof s.claimed === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.claimed)) base.streak.claimedDay = s.claimed;
+    if (typeof s.claimed === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.claimed)) base.streak.claimed = s.claimed;
+    if (typeof s.seen === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.seen)) base.streak.seen = s.seen;
+    if (Number.isInteger(s.tz) && s.tz >= -16 * 60 && s.tz <= 16 * 60) base.streak.tz = s.tz;
+    if (Number.isInteger(s.homeTz) && s.homeTz >= -16 * 60 && s.homeTz <= 16 * 60) base.streak.homeTz = s.homeTz;
+    if (typeof s.homeZone === "string" && s.homeZone) base.streak.homeZone = s.homeZone;
+  }
+  if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
+  return base;
+}
 function hydrate(obj){
   const st = Object.assign(fresh(), obj || {});
   if (!obj || !obj.ver) st.ver = 1;
@@ -799,13 +965,14 @@ function hydrate(obj){
   st.opened = asMap(st.opened);
   st.eggs = asList(st.eggs);
   st.dragons = asList(st.dragons);
+  st.keep = normKeep(st.keep);
   return st;
 }
 function load(){
   try { const raw = localStorage.getItem(KEY); if (raw) return hydrate(JSON.parse(raw)); } catch(e){}
   return null;
 }
-function save(){ dexSync(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function save(){ dexSync(); reconcileKeep(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
 let S = fresh();
 let DSUB = null;
 
@@ -1267,10 +1434,19 @@ function artRoostVideo(){ return sceneVideo("roost", "A hooded stranger crouches
 
 /* ================= screens ================= */
 function setTab(t, sub){
+  if (t === "keep" && !document.documentElement.classList.contains("keep-on")) t = "bank";
+  closeCare({restore:false});
+  document.documentElement.classList.toggle("keep-open", t === "keep");
   S.tab = t;
   DSUB = t === "dragon" && sub === "bestiary" ? "bestiary" : null;
-  for (const id of ["bank","vendors","nest","dragon"]) document.getElementById(id).hidden = id !== t || (id === "dragon" && DSUB === "bestiary");
+  for (const id of ["bank","vendors","nest","dragon","keep"]) document.getElementById(id).hidden = id !== t || (id === "dragon" && DSUB === "bestiary");
   $("#bestiary").hidden = DSUB !== "bestiary";
+  if (t !== "keep"){ closeLedger({restore:false}); stopPenLoop(); }
+  else {
+    requestAnimationFrame(() => { syncKeepCover(); syncPens(); startPenLoop(); });
+    noteDailyVisit();
+    renderStreak();
+  }
   document.querySelectorAll(".tab").forEach((b, i) => { if (b.dataset.tab === t){ b.setAttribute("aria-current","page"); $(".tabs").style.setProperty("--ti", i); } else b.removeAttribute("aria-current"); });
   if (t === "vendors") requestAnimationFrame(() => scrollToScene(S.scene, false));
   syncVideos();
@@ -1600,6 +1776,7 @@ function renderDragon(){
         <div class="growth"><div class="growth-head"><span class="stage-pill">${st.name}</span><span class="growth-note">Steps you add while it\u2019s your prize grow it</span></div>${growth}${replayKey ? `<button class="reset replay-reveal" data-act="replay-reveal" data-id="${p.id}" hidden>Watch it grow again</button>` : ""}</div>
       </div>
       <button class="btn share-btn" data-act="share">Make share card</button>
+      ${document.documentElement.classList.contains("keep-on") ? `<button class="btn ghost" data-act="care" data-id="${esc(p.id)}">Care</button>` : ""}
       ${bstEntry()}
       <div class="section"><h2>Customize</h2>
         <div class="custom">
@@ -1650,6 +1827,8 @@ function render(){
   if (S.tab === "vendors") renderVendors();
   if (S.tab === "nest") renderNest();
   if (S.tab === "dragon"){ if (DSUB === "bestiary") renderBestiary(); else renderDragon(); }
+  if (document.documentElement.classList.contains("keep-on") && !$("#ledgerOv").hidden) renderLedger();
+  if (document.documentElement.classList.contains("keep-on") && S.tab === "keep") syncPens();
 }
 
 function dexRecord(d){
@@ -1661,12 +1840,15 @@ function dexRecord(d){
   });
 }
 function dexSync(){
-  if (!S.dex || typeof S.dex !== "object") S.dex = {};
-  S.dragons.forEach(d => dexKeys(d).forEach(k => {
-    let e = S.dex[k];
-    if (!e) e = S.dex[k] = {first: null, n: S.dragons.filter(x => dexKeys(x).includes(k)).length, top: 0};
-    e.top = Math.max(e.top || 0, stageIdx(d));
-  }));
+  if (!S.dex || typeof S.dex !== "object" || Array.isArray(S.dex)) S.dex = {};
+  S.dragons.forEach(d => {
+    if (!d || typeof d !== "object") return;
+    dexKeys(d).forEach(k => {
+      let e = S.dex[k];
+      if (!e || typeof e !== "object" || Array.isArray(e)) e = S.dex[k] = {first: null, n: S.dragons.filter(x => x && typeof x === "object" && dexKeys(x).includes(k)).length, top: 0};
+      e.top = Math.max(e.top || 0, stageIdx(d));
+    });
+  });
 }
 function migrateDex(){
   S.dex = {};
@@ -1956,6 +2138,8 @@ document.addEventListener("click", ev => {
   }
   const tab = ev.target.closest(".tab");
   if (tab){ setTab(tab.dataset.tab); return; }
+  if (ev.target.id === "careOv"){ closeCare(); return; }
+  if (ev.target.id === "ledgerOv"){ closeLedger(); return; }
   const b = ev.target.closest("[data-act]");
   if (!b) return;
   const a = b.dataset.act;
@@ -1994,6 +2178,19 @@ document.addEventListener("click", ev => {
     });
   }
   else if (a === "close-dex") closeDex();
+  else if (a === "keep-build") toast("Coming soon");
+  else if (a === "streak-claim"){ const n = claimStreak(); if (n) toast("Claimed " + fmt(n) + " steps."); renderStreak(); }
+  else if (a === "keep-ledger") openLedger();
+  else if (a === "close-ledger") closeLedger();
+  else if (a === "ledger-dragon" || a === "pen-dragon") openLedgerDragon(b.dataset.id);
+  else if (a === "ledger-rest"){ if (moveKeep("rest", b.dataset.id) && ledgerPick === b.dataset.id) ledgerPick = null; renderLedger(); }
+  else if (a === "ledger-send"){ if (moveKeep("send", b.dataset.id)) renderLedger(); }
+  else if (a === "ledger-swap"){ if (ledgerPick === b.dataset.id) ledgerPick = null; else ledgerPick = b.dataset.id; renderLedger(); }
+  else if (a === "ledger-swap-do"){ if (moveKeep("swap", ledgerPick, b.dataset.id)) ledgerPick = null; renderLedger(); }
+  else if (a === "ledger-swap-cancel"){ ledgerPick = null; renderLedger(); }
+  else if (a === "care" || a === "ledger-care") openCare(b.dataset.id);
+  else if (a === "close-care") closeCare();
+  else if (a === "care-do"){ if (careAct(careFor, b.dataset.kind)) renderCare(true); }
   else if (a === "dex-replay"){ const d = S.dragons.find(x => x.id === b.dataset.id); closeDex(); if (d) replayReveal(d); }
   else if (a === "share") openShare();
   else if (a === "close-share"){ $("#shareOv").hidden = true; $("#shareOv").innerHTML = ""; autoHatch(); }
@@ -2012,6 +2209,8 @@ document.addEventListener("click", ev => {
   }
 });
 document.addEventListener("keydown", ev => {
+  if (!$("#careOv").hidden && trapTab(ev, $("#careOv"))) return;
+  if (!$("#ledgerOv").hidden && trapTab(ev, $("#ledgerOv"))) return;
   if (S.tab === "vendors" && (ev.key === "ArrowLeft" || ev.key === "ArrowRight") && $("#shareOv").hidden && $("#hatchOv").hidden && $("#revealOv").hidden
       && !(ev.target.closest && ev.target.closest("input,textarea,.fchips"))){
     ev.preventDefault();
@@ -2020,6 +2219,8 @@ document.addEventListener("keydown", ev => {
     return;
   }
   if (ev.key !== "Escape") return;
+  if (!$("#careOv").hidden){ closeCare(); return; }
+  if (!$("#ledgerOv").hidden){ closeLedger(); return; }
   /* Reveal overlay: Escape skips (if allowed) or closes (if payoff ready) */
   if (!$("#revealOv").hidden && revealActive){
     if (revealActive.payoffReady){ closeReveal(); return; }
@@ -2030,7 +2231,494 @@ document.addEventListener("keydown", ev => {
   if (!$("#shareOv").hidden){ $("#shareOv").hidden = true; }
   else if (!$("#hatchOv").hidden && $("#hafter")?.classList.contains("show")) closeHatch();
 });
-window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); });
+function syncKeepCover(){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  const tabs = $(".tabs"), app = $("#app");
+  if (!tabs || !app) return;
+  const cover = app.getBoundingClientRect().bottom - tabs.getBoundingClientRect().top;
+  if (cover > 0) app.style.setProperty("--keep-cover", Math.ceil(cover) + "px");
+}
+function keepArt(img, url){
+  if (!img || img.getAttribute("src")) return;
+  img.addEventListener("load", () => { if (img.naturalWidth) img.classList.add("is-ok"); });
+  img.src = url;
+}
+function mountKeepArt(){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  keepArt($(".keep-bg"), "art/keep/keep-v6.webp");
+  keepArt($(".tab-keep .ti.off"), "art/keep/icon_keep_inactive.png");
+  keepArt($(".tab-keep .ti.on"), "art/keep/icon_keep_active.png");
+  loadSpriteBook();
+}
+/* Three pens on the 1008×1792 painting. They unlock at 1, 3, and 5 distinct breeds. */
+const PENS = [
+  {id:"court", x:32, y:48, w:36, h:20, at:1},
+  {id:"west", x:10, y:34, w:26, h:18, at:3},
+  {id:"east", x:64, y:34, w:26, h:18, at:5}
+];
+const KEEP_W = 1008, KEEP_H = 1792;
+const PEN_TALL = [42, 46, 51, 56];
+let spriteBook = null, spriteAsked = false;
+const spriteMode = new Map();
+const penActors = new Map();
+const penEls = new Map();
+let penMetrics = {rw:0, rh:0, cw:0};
+let penSig = "", penRaf = 0, penLast = 0, penFrames = 0;
+function keepOn(){
+  try {
+    if (new URLSearchParams(location.search).get("keep") === "1") return true;
+    if (sessionStorage.getItem("scalebank.keep") === "1") return true;
+  } catch (e) {}
+  return document.documentElement.classList.contains("keep-on");
+}
+function penStill(){ return matchMedia("(prefers-reduced-motion: reduce)").matches; }
+function penNow(){ return typeof performance !== "undefined" ? performance.now() : Date.now(); }
+function pensOpen(n){
+  const c = +n || 0;
+  if (c >= 5) return 3;
+  if (c >= 3) return 2;
+  if (c >= 1) return 1;
+  return 0;
+}
+function breedCount(){
+  const lines = new Set();
+  asList(S && S.dragons).forEach(d => { if (d && d.line) lines.add(d.line); });
+  return lines.size;
+}
+function spriteKey(d){
+  if (!d || !d.line) return "";
+  return d.line + "-" + STAGES[stageIdx(d)].name.toLowerCase();
+}
+function mutSpriteKey(d){
+  if (!d || !d.line || !d.mut || !MUTATIONS[d.mut]) return "";
+  return d.line + "-" + d.mut + "-" + STAGES[stageIdx(d)].name.toLowerCase();
+}
+function bookSpec(book, bag, key){
+  if (!book || !key) return null;
+  const bagObj = book[bag];
+  if (!bagObj || typeof bagObj !== "object") return null;
+  const spec = bagObj[key];
+  if (!spec || typeof spec !== "object" || Array.isArray(spec)) return null;
+  if (!spec.file && !spec.still) return null;
+  return spec;
+}
+/* Mutation strip, mutation still, then the base breed-stage strip and still. */
+function spriteChain(d, book){
+  const src = book === undefined ? spriteBook : book;
+  const chain = [];
+  const mk = mutSpriteKey(d);
+  const mut = bookSpec(src, "mutations", mk);
+  if (mut){
+    if (mut.file) chain.push({bag:"mutations", key:mk, spec:mut, kind:"strip", file:mut.file});
+    if (mut.still) chain.push({bag:"mutations", key:mk, spec:mut, kind:"still", file:mut.still});
+  }
+  const bk = spriteKey(d);
+  const base = bookSpec(src, "sprites", bk);
+  if (base){
+    if (base.file) chain.push({bag:"sprites", key:bk, spec:base, kind:"strip", file:base.file});
+    if (base.still) chain.push({bag:"sprites", key:bk, spec:base, kind:"still", file:base.still});
+  }
+  return chain;
+}
+function u32(s){
+  let h = 2166136261;
+  for (let i = 0; i < String(s).length; i++) h = Math.imul(h ^ String(s).charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+function loadSpriteBook(){
+  if (!keepOn() || spriteAsked) return;
+  spriteAsked = true;
+  fetch("art/keep/sprites/manifest.json").then(r => r.ok ? r.json() : Promise.reject(new Error("manifest"))).then(m => {
+    spriteBook = m && m.sprites ? m : {frames:8, sprites:{}};
+    penSig = "";
+    syncPens();
+  }).catch(() => { spriteBook = {frames:8, sprites:{}}; penSig = ""; syncPens(); });
+}
+function spritePx(d, spec){
+  const cw = penMetrics.cw || 390;
+  const base = PEN_TALL[stageIdx(d)] || 48;
+  const h = Math.max(40, Math.min(56, base * cw / 390));
+  const fw = spec && spec.frameWidth > 0 ? spec.frameWidth : 0;
+  const fh = spec && spec.frameHeight > 0 ? spec.frameHeight : 0;
+  const aspect = fw && fh ? fw / fh : 1.2;
+  return {w: h * aspect, h};
+}
+function spriteCacheKey(step){ return step.bag + "\0" + step.key + "\0" + step.kind; }
+function settleSprite(ck){
+  penActors.forEach((actor, id) => {
+    const step = actor.chain && actor.chain[actor.step];
+    if (step && spriteCacheKey(step) === ck) probeActor(id);
+  });
+}
+function probeActor(id){
+  if (!keepOn()) return;
+  const actor = penActors.get(id);
+  if (!actor) return;
+  const el = penEls.get(id);
+  const d = ledgerDragon(id);
+  if (!spriteBook){
+    actor.kind = "wait";
+    if (el) paintEl(el, actor);
+    markPenReady();
+    return;
+  }
+  const step = actor.chain && actor.chain[actor.step];
+  if (!step){
+    actor.kind = "ph";
+    actor.spec = null;
+    actor.key = d ? spriteKey(d) : "";
+    if (el && d) el._px = spritePx(d, null);
+    if (el) paintEl(el, actor);
+    markPenReady();
+    return;
+  }
+  actor.key = step.key;
+  actor.spec = step.spec;
+  const ck = spriteCacheKey(step);
+  const hit = spriteMode.get(ck);
+  if (hit === "fail"){
+    actor.step++;
+    actor.shown = -1;
+    probeActor(id);
+    return;
+  }
+  if (hit === "ok"){
+    actor.kind = step.kind;
+    if (el && d) el._px = spritePx(d, step.spec);
+    if (el) paintEl(el, actor);
+    markPenReady();
+    return;
+  }
+  actor.kind = "load";
+  if (el) paintEl(el, actor);
+  markPenReady();
+  if (hit === "load") return;
+  spriteMode.set(ck, "load");
+  const img = new Image();
+  img.onload = () => { if (!keepOn()) return; spriteMode.set(ck, "ok"); settleSprite(ck); };
+  img.onerror = () => { spriteMode.set(ck, "fail"); settleSprite(ck); };
+  img.src = "art/keep/sprites/" + step.file;
+}
+function paintEl(el, actor){
+  if (!keepOn()) return;
+  const sp = el.querySelector(".pen-sprite");
+  if (!sp) return;
+  const spec = actor.spec;
+  const kind = actor.kind === "strip" || actor.kind === "still" ? actor.kind : "ph";
+  const px = el._px || {w:48, h:48};
+  sp.classList.toggle("is-ph", kind === "ph");
+  sp.classList.toggle("is-still", kind === "still");
+  if (kind === "strip" && spec && spec.file){
+    const frames = spec.frames > 0 ? spec.frames : 8;
+    sp.style.backgroundImage = 'url("art/keep/sprites/' + spec.file + '")';
+    sp.style.backgroundSize = (px.w * frames) + "px " + px.h + "px";
+  } else if (kind === "still" && spec && spec.still){
+    sp.style.backgroundImage = 'url("art/keep/sprites/' + spec.still + '")';
+    sp.style.backgroundSize = px.w + "px " + px.h + "px";
+  } else sp.style.backgroundImage = "";
+  sp.style.width = px.w + "px";
+  sp.style.height = px.h + "px";
+}
+function markPenReady(){
+  const world = $("#keepWorld");
+  if (!world) return;
+  if (!spriteBook){ world.dataset.ready = "0"; return; }
+  let ok = true;
+  penActors.forEach(actor => {
+    if (actor.kind !== "ph" && actor.kind !== "still" && actor.kind !== "strip") ok = false;
+  });
+  world.dataset.ready = ok ? "1" : "0";
+}
+function measureKeepWorld(){
+  const stage = $(".keep-stage"), world = $("#keepWorld");
+  if (!stage || !world) return false;
+  const cw = stage.clientWidth, ch = stage.clientHeight;
+  if (cw < 20 || ch < 20) return false;
+  const scale = Math.max(cw / KEEP_W, ch / KEEP_H);
+  const rw = KEEP_W * scale, rh = KEEP_H * scale;
+  world.style.left = ((cw - rw) / 2) + "px";
+  world.style.top = "0px";
+  world.style.width = rw + "px";
+  world.style.height = rh + "px";
+  penMetrics = {rw, rh, cw};
+  return true;
+}
+function mountPenShell(){
+  const world = $("#keepWorld");
+  if (!world || world.dataset.shell) return;
+  world.dataset.shell = "1";
+  world.innerHTML = PENS.map(p => `<div class="keep-pen" data-pen="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%"><i class="keep-ground"></i><p class="pen-lock">Unlocks with a new dragon</p></div>`).join("")
+    + `<div class="keep-keeper" aria-hidden="true"><i class="kk-hood"></i><i class="kk-cloak"></i></div>`;
+}
+function penLimits(pen){
+  const rw = penMetrics.rw || 480;
+  const mx = Math.min(pen.w * 0.28, (28 / rw) * 100);
+  return {x0: pen.x + mx, x1: pen.x + pen.w - mx, y0: pen.y + pen.h * 0.62, y1: pen.y + pen.h * 0.92};
+}
+function placeActor(actor, pen, slot, count){
+  const box = penLimits(pen);
+  const n = Math.max(1, count || 1);
+  const span = (box.x1 - box.x0) / n;
+  const h = u32(actor.id + ":home");
+  actor.x = box.x0 + span * (slot || 0) + span * (0.28 + (h % 400) / 1000);
+  actor.y = box.y0 + (box.y1 - box.y0) * (0.2 + ((h >>> 12) % 650) / 1000);
+  actor.mode = "idle";
+  actor.face = (h & 1) ? -1 : 1;
+  actor.until = penNow() / 1000 + 0.35 + (h % 1600) / 1000;
+  actor.seed = 1;
+  actor.dirty = true;
+}
+function retarget(actor, pen, now){
+  const box = penLimits(pen);
+  const h = u32(actor.id + ":go:" + actor.seed);
+  actor.seed = (actor.seed + 1) | 0;
+  actor.tx = box.x0 + (box.x1 - box.x0) * ((h & 65535) / 65535);
+  actor.ty = box.y0 + (box.y1 - box.y0) * (((h >>> 16) & 65535) / 65535);
+  actor.mode = "walk";
+  actor.until = now + 8;
+}
+function drawActor(actor){
+  const el = penEls.get(actor.id);
+  if (!el) return;
+  if (actor.dirty || actor.mode === "walk"){
+    el.style.left = actor.x.toFixed(3) + "%";
+    el.style.top = actor.y.toFixed(3) + "%";
+    actor.dirty = false;
+  }
+  const z = 8 + Math.round(actor.y * 2);
+  if (el._z !== z){ el._z = z; el.style.zIndex = String(z); }
+  const sp = el.querySelector(".pen-sprite");
+  if (sp && el._face !== actor.face){
+    el._face = actor.face;
+    sp.style.transform = actor.face < 0 ? "scaleX(-1)" : "scaleX(1)";
+  }
+}
+function stepActors(dt, now){
+  penActors.forEach(actor => {
+    const pen = PENS.find(p => p.id === actor.pen);
+    if (!pen) return;
+    if (actor.mode !== "walk"){
+      if (now >= actor.until) retarget(actor, pen, now);
+    } else {
+      const dx = actor.tx - actor.x, dy = actor.ty - actor.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 0.35 || now >= actor.until){
+        actor.mode = "idle";
+        actor.until = now + 1.3 + (u32(actor.id + ":idle:" + actor.seed) % 1800) / 1000;
+        actor.seed = (actor.seed + 1) | 0;
+      } else {
+        const step = Math.min(dist, 4.2 * dt);
+        actor.x += dx / dist * step;
+        actor.y += dy / dist * step;
+        if (dx < -0.08) actor.face = -1;
+        else if (dx > 0.08) actor.face = 1;
+      }
+    }
+    const el = penEls.get(actor.id);
+    const spec = actor.spec;
+    if (el && spec && actor.kind === "strip" && el._px){
+      const sp = el.querySelector(".pen-sprite");
+      actor.acc += dt;
+      const hop = 1 / (spec.fps > 0 ? spec.fps : 8);
+      let guard = 0;
+      while (actor.acc >= hop && guard++ < 3){
+        actor.acc -= hop;
+        actor.frame = (actor.frame + 1) % (spec.frames > 0 ? spec.frames : 8);
+      }
+      if (sp && actor.shown !== actor.frame){
+        actor.shown = actor.frame;
+        sp.style.backgroundPosition = (-actor.frame * el._px.w) + "px 0px";
+      }
+    }
+    drawActor(actor);
+  });
+}
+function penLive(){ return keepOn() && S && S.tab === "keep" && !document.hidden && !$("#keep").hidden; }
+function stopPenLoop(){
+  if (penRaf) cancelAnimationFrame(penRaf);
+  penRaf = 0;
+  penLast = 0;
+}
+function penTick(t){
+  if (!penLive() || penStill()){ penRaf = 0; penLast = 0; return; }
+  penRaf = requestAnimationFrame(penTick);
+  const dt = penLast ? Math.min(0.05, (t - penLast) / 1000) : 0;
+  penLast = t;
+  penFrames++;
+  const world = $("#keepWorld");
+  if (world) world.dataset.frames = String(penFrames);
+  if (dt) stepActors(dt, t / 1000);
+}
+function startPenLoop(){
+  if (penRaf || !penLive() || penStill()) return;
+  penRaf = requestAnimationFrame(penTick);
+}
+function syncPens(){
+  if (!keepOn() || !S || S.tab !== "keep") return;
+  const world = $("#keepWorld");
+  if (!world || !measureKeepWorld()) return;
+  mountPenShell();
+  const open = pensOpen(breedCount());
+  PENS.forEach((p, i) => {
+    const el = world.querySelector('.keep-pen[data-pen="' + p.id + '"]');
+    if (el) el.classList.toggle("is-open", i < open);
+  });
+  const roaming = normKeep(S.keep).roaming;
+  const sig = open + "|" + (spriteBook ? "1" : "0") + "|" + penMetrics.cw + "|" + (penStill() ? "s" : "m") + "|"
+    + roaming.map(id => { const d = ledgerDragon(id); return id + ":" + (d ? (mutSpriteKey(d) || spriteKey(d)) : ""); }).join(",");
+  if (sig !== penSig){
+    penSig = sig;
+    const live = new Set();
+    const slots = new Map();
+    if (open > 0) roaming.forEach((id, i) => {
+      if (!ledgerDragon(id)) return;
+      const pen = PENS[i % open];
+      const list = slots.get(pen.id) || [];
+      list.push(id);
+      slots.set(pen.id, list);
+    });
+    if (open > 0) roaming.forEach((id, i) => {
+      const d = ledgerDragon(id);
+      if (!d) return;
+      live.add(id);
+      const pen = PENS[i % open];
+      const mates = slots.get(pen.id) || [id];
+      const chain = spriteChain(d);
+      const chainSig = chain.map(s => s.bag + ":" + s.kind + ":" + s.file).join("|");
+      let actor = penActors.get(id);
+      if (!actor){
+        actor = {id, pen: pen.id, key: spriteKey(d), chain, chainSig, step:0, spec: chain[0] ? chain[0].spec : null, kind:"load", x:0, y:0, tx:0, ty:0, mode:"idle", until:0, face:1, frame:0, acc:0, shown:-1, seed:1, dirty:true};
+        placeActor(actor, pen, mates.indexOf(id), mates.length);
+        penActors.set(id, actor);
+      } else if (actor.pen !== pen.id){
+        actor.pen = pen.id;
+        placeActor(actor, pen, mates.indexOf(id), mates.length);
+      }
+      if (actor.chainSig !== chainSig){
+        actor.chain = chain;
+        actor.chainSig = chainSig;
+        actor.step = 0;
+        actor.frame = 0;
+        actor.acc = 0;
+        actor.shown = -1;
+        actor.spec = chain[0] ? chain[0].spec : null;
+      }
+      let el = penEls.get(id);
+      if (!el){
+        el = document.createElement("button");
+        el.type = "button";
+        el.className = "pen-dragon";
+        el.dataset.act = "pen-dragon";
+        el.dataset.id = id;
+        el.innerHTML = '<span class="pen-sprite is-ph"><svg viewBox="0 0 72 48" aria-hidden="true"><path fill="#e8bd5f" d="M2 31c5-2 9 0 13 2 0 5 5 9 12 9 9 0 16-6 20-11 2 2 6 3 9 1 2-2 2-5 0-7 4-1 7-4 7-8 0-5-5-8-9-7-1-5-7-8-12-6-2 1-4 3-5 6-6-6-16-6-20-1-1 2-1 5 0 7-6 1-12 4-14 10-4 1-7 0-9-1z"/><path fill="#c4923a" d="M22 22c7-12 18-9 17 3-7 1-13-1-17-3z"/><path fill="#f6e2a8" d="M44 24c3-7 10-9 14-6 2 2 3 4 2 6-5 2-11 2-16 0z"/><path fill="#b8862e" d="M56 20l14 3-14 3zM22 38l-2 8h6zM34 38l-2 8h6z"/></svg></span>';
+        world.appendChild(el);
+        penEls.set(id, el);
+      }
+      const stageName = STAGES[stageIdx(d)].name;
+      el.setAttribute("aria-label", (d.name || d.species || "Dragon") + ", " + stageName);
+      el._px = spritePx(d, actor.spec);
+      probeActor(id);
+      paintEl(el, actor);
+      drawActor(actor);
+    });
+    [...penActors.keys()].forEach(id => {
+      if (live.has(id)) return;
+      penActors.delete(id);
+      const el = penEls.get(id);
+      if (el) el.remove();
+      penEls.delete(id);
+    });
+  }
+  markPenReady();
+  if (penStill()) stopPenLoop();
+  else startPenLoop();
+}
+document.addEventListener("visibilitychange", () => {
+  if (!keepOn()) return;
+  if (document.hidden) stopPenLoop();
+  else startPenLoop();
+});
+const penMotion = matchMedia("(prefers-reduced-motion: reduce)");
+if (penMotion.addEventListener) penMotion.addEventListener("change", () => { penSig = ""; stopPenLoop(); syncPens(); });
+let ledgerPick = null, ledgerReturn = null;
+function focusables(root){
+  if (!root) return [];
+  return [...root.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])")].filter(el => {
+    if (el.disabled || el.getAttribute("aria-hidden") === "true" || el.tabIndex === -1) return false;
+    return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+  });
+}
+function trapTab(ev, root){
+  if (ev.key !== "Tab") return false;
+  const items = focusables(root);
+  ev.preventDefault();
+  if (!items.length) return true;
+  const i = items.indexOf(document.activeElement);
+  const next = ev.shiftKey ? (i <= 0 ? items[items.length - 1] : items[i - 1]) : (i < 0 || i >= items.length - 1 ? items[0] : items[i + 1]);
+  next.focus();
+  return true;
+}
+function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || null; }
+function ledgerRow(id, kind){
+  const d = ledgerDragon(id); if (!d) return "";
+  const picked = ledgerPick === id;
+  const full = S.keep.roaming.length >= 6;
+  let acts;
+  const care = `<button type="button" class="btn ghost" data-act="ledger-care" data-id="${esc(id)}">Care</button>`;
+  if (kind === "roam"){
+    acts = `<button type="button" class="btn ghost" data-act="ledger-rest" data-id="${esc(id)}">Rest</button><button type="button" class="btn ghost" data-act="ledger-swap" data-id="${esc(id)}" aria-pressed="${picked ? "true" : "false"}">Swap</button>${care}`;
+  } else {
+    const send = `<button type="button" class="btn" data-act="ledger-send" data-id="${esc(id)}"${full ? ` disabled aria-describedby="ldgFull"` : ""}>Send to Keep</button>`;
+    const swap = ledgerPick ? `<button type="button" class="btn" data-act="ledger-swap-do" data-id="${esc(id)}">Swap</button>` : "";
+    acts = send + swap + care;
+  }
+  return `<li class="ldg-row${picked ? " is-pick" : ""}"><div class="ldg-art">${dragonArt(d)}</div><div class="ldg-who"><button type="button" class="ldg-name" data-act="ledger-dragon" data-id="${esc(id)}">${esc(d.name || d.species)}</button><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div></div><div class="ldg-acts">${acts}</div></li>`;
+}
+function renderLedger(){
+  const body = $("#ledgerBody");
+  if (!body || !document.documentElement.classList.contains("keep-on")) return;
+  const keep = normKeep(S.keep);
+  if (ledgerPick && keep.roaming.indexOf(ledgerPick) < 0) ledgerPick = null;
+  const pick = ledgerPick && ledgerDragon(ledgerPick);
+  const full = keep.roaming.length >= 6;
+  const roamRows = keep.roaming.map(id => ledgerRow(id, "roam")).join("");
+  const stabRows = keep.stables.map(id => ledgerRow(id, "stab")).join("");
+  body.innerHTML = `<h2>Keeper's Ledger</h2>
+    ${pick ? `<p class="ldg-swap" role="status">Pick a dragon in the stables to swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
+    <section class="ldg-sec ldg-roam"><h3>Roaming in the Keep (${keep.roaming.length}/6)</h3>${roamRows ? `<ul class="ldg-list">${roamRows}</ul>` : `<p class="ldg-empty">No one is roaming.</p>`}</section>
+    <section class="ldg-sec ldg-stables-sec"><h3>Resting in the Stables (${keep.stables.length})</h3>${full ? `<p class="ldg-hint" id="ldgFull">Keep is full, swap instead</p>` : ""}<div class="ldg-stables">${stabRows ? `<ul class="ldg-list">${stabRows}</ul>` : `<p class="ldg-empty">The stables are empty.</p>`}</div></section>`;
+  syncPens();
+}
+function openLedgerDragon(id){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  const d = ledgerDragon(id); if (!d) return;
+  S.prize = d.id; ledgerPick = null; setTab("dragon");
+}
+function openLedger(){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  const ov = $("#ledgerOv");
+  const prev = document.activeElement;
+  ledgerReturn = prev && prev !== document.body ? prev : $(".keep-hot");
+  keepArt(ov.querySelector(".ledger-bg"), "art/keep/ledger-v3.webp");
+  renderLedger();
+  ov.hidden = false;
+  const first = focusables(ov)[0];
+  if (first) first.focus();
+}
+function closeLedger(opts){
+  const ov = $("#ledgerOv");
+  if (!ov || ov.hidden) return;
+  ledgerPick = null;
+  ov.hidden = true;
+  const back = ledgerReturn;
+  ledgerReturn = null;
+  if (opts && opts.restore === false) return;
+  if (back && back.isConnected) back.focus();
+  else { const hot = $(".keep-hot"); if (hot && !$("#keep").hidden) hot.focus(); }
+}
+window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); penSig = ""; syncPens(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncKeepCover);
+mountKeepArt();
 
 /* ================= debug panel ================= */
 /* For testing late-game states without thousands of taps. Only shown with ?debug=1 or #debug. */
@@ -2091,8 +2779,8 @@ function debugAct(a, b){
 const OLD_EGG = {ember:"ember", tide:"tide", forest:"forest", frost:"tide", inferno:"inferno", storm:"storm", void:"void", tempest:"tempest"};
 const OLD_SPECIES = ["Cinder","Soot","Brine","Kelp","Moss","Fernback","Frostling","Rimeback","Inferno","Cinderking","Stormling","Pearl Stormling","Voidling","Starveil","Tempest","Stormcrown"];
 function migrate(){
-  S.eggs = asList(S.eggs);
-  S.dragons = asList(S.dragons);
+  S.eggs = asList(S.eggs).filter(e => e && typeof e === "object" && !Array.isArray(e));
+  S.dragons = asList(S.dragons).filter(d => d && typeof d === "object" && !Array.isArray(d));
   S.owned = asMap(S.owned);
   S.bought = asMap(S.bought);
   S.opened = asMap(S.opened);
@@ -2122,18 +2810,489 @@ function migrateV3(){
     if (!e || typeof e !== "object") continue;
     e.top = Math.min(3, Math.max(0, e.top | 0));
   }
-  S.dragons.forEach(d => { if (!d.mut || !MUTATIONS[d.mut]) return;
+  S.dragons.forEach(d => { if (!d || !d.mut || !MUTATIONS[d.mut]) return;
     const k = d.line + ":" + d.mut, e = S.dex[k] || (S.dex[k] = {first:null, n:0, top:0});
-    if (!e.n) e.n = S.dragons.filter(x => dexKeys(x).includes(k)).length;
+    if (!e.n) e.n = S.dragons.filter(x => x && dexKeys(x).includes(k)).length;
     e.top = Math.max(e.top | 0, stageIdx(d)); });
 }
+/* Dragon Keep. Highest stage, then highest rarity, then id. Each id once: six roaming, the rest stabled. */
+const RARITY_RANK = {Common:0, Uncommon:1, Rare:2, Epic:3, Legendary:4};
+function dragonKey(d){ return d && typeof d === "object" ? idKey(d.id) : null; }
+function rarityRank(d){
+  const it = d && ITEM[d.item];
+  const r = it && RARITY_RANK[it.rarity];
+  return r == null ? -1 : r;
+}
+function migrateV4(){
+  try {
+    const owned = [];
+    asList(S.dragons).forEach((d, i) => {
+      const id = dragonKey(d);
+      if (id == null) return;
+      const prev = owned.find(o => o.id === id);
+      if (!prev){ owned.push({id, d, i}); return; }
+      const better = stageIdx(d) > stageIdx(prev.d) || (stageIdx(d) === stageIdx(prev.d) && rarityRank(d) > rarityRank(prev.d));
+      if (better){ prev.d = d; prev.i = i; }
+    });
+    const keep = normKeep(S.keep);
+    const placed = keep.roaming.concat(keep.stables);
+    const placedSet = new Set(placed);
+    const exact = placed.length === owned.length && placedSet.size === placed.length && owned.every(o => placedSet.has(o.id));
+    if (!exact){
+      owned.sort((a, b) => {
+        const ds = stageIdx(b.d) - stageIdx(a.d); if (ds) return ds;
+        const dr = rarityRank(b.d) - rarityRank(a.d); if (dr) return dr;
+        if (a.id < b.id) return -1;
+        if (a.id > b.id) return 1;
+        return a.i - b.i;
+      });
+      const ids = owned.map(o => o.id);
+      keep.roaming = ids.slice(0, 6);
+      keep.stables = ids.slice(6);
+      keep.zones = [];
+      keep.care = {};
+      keep.streak = {last:null, count:0, best:0};
+      keep.restDay = 0;
+    }
+    S.keep = keep;
+  } catch(e){ S.keep = freshKeep(); }
+}
+function backupV3(raw){
+  if (raw == null) return;
+  try { if (localStorage.getItem(BAK_KEY) == null) localStorage.setItem(BAK_KEY, raw); } catch(e){}
+}
+/* Unparseable saves are replaced with defaults. Keep the raw text once, before that replacement. */
+function backupCorrupt(raw){
+  if (raw == null) return;
+  try {
+    const cur = localStorage.getItem(CORRUPT_KEY);
+    if (cur == null || cur === "") localStorage.setItem(CORRUPT_KEY, raw);
+  } catch(e){}
+}
+/* Owned dragon ids live in roaming (up to 6) or stables, each id once. Existing order stays. */
+function reconcileKeep(){
+  try {
+    const keep = normKeep(S.keep);
+    const owned = [];
+    const ownedSet = new Set();
+    asList(S.dragons).forEach(d => {
+      const id = dragonKey(d);
+      if (id == null || ownedSet.has(id)) return;
+      ownedSet.add(id);
+      owned.push(id);
+    });
+    const roaming = [];
+    const stables = [];
+    const placed = new Set();
+    const take = (id, list) => {
+      if (!ownedSet.has(id) || placed.has(id)) return;
+      placed.add(id);
+      list.push(id);
+    };
+    keep.roaming.forEach(id => take(id, roaming));
+    keep.stables.forEach(id => take(id, stables));
+    owned.forEach(id => {
+      if (placed.has(id)) return;
+      placed.add(id);
+      if (roaming.length < 6) roaming.push(id);
+      else stables.push(id);
+    });
+    keep.roaming = roaming;
+    keep.stables = stables;
+    S.keep = keep;
+  } catch(e){
+    if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
+  }
+}
+/* One write for a keep move. save() reconciles, so the two lists stay a partition of owned ids, roaming at most 6. */
+function moveKeep(op, id, other){
+  const a = idKey(id), b = idKey(other);
+  const keep = normKeep(S.keep);
+  const roaming = keep.roaming.slice(), stables = keep.stables.slice();
+  const owned = new Set();
+  asList(S.dragons).forEach(d => { const k = dragonKey(d); if (k != null) owned.add(k); });
+  const has = (list, k) => k != null && list.indexOf(k) >= 0;
+  let nextR = roaming, nextS = stables, ok = false;
+  if (op === "send" && has(stables, a) && !has(roaming, a) && owned.has(a) && roaming.length < 6){
+    nextS = stables.filter(k => k !== a); nextR = roaming.concat(a); ok = true;
+  } else if (op === "rest" && has(roaming, a) && !has(stables, a) && owned.has(a)){
+    nextR = roaming.filter(k => k !== a); nextS = stables.concat(a); ok = true;
+  } else if (op === "swap" && a !== b && has(roaming, a) && !has(stables, a) && has(stables, b) && !has(roaming, b) && owned.has(a) && owned.has(b)){
+    nextR = roaming.map(k => k === a ? b : k); nextS = stables.map(k => k === b ? a : k); ok = true;
+  }
+  if (!ok) return false;
+  keep.roaming = nextR; keep.stables = nextS; S.keep = keep;
+  save();
+  return true;
+}
+/* One clock for care. Tests replace it with setCareClock; today() and now() both read it. */
+let careClock = null, zoneFn = null, zoneNameFn = null;
+function setCareClock(fn){ careClock = typeof fn === "function" ? fn : null; }
+function setZoneOffset(fn){ zoneFn = typeof fn === "function" ? fn : null; }
+function setTimeZone(fn){ zoneNameFn = typeof fn === "function" ? fn : null; }
+function now(){ return careClock ? careClock() : Date.now(); }
+function zoneOffset(ms){
+  if (zoneFn){
+    const v = zoneFn(ms);
+    if (Number.isInteger(v)) return v;
+  }
+  return new Date(ms).getTimezoneOffset();
+}
+function ymdAt(ms, off){
+  const d = new Date(ms - off * 60000), p = n => String(n).padStart(2, "0");
+  return d.getUTCFullYear() + "-" + p(d.getUTCMonth() + 1) + "-" + p(d.getUTCDate());
+}
+function today(){ const ms = now(); return ymdAt(ms, zoneOffset(ms)); }
+function validOffset(n){ return Number.isInteger(n) && n >= -16 * 60 && n <= 16 * 60; }
+function deviceZone(){
+  try {
+    if (typeof zoneNameFn === "function"){
+      const z = zoneNameFn();
+      if (typeof z === "string" && z) return z;
+    }
+    const z = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return typeof z === "string" ? z : "";
+  } catch (e) {
+    return "";
+  }
+}
+const WEEKDAY = {Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6};
+function zonedStamp(ms, timeZone){
+  try {
+    if (typeof timeZone !== "string" || !timeZone) throw new Error("zone");
+    const dateFmt = new Intl.DateTimeFormat("en-CA", {timeZone: timeZone, year: "numeric", month: "2-digit", day: "2-digit"});
+    const weekFmt = new Intl.DateTimeFormat("en-US", {timeZone: timeZone, weekday: "short"});
+    const parts = {};
+    dateFmt.formatToParts(new Date(ms)).forEach(p => { if (p.type !== "literal") parts[p.type] = p.value; });
+    const day = parts.year + "-" + parts.month + "-" + parts.day;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new Error("day");
+    const weekday = WEEKDAY[String(weekFmt.format(new Date(ms))).slice(0, 3)];
+    if (weekday == null) throw new Error("week");
+    return {day, weekday};
+  } catch (e) {
+    return null;
+  }
+}
+/* homeZone is fixed on first play. homeTz is only the fallback offset. */
+function ensureHome(streak, ms){
+  let fresh = false;
+  if (typeof streak.homeZone !== "string" || !streak.homeZone){
+    const z = deviceZone();
+    if (z){ streak.homeZone = z; fresh = true; }
+  }
+  if (!validOffset(streak.homeTz)){
+    streak.homeTz = validOffset(streak.tz) ? streak.tz : zoneOffset(ms);
+    fresh = true;
+  }
+  return fresh;
+}
+function prepareHome(streak){
+  const ms = now();
+  const fresh = ensureHome(streak, ms);
+  const zoned = zonedStamp(ms, streak.homeZone);
+  if (zoned) return {day: zoned.day, weekday: zoned.weekday, fresh};
+  const off = validOffset(streak.homeTz) ? streak.homeTz : zoneOffset(ms);
+  const day = ymdAt(ms, off);
+  const dt = isoDay(day);
+  return {day, weekday: dt ? dt.getDay() : new Date(ms).getDay(), fresh};
+}
+const SABBATH_NOTE = "Sabbath rest. No chores required.";
+const STREAK_PRIZES = [{at:30, steps:300}, {at:14, steps:140}, {at:7, steps:70}, {at:3, steps:30}, {at:1, steps:10}];
+function isoDay(s){
+  if (typeof s !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+  const [y, m, d] = s.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+  return dt;
+}
+function dayAfter(a, b){ return !!(isoDay(a) && isoDay(b) && a > b); }
+function daysBetween(a, b){
+  const da = isoDay(a), db = isoDay(b);
+  if (!da || !db) return null;
+  const ms = new Date(db.getFullYear(), db.getMonth(), db.getDate()) - new Date(da.getFullYear(), da.getMonth(), da.getDate());
+  return Math.round(ms / 86400000);
+}
+function restDayNum(){
+  const n = S.keep && S.keep.restDay;
+  return Number.isInteger(n) && n >= 0 && n <= 6 ? n : 0;
+}
+function gapMissesWeekday(last, day){
+  const gap = daysBetween(last, day);
+  if (gap == null || gap <= 1) return false;
+  const start = isoDay(last);
+  const rest = restDayNum();
+  for (let i = 1; i < gap; i++){
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    if (d.getDay() !== rest) return true;
+  }
+  return false;
+}
+function streakBroken(last, day){ return gapMissesWeekday(last, day); }
+function streakPrize(count){
+  const n = Math.max(0, Math.round(+count || 0));
+  for (let i = 0; i < STREAK_PRIZES.length; i++) if (n >= STREAK_PRIZES[i].at) return STREAK_PRIZES[i].steps;
+  return 0;
+}
+function streakBag(){
+  if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
+  const keep = normKeep(S.keep);
+  S.keep = keep;
+  return keep.streak;
+}
+/* A new day is strictly later than last on the home-zone calendar. Device zone changes are ignored. */
+function visitKeep(){
+  const streak = streakBag();
+  const home = prepareHome(streak);
+  const day = home.day;
+  const rest = home.weekday === restDayNum();
+  const note = rest ? SABBATH_NOTE : "";
+  const held = {fresh:false, clamped:false, rest, note, blessing:false, day, count:streak.count, best:streak.best};
+  const keepHome = () => { if (home.fresh) save(); };
+  if (dayAfter(streak.last, day)){ keepHome(); return Object.assign(held, {clamped:true}); }
+  if (rest){
+    if (dayAfter(streak.seen, day)){ keepHome(); return held; }
+    if (streak.seen === day){ keepHome(); return held; }
+    streak.seen = day;
+    save();
+    return Object.assign(held, {fresh:true});
+  }
+  if (isoDay(streak.last) && !(day > streak.last)){ keepHome(); return held; }
+  const count = !isoDay(streak.last) || streakBroken(streak.last, day) ? 1 : Math.max(0, Math.round(+streak.count || 0)) + 1;
+  const best = Math.max(Math.round(+streak.best || 0), count);
+  streak.last = day;
+  streak.count = count;
+  streak.best = best;
+  save();
+  return {fresh:true, clamped:false, rest, note, blessing:true, day, count, best};
+}
+function claimedDayOf(streak){
+  if (isoDay(streak && streak.claimedDay)) return streak.claimedDay;
+  if (isoDay(streak && streak.claimed)) return streak.claimed;
+  return null;
+}
+/* The prize follows the date the visit stored. It does not look up today's date. */
+function claimable(streak){
+  const held = claimedDayOf(streak);
+  if (!isoDay(streak && streak.last)) return false;
+  if (held === streak.last) return false;
+  if (held && held > streak.last) return false;
+  return streakPrize(streak.count) > 0;
+}
+function claimStreak(){
+  const v = visitKeep();
+  if (v.rest) return 0;
+  const streak = streakBag();
+  if (!claimable(streak)) return 0;
+  const steps = streakPrize(streak.count);
+  S.bank += steps;
+  streak.claimedDay = streak.last;
+  streak.claimed = streak.last;
+  save();
+  return steps;
+}
+function noteDailyVisit(){
+  if (!keepOn()) return null;
+  const v = visitKeep();
+  if (v.fresh) toast(v.rest ? SABBATH_NOTE : "A blessing for this day.");
+  return v;
+}
+function renderStreak(){
+  const el = $("#keepStreak");
+  if (!el) return;
+  if (!keepOn()){ el.hidden = true; return; }
+  const streak = streakBag();
+  const viewed = prepareHome(streak);
+  if (viewed.fresh) save();
+  const day = viewed.day;
+  const rest = viewed.weekday === restDayNum();
+  const prize = streakPrize(streak.count);
+  const blocked = !claimable(streak);
+  const note = rest ? `<p class="ks-note">${SABBATH_NOTE}</p>` : "";
+  const label = rest ? "Sabbath rest" : (blocked ? "Claimed today" : "Claim " + fmt(prize) + " steps");
+  el.hidden = false;
+  el.innerHTML = `<p class="ks-day">Day ${streak.count || 0}</p><p class="ks-best">Best ${streak.best || 0}</p>${note}<button type="button" class="btn" data-act="streak-claim"${rest || blocked || prize <= 0 ? " disabled" : ""}>${label}</button>`;
+}
+const CARE_ACTS = {
+  feed:  {key:"fed", ms:4 * 60 * 60 * 1000, label:"Feed"},
+  groom: {key:"groomed", ms:8 * 60 * 60 * 1000, label:"Groom"},
+  pet:   {key:"petted", ms:1 * 60 * 60 * 1000, label:"Pet"}
+};
+const NOTE_AT = [10, 30, 60, 100];
+const KEEPER_NOTES = {
+  cinder: [
+    "It settles on the warmest stone and folds its frill down to keep the heat in.",
+    "After eating it breathes more slowly, and the glow along its belly stays even.",
+    "It turns toward footsteps it knows and lets the others pass.",
+    "On a cold morning it leans in and shares its warmth, then goes back to sleep."
+  ],
+  brine: [
+    "It rests with its fins folded and likes a damp cloth left nearby.",
+    "When the room is dry it drinks in small sips and grows restless until it does.",
+    "A finger drawn along the floor will lead it, the way water finds a low path.",
+    "Rain on the glass holds it longer than any noise in the room."
+  ],
+  moss: [
+    "It naps in a square of sunlight and wakes with a little dust on its shoulders.",
+    "The new growth there is soft. It stands quiet while you brush it clean.",
+    "It sniffs leaves and seems content just to smell them.",
+    "In a still corner it stops startling at birdsong outside the window."
+  ],
+  inferno: [
+    "The plates on its back are hot after a walk and cool once it has sat a while.",
+    "It prefers its food a little dry, and it eats without hurry.",
+    "A familiar voice brings its head down. The horns are heavy, and it moves them carefully.",
+    "Each evening it picks the same stone and stays until the room is dark."
+  ],
+  stormling: [
+    "A breeze at the window lifts its streamers, and it watches them with interest.",
+    "It eats a little, often, then shakes its wings out and lies down.",
+    "Before the weather turns it walks the room once and settles.",
+    "In a quiet room it folds close and takes up less space than you expect."
+  ],
+  voidling: [
+    "It keeps to the shaded side of the room and squints in a bright window.",
+    "The pale speckles on its hide show clearer after a grooming.",
+    "It learns a still hand and will rest its chin there.",
+    "After dark it stays near, awake and easy, as if this were simply its hour."
+  ],
+  tempest: [
+    "It folds its long legs carefully when it lies down, and it is patient about it.",
+    "Rain beads on its hide and runs off. It likes a draft.",
+    "A low voice reaches it better than a loud one.",
+    "When it trusts you it lowers its head to yours and waits."
+  ]
+};
+function careStamp(v){
+  if (v == null || v === "") return null;
+  const n = +v;
+  return Number.isFinite(n) ? n : null;
+}
+function careRecord(id){
+  const bag = S.keep && S.keep.care;
+  const c = bag && typeof bag === "object" ? bag[id] : null;
+  const bond = c && Number.isFinite(+c.bond) ? Math.max(0, Math.min(100, Math.round(+c.bond))) : 0;
+  return {fed: careStamp(c && c.fed), groomed: careStamp(c && c.groomed), petted: careStamp(c && c.petted), bond};
+}
+function careLeft(ms){
+  if (ms <= 0) return "Ready";
+  const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+  if (h && m) return h + "h " + m + "m";
+  if (h) return h + "h";
+  if (m) return m + "m";
+  return Math.max(1, Math.ceil(ms / 1000)) + "s";
+}
+/* A stamp ahead of the clock is not ready. The wait is the full cooldown, never more. */
+function careWait(last, t, ms){
+  if (last == null || !(ms > 0)) return 0;
+  if (t < last) return ms;
+  const left = last + ms - t;
+  if (left <= 0) return 0;
+  return left > ms ? ms : left;
+}
+/* Pull future stamps back to now and save, so a rolled-back clock starts one full cooldown. */
+function careClamp(id){
+  const key = idKey(id);
+  if (key == null || !S.dragons.some(d => dragonKey(d) === key)) return null;
+  if (!S.keep || typeof S.keep !== "object" || Array.isArray(S.keep)) S.keep = freshKeep();
+  if (!S.keep.care || typeof S.keep.care !== "object" || Array.isArray(S.keep.care)) S.keep.care = {};
+  const cur = careRecord(key);
+  const t = now();
+  const next = {fed: cur.fed, groomed: cur.groomed, petted: cur.petted, bond: cur.bond};
+  let changed = false;
+  Object.keys(CARE_ACTS).forEach(kind => {
+    const field = CARE_ACTS[kind].key;
+    if (next[field] != null && t < next[field]){ next[field] = t; changed = true; }
+  });
+  if (changed){ S.keep.care[key] = next; save(); }
+  return key;
+}
+function careSeals(d){
+  return d && d.mut && MUTATIONS[d.mut] ? [d.mut] : [];
+}
+function keeperNotes(id){
+  const d = id && typeof id === "object" ? id : S.dragons.find(x => dragonKey(x) === id);
+  const list = (d && KEEPER_NOTES[d.line]) || [];
+  const bond = careRecord(d ? dragonKey(d) : id).bond;
+  return NOTE_AT.map((at, i) => ({at, open: bond >= at && !!list[i], text: bond >= at && list[i] ? list[i] : "Keep caring to learn more"}));
+}
+/* One save for a care action. Bond rises by one, capped at 100. A cooldown writes nothing. */
+function careAct(id, kind){
+  const spec = CARE_ACTS[kind];
+  const key = careClamp(id);
+  if (!spec || key == null) return false;
+  const cur = careRecord(key);
+  const t = now();
+  if (careWait(cur[spec.key], t, spec.ms) > 0) return false;
+  const next = {fed: cur.fed, groomed: cur.groomed, petted: cur.petted, bond: Math.min(100, cur.bond + 1)};
+  next[spec.key] = t;
+  S.keep.care[key] = next;
+  save();
+  return true;
+}
+let careFor = null, careReturn = null;
+function openCare(id){
+  if (!document.documentElement.classList.contains("keep-on")) return;
+  const d = S.dragons.find(x => dragonKey(x) === idKey(id));
+  if (!d) return;
+  careFor = dragonKey(d);
+  const prev = document.activeElement;
+  careReturn = prev && prev !== document.body ? prev : null;
+  renderCare(false);
+  const ov = $("#careOv");
+  ov.hidden = false;
+  const first = focusables(ov)[0];
+  if (first) first.focus();
+}
+function closeCare(opts){
+  const ov = $("#careOv");
+  if (!ov || ov.hidden) return;
+  ov.hidden = true;
+  const back = careReturn;
+  careReturn = null;
+  careFor = null;
+  if (opts && opts.restore === false) return;
+  if (back && back.isConnected) back.focus();
+}
+function renderCare(hop){
+  const body = $("#careBody");
+  const d = S.dragons.find(x => dragonKey(x) === careFor);
+  if (!body || !d) return;
+  careClamp(d.id);
+  const rec = careRecord(d.id);
+  const t = now();
+  const acts = Object.keys(CARE_ACTS).map(kind => {
+    const spec = CARE_ACTS[kind];
+    const left = careWait(rec[spec.key], t, spec.ms);
+    const ready = left <= 0;
+    return `<button type="button" class="btn${ready ? "" : " ghost"}" data-act="care-do" data-kind="${kind}"${ready ? "" : " disabled"}>${spec.label}<small>${ready ? "Ready" : careLeft(left)}</small></button>`;
+  }).join("");
+  const seals = careSeals(d).map(m =>
+    `<span class="wax acc-${m}" role="img" aria-label="${esc(MUTATIONS[m].name)} mutation">${esc(MUTATIONS[m].name.slice(0, 1))}</span>`).join("");
+  const notes = keeperNotes(d).map(n => `<p class="care-note${n.open ? "" : " locked"}">${esc(n.text)}</p>`).join("");
+  body.innerHTML = `<div class="care-top${hop ? " is-happy" : ""}"><div>${dragonArt(d)}</div><div><p class="care-name">${esc(d.name || d.species)}</p><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div><div class="bond" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${rec.bond}" aria-label="Bond ${rec.bond} of 100"><i style="width:${rec.bond}%"></i></div><div class="bond-n">Bond ${rec.bond} / 100</div></div></div>${seals ? `<div class="wax-row">${seals}</div>` : ""}${hop ? `<p class="care-pleased" role="status">It looks pleased.</p>` : ""}<div class="care-acts">${acts}</div><h3>Keeper's Notes</h3>${notes}`;
+}
 function start(data){
-  S = (data && data.state) ? hydrate(data.state) : (load() || fresh());
-  if (!S.opened) S.opened = {};
-  migrate();
-  if ((S.ver || 1) < 3){ migrateV3(); S.ver = 3; save(); }
+  let raw = null;
+  try { raw = localStorage.getItem(KEY); } catch(e){}
+  const injected = !!(data && data.state);
+  let corrupt = false;
+  if (!injected && raw != null){ try { JSON.parse(raw); } catch(e){ corrupt = true; } }
+  if (corrupt) backupCorrupt(raw);
+  S = injected ? hydrate(data.state) : (load() || fresh());
+  if (!S.opened || typeof S.opened !== "object" || Array.isArray(S.opened)) S.opened = {};
+  const migrating = corrupt || (S.ver || 1) < 4;
+  if (migrating) backupV3(raw);
+  try {
+    migrate();
+    if ((S.ver || 1) < 3){ migrateV3(); S.ver = 3; }
+    if ((S.ver || 1) < 4){ migrateV4(); S.ver = 4; }
+  } catch(e){ S = fresh(); }
+  reconcileKeep();
+  if (migrating) save();
   ITEMS.forEach(it => { if (S.owned[it.id]) for (let k = 1; k <= it.scene; k++) S.opened[k] = true; });
   applyDebugParams();
+  noteDailyVisit();
+  syncKeepCover();
   shown = S.bank;
   $("#balance").textContent = fmt(S.bank);
   buildScenes();
