@@ -75,7 +75,7 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-pool.is-live::before{background:radial-gradient(ellipse at 50% 55%, rgba(220,248,255,.95), rgba(90,190,255,.55) 46%, transparent 74%)}
 /* Pens are percentages of the full 1008×1792 painting, inside the same fit as the art. */
 .keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:100%;pointer-events:none}
-.keep-fence{position:absolute;z-index:3;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
+.keep-fence{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
 .keep-plates{position:absolute;z-index:4;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .keep-pen{position:absolute}
 .keep-ground{position:absolute;left:6%;right:6%;bottom:0;height:36%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(216,169,75,.2),rgba(216,169,75,0) 72%)}
@@ -706,7 +706,6 @@ button.dexchip{cursor:pointer}
       <div class="keep-fit" id="keepFit">
         <img class="keep-bg keep-art" alt="" draggable="false">
         <div class="keep-world" id="keepWorld"></div>
-        <img class="keep-fence keep-art" id="keepFence" alt="" draggable="false" hidden>
         <div class="keep-plates" id="keepPlates"></div>
         <div class="keep-wing" id="keepWing"><p class="wing-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span></p></div>
         <button type="button" class="keep-spot keep-forge" data-act="keep-forge" aria-label="Forge" hidden></button>
@@ -2271,68 +2270,76 @@ function keepArt(img, url){
   img.addEventListener("load", () => { if (img.naturalWidth) img.classList.add("is-ok"); });
   img.src = url;
 }
-/* art/keep/manifest.json can name a front fence per background. Anything unlisted uses fence-front.webp. */
-let fenceBook = null, fenceAsked = false;
-function fenceFile(value){
-  if (typeof value === "string" && value.trim()) return value.trim();
-  if (value && typeof value === "object" && typeof value.fence === "string" && value.fence.trim()) return value.fence.trim();
-  return "";
-}
-function readFenceBook(json){
-  const map = {};
-  if (!json || typeof json !== "object" || Array.isArray(json)) return map;
-  const put = (key, value) => {
-    const file = fenceFile(value);
-    const name = String(key || "").split("?")[0].split("/").pop();
-    if (name && file) map[name] = file;
-  };
-  if (json.fences && typeof json.fences === "object" && !Array.isArray(json.fences)) Object.keys(json.fences).forEach(k => put(k, json.fences[k]));
-  const bgs = json.backgrounds;
-  if (Array.isArray(bgs)) bgs.forEach(row => { if (row && row.file) put(row.file, row); });
-  else if (bgs && typeof bgs === "object") Object.keys(bgs).forEach(k => put(k, bgs[k]));
-  if (typeof json.fence === "string" && json.fence.trim()) map["*"] = json.fence.trim();
-  return map;
-}
-function fencePath(file){
-  if (!file) return "";
-  return file.indexOf("/") >= 0 ? file : "art/keep/" + file;
-}
-function fenceForBg(src){
+/* One front fence per pen, art/keep/fence-front-<variant>-<pen>.webp. A miss is remembered. */
+const FENCE_PENS = [
+  {id:"red", name:"ember"},
+  {id:"purple", name:"violet"},
+  {id:"blue", name:"azure"},
+  {id:"green", name:"pond"}
+];
+const fenceState = new Map();
+function fenceVariant(src){
   const name = String(src || "").split("?")[0].split("/").pop();
-  const book = fenceBook || {};
-  return fencePath(book[name] || book["*"] || "fence-front.webp");
+  if (name === "keep-v6.webp") return "v6";
+  const hit = /^keep-weather-(fog|overcast|rain|snow|storm|sunny)\.webp$/.exec(name);
+  return hit ? hit[1] : "";
 }
-function syncKeepFence(src){
-  const img = $("#keepFence");
-  if (!img || fenceBook == null) return;
-  const url = fenceForBg(src);
-  if (!url || img.dataset.file === url) return;
-  img.dataset.file = url;
+function fencePenUrl(variant, pen){
+  return "art/keep/fence-front-" + variant + "-" + pen + ".webp";
+}
+function hidePenFence(img){
   img.hidden = true;
   img.classList.remove("is-ok");
-  img.removeAttribute("src");
-  const probe = new Image();
-  probe.onload = () => {
-    if (img.dataset.file !== url || !probe.naturalWidth) return;
-    img.src = url;
+  if (img.getAttribute("src")) img.removeAttribute("src");
+}
+function showPenFence(img, url){
+  const state = fenceState.get(url);
+  if (state === "ok"){
+    if (img.getAttribute("src") !== url) img.src = url;
     img.hidden = false;
     img.classList.add("is-ok");
-  };
-  probe.onerror = () => {
-    if (img.dataset.file !== url) return;
-    img.hidden = true;
-    img.classList.remove("is-ok");
-    img.removeAttribute("src");
-  };
-  probe.src = url;
+    return;
+  }
+  if (state === "miss"){ hidePenFence(img); return; }
+  if (state === "pend") return;
+  fenceState.set(url, "pend");
+  hidePenFence(img);
+  fetch(url).then(r => {
+    fenceState.set(url, r.ok ? "ok" : "miss");
+    if (img.dataset.file === url) showPenFence(img, url);
+  }).catch(() => {
+    fenceState.set(url, "miss");
+    if (img.dataset.file === url) showPenFence(img, url);
+  });
 }
-function loadFenceBook(){
-  if (!keepOn() || fenceAsked) return;
-  fenceAsked = true;
-  fetch("art/keep/manifest.json", {cache:"no-cache"}).then(r => r.ok ? r.json() : null).catch(() => null).then(json => {
-    fenceBook = readFenceBook(json);
-    const bg = $(".keep-bg");
-    syncKeepFence(bg ? bg.getAttribute("src") : "");
+function syncPenFences(src){
+  const world = $("#keepWorld");
+  if (!world || !keepOn()) return;
+  const variant = fenceVariant(src);
+  FENCE_PENS.forEach((pen, i) => {
+    let img = world.querySelector('.keep-fence[data-pen="' + pen.name + '"]');
+    if (!img){
+      img = document.createElement("img");
+      img.className = "keep-fence keep-art";
+      img.alt = "";
+      img.draggable = false;
+      img.hidden = true;
+      img.dataset.pen = pen.name;
+      img.style.zIndex = String(i * 20 + 10);
+      world.appendChild(img);
+    }
+    if (!variant){
+      img.dataset.file = "";
+      hidePenFence(img);
+      return;
+    }
+    const url = fencePenUrl(variant, pen.name);
+    if (img.dataset.file === url){
+      showPenFence(img, url);
+      return;
+    }
+    img.dataset.file = url;
+    showPenFence(img, url);
   });
 }
 function mountKeepArt(){
@@ -2340,7 +2347,7 @@ function mountKeepArt(){
   const bg = $(".keep-bg");
   if (bg && !bg.dataset.fence){
     bg.dataset.fence = "1";
-    const kick = () => syncKeepFence(bg.getAttribute("src"));
+    const kick = () => syncPenFences(bg.getAttribute("src"));
     bg.addEventListener("load", kick);
     bg.addEventListener("error", kick);
   }
@@ -2348,7 +2355,7 @@ function mountKeepArt(){
   keepArt($(".tab-keep .ti.off"), "art/keep/icon_keep_inactive.png");
   keepArt($(".tab-keep .ti.on"), "art/keep/icon_keep_active.png");
   loadSpriteBook();
-  loadFenceBook();
+  syncPenFences(bg ? bg.getAttribute("src") : "");
 }
 /* Feet boxes on the 1008×1792 painting. Snow drops every box 8px. Ember, violet, azure, pond. */
 const PENS = [
@@ -2735,7 +2742,8 @@ function drawActor(actor){
     el.style.top = actor.y.toFixed(3) + "%";
     actor.dirty = false;
   }
-  const z = 20 + Math.round(actor.y * 10) + Math.max(0, actor.slot || 0);
+  const penZ = {red:0, purple:1, blue:2, green:3};
+  const z = (penZ[actor.pen] || 0) * 20 + Math.max(0, actor.slot || 0);
   if (el._z !== z){ el._z = z; el.style.zIndex = String(z); }
   const sp = el.querySelector(".pen-sprite");
   if (sp && el._face !== actor.face){
