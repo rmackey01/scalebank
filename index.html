@@ -399,6 +399,8 @@ button.bx:active{transform:scale(.96)}
 .dexsheet .stg-h{margin:12px 0 6px;padding-bottom:5px;border-bottom:1px solid rgba(216,169,75,.3);font:700 8.5px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);text-align:left}
 .dexsheet .stg-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0}
 .dexsheet .stg{margin:0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.dexsheet button.stg{appearance:none;background:none;border:0;padding:0;width:100%;color:inherit;font:inherit;cursor:pointer;text-align:inherit}
+.dexsheet button.stg:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .dexsheet .stg > img,.dexsheet .stg-ph{width:100%;aspect-ratio:784/1168;border-radius:8px;object-fit:cover;background:#1a1612;border:1px solid rgba(216,169,75,.35);display:block}
 .dexsheet .stg.lock > img{background:radial-gradient(ellipse 70% 60% at 50% 50%,#e8dcc4,#aea48f 80%)}
 .dexsheet .stg.top > img,.dexsheet .stg.top .stg-ph{border:2px solid var(--gold);box-shadow:0 0 8px rgba(216,169,75,.35)}
@@ -1724,7 +1726,7 @@ function openDex(k){
     const reached = i <= e.top, top = i === e.top;
     const label = `${st.name}, ${reached ? "reached" : "not reached yet"}`;
     const cap = `<figcaption>${esc(st.name)}</figcaption>`;
-    if (reached) return `<figure class="stg${top ? " top" : ""}" aria-label="${esc(label)}"><img src="${stageSrc(line, i)}.webp" alt="" loading="lazy" draggable="false">${cap}</figure>`;
+    if (reached) return `<button type="button" class="stg${top ? " top" : ""}" data-act="dex-stage" data-i="${i}" aria-pressed="${top ? "true" : "false"}" aria-label="${esc(label)}"><img src="${stageSrc(line, i)}.webp" alt="" loading="lazy" draggable="false">${cap}</button>`;
     const ph = i === 0
       ? `<img src="art/bestiary/silhouettes/${line}-1-silhouette.webp" alt="" loading="lazy" draggable="false">`
       : `<span class="stg-q">???</span>`;
@@ -1734,10 +1736,10 @@ function openDex(k){
     const reached = i <= e.top, top = i === e.top, listed = mutStage(line, m, i);
     const label = `${st.name}, ${reached ? "reached" : "not reached yet"}`;
     const cap = `<figcaption>${esc(st.name)}</figcaption>`;
-    if (reached && listed) return `<figure class="stg${top ? " top" : ""}" aria-label="${esc(label)}"><img src="${mutSrc(line, m, i)}.webp" alt="" loading="lazy" draggable="false">${cap}</figure>`;
+    if (reached && listed) return `<button type="button" class="stg${top ? " top" : ""}" data-act="dex-stage" data-i="${i}" aria-pressed="${top ? "true" : "false"}" aria-label="${esc(label)}"><img src="${mutSrc(line, m, i)}.webp" alt="" loading="lazy" draggable="false">${cap}</button>`;
     if (reached){
       const fx = MUTATIONS[m].fx, edge = EDGES[line + "-" + (i + 1)] || "#d8c8ac";
-      return `<figure class="stg${top ? " top" : ""}" aria-label="${esc(label)}"><div class="dart fx-${fx}" style="--edge:${edge}"><img src="${stageSrc(line, i)}.webp" alt="" loading="lazy" draggable="false">${fx === "shine" ? `<b class="shine"></b>` : ""}</div>${cap}</figure>`;
+      return `<button type="button" class="stg${top ? " top" : ""}" data-act="dex-stage" data-i="${i}" aria-pressed="${top ? "true" : "false"}" aria-label="${esc(label)}"><div class="dart fx-${fx}" style="--edge:${edge}"><img src="${stageSrc(line, i)}.webp" alt="" loading="lazy" draggable="false">${fx === "shine" ? `<b class="shine"></b>` : ""}</div>${cap}</button>`;
     }
     if (listed) return `<figure class="stg lock" aria-label="${esc(label)}"><img src="${mutSrc(line, m, i)}-sil.webp" alt="" loading="lazy" draggable="false">${cap}</figure>`;
     const ph = i === 0
@@ -1956,6 +1958,24 @@ document.addEventListener("click", ev => {
   else if (a === "bestiary"){ setTab("dragon", "bestiary"); $(".bst-scroll").scrollTop = 0; $("#bestiary h1").focus(); }
   else if (a === "bestiary-back"){ setTab("dragon"); const b2 = $(".bst-entry"); if (b2) b2.focus(); }
   else if (a === "dex") openDex(b.dataset.k);
+  else if (a === "dex-stage"){
+    const i = +b.dataset.i;
+    const e = dexFrom && S.dex[dexFrom];
+    if (!e || i > e.top) return;
+    const [line, m] = dexFrom.split(":");
+    const it = eggOf(line);
+    const d = {item: it.id, line, mut: m || null, name: dexName(line, m)};
+    const plate = $("#dexOv .plate");
+    if (!plate) return;
+    plate.innerHTML = dragonArt(d, {live:true, stage:i});
+    const v = plate.querySelector("video");
+    if (v) v.play().catch(() => {});
+    $("#dexOv").querySelectorAll(".stg-row [data-act=dex-stage]").forEach(el => {
+      const on = +el.dataset.i === i;
+      el.classList.toggle("top", on);
+      el.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
   else if (a === "close-dex") closeDex();
   else if (a === "dex-replay"){ const d = S.dragons.find(x => x.id === b.dataset.id); closeDex(); if (d) replayReveal(d); }
   else if (a === "share") openShare();
