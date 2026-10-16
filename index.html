@@ -950,6 +950,7 @@ function normKeep(k){
     if (typeof s.claimed === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.claimed)) base.streak.claimed = s.claimed;
     if (typeof s.seen === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.seen)) base.streak.seen = s.seen;
     if (Number.isInteger(s.tz) && s.tz >= -16 * 60 && s.tz <= 16 * 60) base.streak.tz = s.tz;
+    if (Number.isInteger(s.homeTz) && s.homeTz >= -16 * 60 && s.homeTz <= 16 * 60) base.streak.homeTz = s.homeTz;
   }
   if (Number.isInteger(k.restDay) && k.restDay >= 0 && k.restDay <= 6) base.restDay = k.restDay;
   return base;
@@ -2923,11 +2924,18 @@ function ymdAt(ms, off){
   return d.getUTCFullYear() + "-" + p(d.getUTCMonth() + 1) + "-" + p(d.getUTCDate());
 }
 function today(){ const ms = now(); return ymdAt(ms, zoneOffset(ms)); }
-function streakView(streak){
+function validOffset(n){ return Number.isInteger(n) && n >= -16 * 60 && n <= 16 * 60; }
+/* homeTz is fixed on first play. Later device zones are ignored. */
+function ensureHomeTz(streak, ms){
+  if (validOffset(streak.homeTz)) return {off: streak.homeTz, fresh: false};
+  const off = validOffset(streak.tz) ? streak.tz : zoneOffset(ms);
+  streak.homeTz = off;
+  return {off, fresh: true};
+}
+function prepareHome(streak){
   const ms = now();
-  const cur = zoneOffset(ms);
-  const saved = streak && Number.isInteger(streak.tz) ? streak.tz : cur;
-  return {ms, cur, day: ymdAt(ms, saved)};
+  const home = ensureHomeTz(streak, ms);
+  return {day: ymdAt(ms, home.off), fresh: home.fresh};
 }
 const SABBATH_NOTE = "Sabbath rest. No chores required.";
 const STREAK_PRIZES = [{at:30, steps:300}, {at:14, steps:140}, {at:7, steps:70}, {at:3, steps:30}, {at:1, steps:10}];
@@ -2976,34 +2984,31 @@ function streakBag(){
   S.keep = keep;
   return keep.streak;
 }
-/* A new day is strictly later than last on the saved-offset calendar.
-   Once it counts, tz becomes the current offset and last becomes the later of that saved date and the current-offset date, so neither zone can count the day again. */
+/* A new day is strictly later than last on the home-zone calendar. Device zone changes are ignored. */
 function visitKeep(){
   const streak = streakBag();
-  const view = streakView(streak);
-  const day = view.day;
+  const home = prepareHome(streak);
+  const day = home.day;
   const rest = isRestDay(day);
   const note = rest ? SABBATH_NOTE : "";
   const held = {fresh:false, clamped:false, rest, note, blessing:false, day, count:streak.count, best:streak.best};
-  if (dayAfter(streak.last, day)) return Object.assign(held, {clamped:true});
+  const keepHome = () => { if (home.fresh) save(); };
+  if (dayAfter(streak.last, day)){ keepHome(); return Object.assign(held, {clamped:true}); }
   if (rest){
-    if (dayAfter(streak.seen, day)) return held;
-    if (streak.seen === day) return held;
+    if (dayAfter(streak.seen, day)){ keepHome(); return held; }
+    if (streak.seen === day){ keepHome(); return held; }
     streak.seen = day;
     save();
     return Object.assign(held, {fresh:true});
   }
-  if (isoDay(streak.last) && !(day > streak.last)) return held;
+  if (isoDay(streak.last) && !(day > streak.last)){ keepHome(); return held; }
   const count = !isoDay(streak.last) || streakBroken(streak.last, day) ? 1 : Math.max(0, Math.round(+streak.count || 0)) + 1;
   const best = Math.max(Math.round(+streak.best || 0), count);
-  const currentDay = ymdAt(view.ms, view.cur);
-  const recorded = currentDay > day ? currentDay : day;
-  streak.last = recorded;
+  streak.last = day;
   streak.count = count;
   streak.best = best;
-  streak.tz = view.cur;
   save();
-  return {fresh:true, clamped:false, rest, note, blessing:true, day: recorded, count, best};
+  return {fresh:true, clamped:false, rest, note, blessing:true, day, count, best};
 }
 function claimedDayOf(streak){
   if (isoDay(streak && streak.claimedDay)) return streak.claimedDay;
@@ -3041,7 +3046,9 @@ function renderStreak(){
   if (!el) return;
   if (!keepOn()){ el.hidden = true; return; }
   const streak = streakBag();
-  const day = streakView(streak).day;
+  const viewed = prepareHome(streak);
+  if (viewed.fresh) save();
+  const day = viewed.day;
   const rest = isRestDay(day);
   const prize = streakPrize(streak.count);
   const blocked = !claimable(streak);
