@@ -945,6 +945,8 @@ function normKeep(k){
     base.streak.last = (s.last == null || typeof s.last === "string" || typeof s.last === "number") ? (s.last ?? null) : null;
     base.streak.count = Number.isFinite(+s.count) ? +s.count : 0;
     base.streak.best = Number.isFinite(+s.best) ? +s.best : 0;
+    if (typeof s.claimedDay === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.claimedDay)) base.streak.claimedDay = s.claimedDay;
+    else if (typeof s.claimed === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.claimed)) base.streak.claimedDay = s.claimed;
     if (typeof s.claimed === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.claimed)) base.streak.claimed = s.claimed;
     if (typeof s.seen === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.seen)) base.streak.seen = s.seen;
     if (Number.isInteger(s.tz) && s.tz >= -16 * 60 && s.tz <= 16 * 60) base.streak.tz = s.tz;
@@ -2975,7 +2977,7 @@ function streakBag(){
   return keep.streak;
 }
 /* A new day is strictly later than last on the saved-offset calendar.
-   Once it counts, last and tz anchor to the current offset so a later check the same instant sees that date. */
+   Once it counts, tz becomes the current offset and last becomes the later of that saved date and the current-offset date, so neither zone can count the day again. */
 function visitKeep(){
   const streak = streakBag();
   const view = streakView(streak);
@@ -2994,7 +2996,8 @@ function visitKeep(){
   if (isoDay(streak.last) && !(day > streak.last)) return held;
   const count = !isoDay(streak.last) || streakBroken(streak.last, day) ? 1 : Math.max(0, Math.round(+streak.count || 0)) + 1;
   const best = Math.max(Math.round(+streak.best || 0), count);
-  const recorded = ymdAt(view.ms, view.cur);
+  const currentDay = ymdAt(view.ms, view.cur);
+  const recorded = currentDay > day ? currentDay : day;
   streak.last = recorded;
   streak.count = count;
   streak.best = best;
@@ -3002,18 +3005,28 @@ function visitKeep(){
   save();
   return {fresh:true, clamped:false, rest, note, blessing:true, day: recorded, count, best};
 }
-/* Pay the current tier once per later local date. Sunday and a day that is not past claimed pay nothing. */
+function claimedDayOf(streak){
+  if (isoDay(streak && streak.claimedDay)) return streak.claimedDay;
+  if (isoDay(streak && streak.claimed)) return streak.claimed;
+  return null;
+}
+/* The prize follows the date the visit stored. It does not look up today's date. */
+function claimable(streak){
+  const held = claimedDayOf(streak);
+  if (!isoDay(streak && streak.last)) return false;
+  if (held === streak.last) return false;
+  if (held && held > streak.last) return false;
+  return streakPrize(streak.count) > 0;
+}
 function claimStreak(){
   const v = visitKeep();
-  if (v.clamped || v.rest) return 0;
+  if (v.rest) return 0;
   const streak = streakBag();
-  const day = v.day;
-  if (isoDay(streak.claimed) && !(day > streak.claimed)) return 0;
-  if (streak.last !== day) return 0;
+  if (!claimable(streak)) return 0;
   const steps = streakPrize(streak.count);
-  if (steps <= 0) return 0;
   S.bank += steps;
-  streak.claimed = day;
+  streak.claimedDay = streak.last;
+  streak.claimed = streak.last;
   save();
   return steps;
 }
@@ -3031,7 +3044,7 @@ function renderStreak(){
   const day = streakView(streak).day;
   const rest = isRestDay(day);
   const prize = streakPrize(streak.count);
-  const blocked = isoDay(streak.claimed) && !(day > streak.claimed);
+  const blocked = !claimable(streak);
   const note = rest ? `<p class="ks-note">${SABBATH_NOTE}</p>` : "";
   const label = rest ? "Sabbath rest" : (blocked ? "Claimed today" : "Claim " + fmt(prize) + " steps");
   el.hidden = false;

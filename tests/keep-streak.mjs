@@ -444,6 +444,44 @@ add("zone-farm", t => {
   t.equal(same.snapshot().keep.streak.count, 2, "Keep does not make day 3");
 });
 
+add("tokyo-same-day", t => {
+  const CHI = 300, TYO = -540;
+  let off = TYO;
+  let clock = Date.UTC(2026, 9, 19, 1, 0, 0);
+  const g = boot(save(), {search: "?keep=1"});
+  g.setCareClock(() => clock);
+  g.setZoneOffset(() => off);
+  t.equal(g.noteDailyVisit().count, 1, "Tokyo load records day 1");
+  t.equal(g.claimStreak(), 10, "day 1 pays 10");
+  t.equal(g.snapshot().keep.streak.claimedDay, "2026-10-19", "day 1 claims the Tokyo date");
+  t.equal(g.claimStreak(), 0, "day 1 does not pay twice");
+  const bank = g.snapshot().bank;
+  off = CHI;
+  t.equal(g.noteDailyVisit().fresh, false, "Chicago the same instant is still the Tokyo date");
+  t.equal(g.noteDailyVisit().count, 1, "opening Keep after that switch does not add a day");
+  t.equal(g.claimStreak(), 0, "the same Tokyo date does not pay");
+  t.equal(g.snapshot().keep.streak.count, 1, "still day 1");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-19", "last stays on the Tokyo date");
+  t.equal(g.snapshot().keep.streak.tz, TYO, "tz stays Tokyo until a later Tokyo date counts");
+  clock = Date.UTC(2026, 9, 19, 18, 0, 0);
+  const loaded = g.noteDailyVisit();
+  t.equal(loaded.count, 2, "the next Tokyo date counts one day");
+  t.equal(loaded.day, "2026-10-20", "last is that Tokyo date, not Chicago's earlier one");
+  t.equal(g.snapshot().keep.streak.last, "2026-10-20", "the visit stores the Tokyo date");
+  t.equal(g.snapshot().keep.streak.tz, CHI, "tz updates to Chicago once that day counts");
+  t.equal(g.noteDailyVisit().count, 2, "opening Keep does not count Chicago's earlier date");
+  t.equal(g.claimStreak(), 10, "day 2 pays 10");
+  t.equal(g.snapshot().keep.streak.claimedDay, "2026-10-20", "claimedDay is the date the visit recorded");
+  t.equal(g.claimStreak(), 0, "day 2 does not pay twice");
+  t.equal(g.snapshot().bank, bank + 10, "one payout for the counted day");
+  clock = Date.UTC(2026, 9, 20, 6, 0, 0);
+  t.equal(g.noteDailyVisit().fresh, false, "Chicago reaching that same date is not a new day");
+  t.equal(g.noteDailyVisit().count, 2, "Keep does not make day 3");
+  t.equal(g.claimStreak(), 0, "that date does not pay again");
+  t.equal(g.snapshot().keep.streak.count, 2, "the streak is still day 2");
+  t.equal(g.snapshot().bank, bank + 10, "no 30-step payout");
+});
+
 add("old-save-offset", t => {
   let clock = stamp(2026, 10, 16, 15);
   const g = boot(save({last: key(2026, 10, 15), count: 2, best: 2}));
