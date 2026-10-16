@@ -57,3 +57,28 @@
 
 ## Mock
 - `out/ledger-kit-mock.jpg`: original on the left, re-composed from the kit on the right (7 Keep cards at 0.8 scale, 8 stalls). Rebuild with `sprites_work/ledger_mock.py`. The stall piece is rebuilt with `sprites_work/ledger_kit_stall.py` and the other pieces with `sprites_work/ledger_kit.py`.
+
+## Full-width background (current `../ledger-v3.webp`)
+- 1008×1792, made by `sprites_work/ledger_wide.py` with no AI generation. The narrow version is backed up at `keep_ledger_old/ledger-v3-narrow.webp`.
+- 0–92: dark strip for the app header.
+- Gold-studded book-cover frame, 22 px thick: outer edge x 0–1008, y 92–1446.
+- Parchment page interior: x 22, y 114, w 964, h 1310 (to y 1424). Corner flourishes are scaled 1.4× and sit about 105×123 px in each corner.
+- Writing area (clear of flourishes): x 40, y 130, w 928, h 1280. Keep the rows between the corner flourishes, or inset to x 140–868, at y < 245 and y > 1300.
+- Wooden board for Swap/Send: y 1458–1574, full width.
+- 1580+: dark strip for the tab bar.
+
+## Suggested scale at the full width (matches the other tabs)
+| piece | scale | size | layout |
+|---|---|---|---|
+| title.webp | 1.3 | 754×159 | centred, y 124 |
+| capital-T.webp | 1.3 | 107×125 | (60, 292), with the heading text at x ≈ 181, 46 px |
+| card-frame / card-empty | **1.65** | 290×381 | 3 columns, x = 53 / 359 / 665, gap 16 |
+| portraits (in cards) | 2× NEAREST | 288×224 | top-centre of the card, +24 px |
+| card name / star | 44 px font / star 1.5× | — | name at card bottom −76, star at −50 |
+| divider.webp | 1.6 | 928×42 | centred, heading 44 px |
+| stall-frame.webp | **1.5** | 216×258 | 4 columns, x = 54 / 282 / 510 / 738, gap 12 |
+| portraits (in stalls) | 1.5× NEAREST | 216×168 | |
+| seals | 1.5 | 60×60 | (x+146, y+180) |
+| btn-swap / btn-send / cross | 1.0–1.25 | 246×92 / 310×92 / 68×80 | on the board, y ≈ 1470 |
+- Two rows of cards fill the page to about y 1220. With 7 Keep dragons plus the Stables, the content inside the page interior (y ≈ 420–1420) must scroll. The title and heading can stay fixed.
+- Mock: `out/ledger-wide-mock.jpg` (original on the left, new full-width layout on the right), built by `sprites_work/ledger_wide_mock.py`.
