@@ -203,6 +203,40 @@ html.keep-open .tabs{position:relative;z-index:2}
 @keyframes careHop{0%{transform:translateY(0)}35%{transform:translateY(-10px)}70%{transform:translateY(0)}85%{transform:translateY(-3px)}100%{transform:translateY(0)}}
 .care-top.is-happy .dart{animation:careHop .7s ease}
 @media (prefers-reduced-motion:reduce){.care-top.is-happy .dart{animation:none}}
+/* Dev gallery. Present in the page, shown only when ?dev=1. */
+#devOv{position:absolute;z-index:40;inset:0;display:flex;flex-direction:column;background:var(--ink);color:var(--fg)}
+.dev-bar{display:flex;align-items:center;gap:8px;padding-block:12px 8px}
+.dev-bar h1{margin:0;flex:1;min-width:0;font-family:var(--display);font-weight:600;font-size:24px}
+.dev-count{margin:0;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
+.dev-count.is-miss{color:#ffb0a0}
+.dev-nav{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px}
+.dev-nav button{flex:none;border:1px solid var(--line);background:var(--stone);color:var(--fg);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700}
+.dev-scroll{flex:1;min-height:0;overflow-y:auto;padding:0 16px 28px}
+.dev-sec h2{margin:18px 0 8px;font-family:var(--display);font-weight:600;font-size:21px}
+.dev-note{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.dev-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.dev-cell{margin:0;min-width:0;background:var(--stone);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.dev-cell img{display:block;width:100%;height:88px;object-fit:contain;background:#0b0d10}
+.dev-cell figcaption{padding:4px 6px 6px;font-size:11px;line-height:1.25}
+.dev-cell figcaption b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dev-cell figcaption small{display:block;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dev-cell.is-miss{border-color:#e2583e}
+.dev-flag{display:inline-block;margin-top:2px;color:#ffb0a0;font-style:normal;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:10px}
+.dev-chips{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.dev-chips i{font-style:normal;font-size:9px;font-weight:700;letter-spacing:.04em;padding:1px 4px;border-radius:4px;background:#1b2229;color:var(--muted)}
+.dev-chips i.is-miss{background:#5a2018;color:#ffb0a0}
+.dev-keep{margin:0 0 10px;background:var(--stone);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dev-keep img{display:block;width:100%;height:200px;object-fit:cover;object-position:center 18%;background:#070708}
+.dev-keep figcaption{padding:6px 8px 8px;font-size:13px}
+.dev-keep figcaption b,.dev-keep figcaption small{display:block}
+.dev-keep figcaption small{color:var(--muted);font-size:11px}
+.dev-keep.is-miss{border-color:#e2583e}
+.dev-rf{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 6px 10px;text-align:center}
+.dev-rf img{width:72px;height:auto;border-radius:8px;background:transparent}
+.dev-rf b{font-size:12px}
+.dev-miss{margin:8px 0 0;font-size:13px;color:#ffb0a0}
+.dev-miss ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
+.dev-reopen{position:absolute;z-index:7;top:12px;right:12px;border:1px solid var(--gold-lo);background:var(--stone);color:var(--gold-hi);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;letter-spacing:.08em}
 
 /* ---------- shared bits ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
@@ -821,6 +855,16 @@ button.dexchip{cursor:pointer}
       <div class="care-sheet" id="careBody"></div>
       <button type="button" class="btn" data-act="close-care">Close</button>
     </div>
+  </div>
+  <button type="button" class="dev-reopen" id="devReopen" data-act="open-dev" hidden>Dev</button>
+  <div id="devOv" hidden>
+    <div class="dev-bar pad">
+      <h1>Dev gallery</h1>
+      <p class="dev-count" id="devCount">Checking art</p>
+      <button type="button" class="btn" data-act="close-dev">Close</button>
+    </div>
+    <div class="dev-nav" id="devNav"></div>
+    <div class="dev-scroll" id="devBody"></div>
   </div>
 </div>
 
@@ -2251,6 +2295,9 @@ document.addEventListener("click", ev => {
   const b = ev.target.closest("[data-act]");
   if (!b) return;
   const a = b.dataset.act;
+  if (a === "close-dev"){ closeDev(); return; }
+  if (a === "open-dev"){ openDev(); return; }
+  if (a === "dev-jump"){ const el = document.getElementById("dev-" + b.dataset.id); if (el) el.scrollIntoView({block:"start"}); return; }
   if (a.startsWith("dbg-")) debugAct(a, b);
   else if (a === "add") addSteps(+b.dataset.n);
   else if (a === "buy") buy(b.dataset.id);
@@ -2335,6 +2382,7 @@ document.addEventListener("keydown", ev => {
     return;
   }
   if (ev.key !== "Escape") return;
+  if (DEV && !$("#devOv").hidden){ closeDev(); return; }
   if (!$("#careOv").hidden){ closeCare(); return; }
   if (!$("#ledgerOv").hidden){ closeLedger(); return; }
   /* Reveal overlay: Escape skips (if allowed) or closes (if payoff ready) */
@@ -3777,6 +3825,190 @@ probeLedgerBg();
 
 /* ================= debug panel ================= */
 /* For testing late-game states without thousands of taps. Only shown with ?debug=1 or #debug. */
+/* Dev gallery. Query only: ?dev=1. It never writes the save or changes a dragon. */
+const DEV = /[?&]dev=1(&|$)/.test(location.search);
+let devMiss = 0, devSeen = 0;
+function devMark(el, miss){
+  if (!el || el.dataset.checked) return;
+  el.dataset.checked = "1";
+  devSeen++;
+  const card = el.closest(".dev-cell, .dev-keep");
+  if (!miss){ devTally(); return; }
+  devMiss++;
+  el.classList.add("is-miss");
+  if (card){
+    card.classList.add("is-miss");
+    const flag = card.querySelector(".dev-flag");
+    if (flag) flag.hidden = false;
+  }
+  devTally();
+}
+function devTally(){
+  const el = $("#devCount");
+  if (!el) return;
+  el.textContent = devMiss ? devMiss + " missing" : (devSeen ? "All checked files are here" : "Checking art");
+  el.classList.toggle("is-miss", devMiss > 0);
+}
+function devCard(label, src, extra){
+  const chips = (extra || []).map(url => `<i data-probe="${esc(url)}">${esc(url.split("/").pop())}</i>`).join("");
+  return `<figure class="dev-cell"><div class="dev-pic"><img src="${esc(src)}" alt="" data-probe="${esc(src)}"></div><figcaption><b>${esc(label)}</b><small>${esc(src.split("/").pop())}</small>${chips ? `<span class="dev-chips">${chips}</span>` : ""}<em class="dev-flag" hidden>Missing</em></figcaption></figure>`;
+}
+function devKeep(label, src){
+  return `<figure class="dev-keep"><img src="${esc(src)}" alt="" data-probe="${esc(src)}"><figcaption><b>${esc(label)}</b><small>${esc(src)}</small><em class="dev-flag" hidden>Missing</em></figcaption></figure>`;
+}
+function devProbe(root){
+  root.querySelectorAll("img[data-probe]").forEach(img => {
+    const mark = () => devMark(img, !img.naturalWidth);
+    if (img.complete) mark();
+    else { img.addEventListener("load", mark, {once:true}); img.addEventListener("error", mark, {once:true}); }
+  });
+  root.querySelectorAll("i[data-probe]").forEach(chip => {
+    fetch(chip.dataset.probe, {method:"HEAD"}).then(r => devMark(chip, !r.ok)).catch(() => devMark(chip, true));
+  });
+}
+function devSection(id, title, note, body){
+  return `<section class="dev-sec" id="dev-${id}"><h2>${esc(title)}</h2>${note ? `<p class="dev-note">${note}</p>` : ""}<div class="dev-grid">${body}</div></section>`;
+}
+function renderDev(){
+  const body = $("#devBody"), nav = $("#devNav");
+  if (!body || body.dataset.built) return;
+  body.dataset.built = "1";
+  devMiss = 0; devSeen = 0;
+  const breeds = [], portraits = [], mutations = [];
+  DEX_LINES.forEach(line => {
+    const name = DRAGONS[line].name;
+    STAGES.forEach((st, si) => {
+      const base = stageSrc(line, si);
+      breeds.push(devCard(name + " · " + st.name, base + ".webp", [base + ".mp4", base + ".webm"]));
+    });
+    LEDGER_STAGE.forEach(stage => {
+      portraits.push(devCard(name + " · " + stage, `${LEDGER_UI}/portraits/${line}-${stage}.webp`));
+      MUT_KEYS.forEach(m => {
+        portraits.push(devCard(MUTATIONS[m].name + " " + name + " · " + stage, `${LEDGER_UI}/portraits/${line}-${m}-${stage}.webp`));
+      });
+    });
+    MUT_KEYS.forEach(m => MSTAGE.forEach((folder, si) => {
+      const base = mutSrc(line, m, si);
+      mutations.push(devCard(MUTATIONS[m].name + " " + name + " · " + STAGES[si].name, base + ".webp", [base + ".mp4", base + "-poster.webp"]));
+    }));
+  });
+  const frames = Object.keys(RARITY).map(r => {
+    const it = ITEMS.find(i => i.kind === "egg" && i.rarity === r);
+    const src = stageSrc(it.line, 0) + ".webp";
+    const plain = `<div class="dev-cell dev-rf rf rf-${r.toLowerCase()}"><img src="${esc(src)}" alt=""><b>${esc(r)}</b><small>${esc(DRAGONS[it.line].name)}</small></div>`;
+    const mut = `<div class="dev-cell dev-rf rf rf-${r.toLowerCase()} rf-mut"><img src="${esc(src)}" alt=""><b>${esc(r)}</b><small>Mutated</small></div>`;
+    return plain + mut;
+  }).join("");
+  const skies = [`<div class="dev-wide">${devKeep("Keep", "art/keep/keep-v6.webp")}</div>`];
+  Object.keys(WEATHER_SKY).forEach(kind => {
+    const src = weatherSky(kind);
+    skies.push(`<div class="dev-wide">${devKeep(cap(kind), src)}</div>`);
+  });
+  const other = [];
+  ITEMS.filter(i => i.kind === "egg").forEach(it => {
+    other.push(devCard(it.name, NA + it.line + "_egg.webp"));
+    other.push(devCard(it.name + " nest", NA + it.line + "_nest.webp"));
+    other.push(devCard(it.name + " tube", NA + "fill_" + it.line + ".webp"));
+  });
+  SCENES.forEach(sc => {
+    other.push(devCard(sc.name, "art/" + sc.id + "-poster.webp", ["art/" + sc.id + ".mp4", "art/" + sc.id + ".webm"]));
+  });
+  const revealKeys = REVEAL_KEY.filter(Boolean);
+  DEX_LINES.forEach(line => {
+    revealKeys.forEach(key => {
+      other.push(devCard(DRAGONS[line].name + " " + key, revealSrc(line, key) + "-poster.webp"));
+      MUT_KEYS.forEach(m => {
+        other.push(devCard(MUTATIONS[m].name + " " + DRAGONS[line].name + " " + key, `art/reveals/${line}-${m}-${key}-poster.webp`));
+      });
+    });
+  });
+  ["title.webp","capital-T.webp","divider.webp","star.webp","card-frame.webp","card-empty.webp","stall-frame.webp","btn-swap.webp","btn-send.webp","cross.webp","parchment-tile.webp"].forEach(file => {
+    other.push(devCard(file.replace(/\.webp$/, ""), LEDGER_UI + "/" + file));
+  });
+  other.push(devCard("ledger page", "art/keep/ledger-v3.webp"));
+  Array.from(new Set(Object.values(LEDGER_SEAL).concat(["grey"]))).forEach(color => {
+    other.push(devCard(color + " seal", `${LEDGER_UI}/seals/seal-${color}.webp`));
+  });
+  ["background.webp","banner_panel.webp","cabinet_back.webp","cabinet_frame.webp","shelf.webp","ring.webp","ring_sheet.webp","info_card_panel.webp","portrait_backing.webp","portrait_frame.webp","nest_empty.webp","tube_track_back.webp","tube_track_front.webp","tube_connector.webp","nav_bar_bg.webp","nav_active_underline.webp","nav_notification_dot.webp","icon_bank_inactive.webp","icon_bank_active.webp","icon_vendors_inactive.webp","icon_vendors_active.webp","icon_nest_inactive.webp","icon_nest_active.webp","icon_dragon_inactive.webp","icon_dragon_active.webp"].forEach(file => {
+    other.push(devCard(file.replace(/\.webp$/, ""), NA + file));
+  });
+  for (let n = 1; n <= 6; n++) other.push(devCard("ember " + n, NA + "ember_0" + n + ".webp"));
+  other.push(devCard("Keep tab", "art/keep/icon_keep_inactive.png"));
+  other.push(devCard("Keep tab on", "art/keep/icon_keep_active.png"));
+  DEX_LINES.forEach(line => other.push(devCard(DRAGONS[line].name + " slot", breedSlotUrl(line))));
+  ["v6"].concat(Object.values(WEATHER_SKY)).forEach(variant => {
+    FENCE_PENS.forEach(pen => other.push(devCard(variant + " " + pen.name, fencePenUrl(variant, pen.name))));
+  });
+  const sections = [
+    ["breeds", "Breeds and stages", breeds.join("")],
+    ["portraits", "Portraits", portraits.join("")],
+    ["mutations", "Mutations", mutations.join("")],
+    ["frames", "Rarity frames", frames],
+    ["weather", "Weather", ""],
+    ["other", "Other art", other.join("")]
+  ];
+  nav.innerHTML = sections.map(([id, title]) => `<button type="button" data-act="dev-jump" data-id="${id}">${esc(title)}</button>`).join("")
+    + `<button type="button" data-act="dev-jump" data-id="sprites">Keep sprites</button>`;
+  body.innerHTML = sections.map(([id, title, html]) => {
+    if (id === "weather") return `<section class="dev-sec" id="dev-weather"><h2>Weather</h2><p class="dev-note">Night has no painting of its own. The Keep uses keep-v6.webp.</p>${skies.join("")}</section>`;
+    return devSection(id, title, "", html);
+  }).join("") + `<section class="dev-sec" id="dev-sprites"><h2>Keep sprites</h2><p class="dev-note" id="devSpriteNote">Reading the sprite manifests.</p><div class="dev-grid" id="devSpriteGrid"></div></section>`;
+  devProbe(body);
+  devSprites();
+}
+function devSprites(){
+  const read = url => fetch(url).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  Promise.all([
+    read("art/keep/sprites/manifest.json"),
+    read("art/keep/sprites/pixel/manifest.json")
+  ]).then(([oldM, pixM]) => {
+    const grid = $("#devSpriteGrid"), note = $("#devSpriteNote");
+    if (!grid) return;
+    const book = {
+      sprites: (oldM && oldM.sprites) || {},
+      mutations: (oldM && oldM.mutations) || {},
+      pixel: (pixM && pixM.sprites) || {}
+    };
+    const cards = [], missing = [];
+    const take = (bag, key, label) => {
+      const spec = bookSpec(book, bag, key);
+      if (!spec){ missing.push(label + " · " + bag); return; }
+      const file = spec.still || spec.file;
+      cards.push(devCard(label, spriteUrl(bag, file)));
+    };
+    DEX_LINES.forEach(line => {
+      STAGES.forEach(st => {
+        const stage = st.name.toLowerCase();
+        take("pixel", line + "-" + stage, DRAGONS[line].name + " · " + st.name);
+        MUT_KEYS.forEach(m => take("mutations", line + "-" + m + "-" + stage, MUTATIONS[m].name + " " + DRAGONS[line].name + " · " + st.name));
+      });
+    });
+    grid.innerHTML = cards.join("");
+    note.innerHTML = missing.length
+      ? `<span class="dev-miss">${missing.length} not in the sprite manifests</span><details class="dev-miss"><summary>Show</summary><ul>${missing.map(m => `<li>${esc(m)}</li>`).join("")}</ul></details>`
+      : "Every breed and mutation stage is in a sprite manifest.";
+    if (missing.length){ devMiss += missing.length; devSeen += missing.length; devTally(); }
+    devProbe(grid);
+  });
+}
+function openDev(){
+  if (!DEV) return;
+  const ov = $("#devOv");
+  if (!ov) return;
+  renderDev();
+  ov.hidden = false;
+  const again = $("#devReopen");
+  if (again) again.hidden = true;
+  const close = ov.querySelector("[data-act=close-dev]");
+  if (close) close.focus();
+}
+function closeDev(){
+  const ov = $("#devOv");
+  if (!ov || ov.hidden) return;
+  ov.hidden = true;
+  const again = $("#devReopen");
+  if (again && DEV) again.hidden = false;
+}
 const DEBUG = /[?&]debug=1(&|$)/.test(location.search) || location.hash === "#debug";
 
 /* Debug URL params: ?debug=1&xp=N sets prize dragon xp, &dragon=line picks dragon, &eggsteps=N sets eggs' steps-left */
@@ -4504,6 +4736,7 @@ function start(data){
   buildScenes();
   if (DEBUG) debugPanel();
   setTab(S.tab || "bank");
+  if (DEV) openDev();
   loadMutArt();
   setTimeout(autoHatch, 600);
 }
