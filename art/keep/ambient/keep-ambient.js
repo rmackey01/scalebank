@@ -16,8 +16,7 @@
       waterfall: {file: "water-mask-waterfall.png", x: 444, y: 862,  w: 57,  h: 106, fall: 230, streaks: 14},
       pond:      {file: "water-mask-pond.png",      x: 125, y: 1446, w: 485, h: 113, amp: 1.2, period: 5.0, glints: 26, ripples: 8}
     },
-    glows: [ // x, y, radius, rgb, strength, flicker speed. Additive.
-      {id: "forge",       x: 475, y: 562,  r: 92, c: [255, 150, 50],  a: .34, f: 1.7},
+    glows: [ // x, y, radius, rgb, strength, flicker speed. Additive. Forge glow is the .keep-forge.is-live light already in index.html.
       {id: "torch-hoardL",x: 183, y: 455,  r: 34, c: [255, 170, 70],  a: .40, f: 2.6},
       {id: "torch-hoardR",x: 735, y: 420,  r: 34, c: [255, 170, 70],  a: .40, f: 2.3},
       {id: "torch-nest",  x: 378, y: 182,  r: 30, c: [255, 170, 70],  a: .36, f: 2.9},

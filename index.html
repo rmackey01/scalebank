@@ -755,7 +755,7 @@ button.dexchip{cursor:pointer}
     <header class="keep-head">
       <p class="kh-steps" id="keepSteps"><svg class="kh-foot" viewBox="0 0 16 20" aria-hidden="true"><ellipse cx="8" cy="13.2" rx="4.6" ry="5.4" fill="currentColor"/><circle cx="4.1" cy="5.2" r="1.55" fill="currentColor"/><circle cx="8" cy="3.3" r="1.7" fill="currentColor"/><circle cx="11.9" cy="5.2" r="1.55" fill="currentColor"/></svg><span id="keepStepN">0</span> steps</p>
       <div class="kh-center">
-        <h1>Dragon Keep</h1>
+        <h1>Dragon's Keep</h1>
         <div class="keep-streak" id="keepStreak" hidden></div>
       </div>
       <div class="kh-right">
@@ -828,6 +828,7 @@ button.dexchip{cursor:pointer}
   </div>
 </div>
 
+<script src="art/keep/ambient/keep-ambient.js"></script>
 <script>
 (function(){
 "use strict";
@@ -2722,7 +2723,7 @@ const spriteMode = new Map();
 const penActors = new Map();
 const penEls = new Map();
 let penMetrics = {rw:0, rh:0, cw:0};
-let penSig = "", penRaf = 0, penLast = 0, penFrames = 0;
+let penSig = "", penRaf = 0, penLast = 0, penFrames = 0, keepAmb = null;
 function keepOn(){ return true; }
 function penStill(){ return matchMedia("(prefers-reduced-motion: reduce)").matches; }
 function penNow(){ return typeof performance !== "undefined" ? performance.now() : Date.now(); }
@@ -3004,6 +3005,7 @@ function measureKeepWorld(){
   placeKeepBox($(".keep-pool"), KEEP_POOL);
   placeKeepBox($("#keepWing"), KEEP_WING);
   trackKeepScroll();
+  if (keepAmb) keepAmb.resize();
   return true;
 }
 /* The wing is not a pen. A normal save leaves it locked. The finished dev account opens it once every breed is owned. */
@@ -3287,6 +3289,7 @@ function stopPenLoop(){
   if (penRaf) cancelAnimationFrame(penRaf);
   penRaf = 0;
   penLast = 0;
+  if (keepAmb) keepAmb.stop();
 }
 function penTick(t){
   if (!penLive() || penStill()){ penRaf = 0; penLast = 0; return; }
@@ -3301,6 +3304,7 @@ function penTick(t){
 function startPenLoop(){
   if (penRaf || !penLive() || penStill()) return;
   penRaf = requestAnimationFrame(penTick);
+  if (keepAmb) keepAmb.start();
 }
 /* One shown dragon per breed. Highest stage, mutated wins a tie, and a saved Ledger pick overrides both. */
 function mutRank(d){ return d && d.mut && MUTATIONS[d.mut] ? 1 : 0; }
@@ -3625,6 +3629,16 @@ function syncPens(){
   }
   applySlotTint(variant);
   markPenReady();
+  if (!keepAmb && typeof KeepAmbient !== "undefined" && world.querySelector('.keep-fence[data-pen="ember"]') && world.querySelector('.keep-fence[data-pen="pond"]')){
+    keepAmb = KeepAmbient.mount({
+      world: world,
+      bg: bg,
+      base: "art/keep/ambient/",
+      fenceZ: {ember: penFenceZ("ember"), pond: penFenceZ("pond")},
+      variant: fenceVariant(bg && bg.getAttribute("src")) || "v6"
+    });
+  }
+  if (keepAmb) keepAmb.setVariant(fenceVariant(bg && bg.getAttribute("src")) || "v6");
   if (penStill()) stopPenLoop();
   else startPenLoop();
 }
