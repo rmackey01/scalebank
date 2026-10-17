@@ -3,7 +3,7 @@
 <title>Scale Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&family=Lato:wght@400;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&family=IM+Fell+English:ital@0;1&family=Lato:wght@400;700;900&display=swap">
 <style>
 /* Layout: one-column phone app, three screens over a fixed bottom tab bar; vendors swipe sideways with scroll-snap. */
 :root{
@@ -70,7 +70,7 @@ html.keep-open .tabs{position:relative;z-index:2}
 /* Invisible taps on the painted lectern. A ring shows for keyboard focus only. */
 .keep-spot{position:absolute;z-index:4;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;font-size:0;line-height:0;cursor:pointer;pointer-events:auto}
 /* Header: steps, title and day pill, coins and the flame streak button. */
-.keep-head{position:relative;z-index:3;container:keephead / inline-size;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;column-gap:4px;box-sizing:border-box;width:100%;padding:5px 6px 4px;pointer-events:none;color:#f4d78f}
+.keep-head{position:relative;z-index:9;container:keephead / inline-size;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;column-gap:4px;box-sizing:border-box;width:100%;padding:5px 6px 4px;pointer-events:none;color:#f4d78f}
 .keep-head .kh-center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;max-width:100%}
 .keep-head h1{margin:0;min-width:0;font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;line-height:1;white-space:nowrap}
 .keep-head .kh-steps,.keep-head .kh-coins{display:inline-flex;align-items:center;gap:3px;max-width:100%;margin:0;padding:3px 5px;border-radius:8px;border:1px solid var(--gold-lo);background:rgba(12,16,21,.88);font-weight:700;font-variant-numeric:tabular-nums;font-size:10px;line-height:1;color:var(--gold-hi);white-space:nowrap}
@@ -101,13 +101,13 @@ html.keep-open .tabs{position:relative;z-index:2}
 .keep-forge.is-live::before{background:radial-gradient(ellipse at 50% 42%, rgba(255,226,160,.95), rgba(255,150,40,.5) 42%, transparent 72%)}
 .keep-pool.is-live::before{background:radial-gradient(ellipse at 50% 55%, rgba(220,248,255,.95), rgba(90,190,255,.55) 46%, transparent 74%)}
 .keep-credit{position:absolute;z-index:6;left:8px;bottom:calc(var(--keep-tab,16px) + 8px);margin:0;max-width:calc(100% - 108px);font-size:10px;line-height:1.2;letter-spacing:.04em;color:var(--muted);text-decoration:none;pointer-events:auto}
-.ldg-opts{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:0}
-.ldg-opt{display:inline-flex;align-items:center;gap:6px;margin:0;padding:3px 4px 3px 8px;border-radius:999px;border:1px solid #8a5a1c;background:rgba(255,244,214,.45);color:#3a2412;font-size:11px;font-weight:700;letter-spacing:.01em;line-height:1.2;cursor:pointer}
-.ldg-opt i{position:relative;width:22px;height:12px;border-radius:999px;background:#2a241c;border:1px solid var(--gold-lo);flex:none}
-.ldg-opt i::after{content:"";position:absolute;top:1px;left:1px;width:8px;height:8px;border-radius:50%;background:#8a8070}
+.ldg-opts{display:flex;flex-wrap:wrap;justify-content:center;gap:calc(8 * var(--u, 1px));margin:calc(10 * var(--u, 1px)) 0}
+.ldg-opt{display:inline-flex;align-items:center;gap:calc(6 * var(--u, 1px));margin:0;padding:calc(4 * var(--u, 1px)) calc(8 * var(--u, 1px)) calc(4 * var(--u, 1px)) calc(10 * var(--u, 1px));border-radius:999px;border:1px solid #8a5a1c;background:rgba(255,244,214,.55);color:#3a2412;font-size:calc(13 * var(--u, 1px));font-weight:700;letter-spacing:.01em;line-height:1.2;cursor:pointer;white-space:nowrap}
+.ldg-opt i{position:relative;width:16px;height:9px;border-radius:999px;background:#2a241c;border:1px solid var(--gold-lo);flex:none}
+.ldg-opt i::after{content:"";position:absolute;top:1px;left:1px;width:6px;height:6px;border-radius:50%;background:#8a8070}
 .ldg-opt[aria-pressed="true"]{border-color:var(--gold);background:rgba(216,169,75,.16)}
 .ldg-opt[aria-pressed="true"] i{background:linear-gradient(180deg,#e8bd5f,#b9862e);border-color:#8a5a1c}
-.ldg-opt[aria-pressed="true"] i::after{transform:translateX(10px);background:#1b1206}
+.ldg-opt[aria-pressed="true"] i::after{transform:translateX(7px);background:#1b1206}
 /* Pens are percentages of the full 1008×1792 painting, inside the same fit as the art. */
 .keep-world{position:absolute;z-index:2;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .keep-fence{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none}
@@ -132,49 +132,53 @@ html.keep-open .tabs{position:relative;z-index:2}
 .pen-sprite{position:relative;z-index:2;display:block;background-repeat:no-repeat;background-position:left center}
 .pen-sprite svg{display:none;width:100%;height:100%}
 .pen-sprite.is-ph svg{display:block}
-.ledger{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
-.ledger-sheet{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #6e4a1c;border-radius:16px;background:radial-gradient(120% 70% at 50% 0%,rgba(255,236,196,.5),transparent 58%),linear-gradient(180deg,#f0d7a2,#e0bc78 42%,#c4984e);box-shadow:inset 0 0 0 1px rgba(255,244,214,.55)}
-.ledger-fit{position:absolute;top:0}
-.ledger-bg{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:fill;pointer-events:none;opacity:0;transition:none}
-.ledger-bg.is-ok{opacity:1}
-/* Writing area on the 1008×1792 page: x235 y140 w597 h1150. */
-.ledger-body{position:absolute;z-index:1;left:calc(235 / 1008 * 100%);top:calc(140 / 1792 * 100%);width:calc(597 / 1008 * 100%);height:calc(1150 / 1792 * 100%);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;padding:2px 1px 4px;background:transparent;color:#2a160c}
-/* Wooden board: y1425–1545. Swap and Send sit on the plank, clear of the clasp. */
-.ledger-board{position:absolute;z-index:2;left:3%;width:94%;top:calc(1425 / 1792 * 100%);height:calc(120 / 1792 * 100%);display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:0 2% 0 4%;box-sizing:border-box;pointer-events:none}
-.ldg-cross{width:16px;height:16px;flex:none;filter:drop-shadow(0 1px 0 #3a2412)}
-.ledger-board .btn{pointer-events:auto;flex:1;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:3px 6px;border-radius:8px;border:1px solid #6b4420;background:linear-gradient(180deg,#f0d7a2,#d7b56a 42%,#a67c3d);color:#3a2412;font-family:var(--display);font-weight:700;font-size:12px;line-height:1.05;letter-spacing:.01em;text-shadow:0 1px 0 rgba(255,248,230,.65);box-shadow:inset 0 1px 0 rgba(255,248,230,.85),inset 0 -2px 0 #6b4420,0 1px 1px rgba(0,0,0,.45)}
-.ledger-board .btn svg{width:12px;height:12px;flex:none}
-.ledger-board .btn[disabled]{background:linear-gradient(180deg,#e6c98a,#c4a15a 46%,#8f6a38);color:#5c4330;border-color:#6b4420;box-shadow:inset 0 1px 0 rgba(255,248,230,.7),inset 0 -2px 0 #6b4420}
-.ldg-seal{width:13px;height:13px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#e2583e,#7a1e14);box-shadow:inset 0 1px 0 rgba(255,200,180,.45),0 0 0 1px #4a140e}
-.ldg-seal svg{width:8px;height:8px}
-.ldg-title{margin:0;text-align:center;font-family:var(--display);font-weight:700;font-size:20px;line-height:1;color:#e8bd5f;text-shadow:0 1px 0 #6b3e12,0 2px 0 #3a2412,0 0 8px rgba(216,169,75,.4)}
-.ldg-sub{margin:1px 0 0;text-align:center;font-family:var(--display);font-style:italic;font-weight:600;font-size:10px;line-height:1.15;color:#3a2412}
-.ldg-verse{margin:0;padding:4px 6px;border-radius:4px;border:1px solid #8a5a1c;background:linear-gradient(180deg,rgba(255,248,230,.62),rgba(224,188,120,.28));color:#2a160c;font-family:var(--display);font-style:italic;font-size:11px;line-height:1.3;text-align:center}
-.ldg-rule{display:flex;align-items:center;gap:5px;margin:1px 0}
-.ldg-rule::before,.ldg-rule::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#7a5420 12%,#e8bd5f,#7a5420 88%,transparent)}
-.ldg-rule i{width:5px;height:5px;flex:none;background:#e8bd5f;transform:rotate(45deg);box-shadow:0 0 0 1px #6b3e12}
-.ldg-rule span{font-family:var(--display);font-weight:700;font-size:12px;line-height:1;color:#2a160c;white-space:nowrap}
-.ldg-roam-h{display:flex;align-items:center;gap:6px;margin:0;font-family:var(--display);font-weight:700;font-size:13px;line-height:1;color:#2a160c}
-.ldg-drop{flex:none;font-family:var(--display);font-weight:700;font-size:30px;line-height:.75;color:#e8bd5f;text-shadow:0 1px 0 #6b3e12,0 2px 0 #3a2412}
-.ldg-grid{display:grid;gap:4px;margin:0;padding:0;list-style:none}
-.ldg-roam-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-.ldg-stall-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.ldg-pcard,.ldg-stall{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;width:100%;min-width:0;margin:0;padding:3px 2px 2px;cursor:pointer;font:inherit;line-height:1}
-.ldg-pcard{min-height:62px;border:1px solid #6e4a22;border-radius:3px;background:linear-gradient(180deg,rgba(255,248,230,.7),rgba(224,188,120,.28));color:#2a160c;box-shadow:inset 0 0 0 1px rgba(255,244,214,.45)}
-.ldg-stall{position:relative;min-height:58px;border:1px solid #1a0e08;border-radius:46% 46% 4px 4px;background:linear-gradient(180deg,#6b4630 0%,#3a2416 42%,#24160e);color:#f3e0b8;box-shadow:inset 0 0 0 1px #a07848,inset 0 8px 6px rgba(0,0,0,.28)}
-.ldg-pcard.is-on,.ldg-stall.is-on{box-shadow:0 0 0 2px #f4d78f,0 0 16px 3px rgba(244,215,143,.95);outline:1px solid #f4d78f}
-.ldg-slot{min-height:62px;border:1px dashed #8a6840;border-radius:3px;background:transparent}
-.ldg-pcard .dart,.ldg-stall .dart{width:78%;aspect-ratio:3/4;border-radius:2px;background:transparent;box-shadow:none}
-.ldg-pcard .dart::after,.ldg-stall .dart::after{box-shadow:none}
-.ldg-pcard .dart > img,.ldg-stall .dart > img{object-fit:contain;-webkit-mask:none;mask:none}
-.ldg-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--display);font-weight:700;font-size:10px;line-height:1.05;text-align:center;color:inherit}
-.ldg-stall .ldg-name{font-size:8px}
-.ldg-star{width:9px;height:9px;display:block;flex:none}
-.ldg-gem{position:absolute;top:3px;right:2px;width:7px;height:7px;border-radius:50%;box-shadow:inset 0 1px 1px rgba(255,255,255,.6),inset 0 -1px 1px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.4)}
-.ldg-swap{margin:0;text-align:center;color:#3a2412;font-family:var(--display);font-size:10px;line-height:1.2}
-.ldg-swap .btn{min-width:0;padding:1px 5px;font-size:10px}
-.ldg-hint{margin:0;color:#6b3e12;font-size:10px;line-height:1.2;text-align:center}
-.ledger > .btn{align-self:center;min-width:140px;padding:8px 16px}
+/* Page between the Keep header and the tab bar. Type tracks the Nest screen (--u at 390). */
+#ledgerOv{container-type:inline-size;position:absolute;z-index:8;left:0;right:0;top:var(--keep-head,0px);bottom:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background-color:#c4a15a;background-image:url("art/keep/ledger-ui/parchment-tile.webp");background-repeat:repeat-y;background-size:100% auto;background-position:center top}
+.ledger{--u:calc(100cqw / 390);position:relative;z-index:1;width:100%;min-height:100%;margin:0;padding-top:calc(10 * var(--u));padding-bottom:calc(16 * var(--u));padding-inline:calc(20 * var(--u));box-sizing:border-box;color:#342214}
+.ldg-back{position:absolute;z-index:6;top:calc(8 * var(--u));left:calc(8 * var(--u));width:calc(32 * var(--u));height:calc(32 * var(--u));padding:0;border-radius:50%;border:1px solid rgba(90,56,16,.55);background:rgba(255,244,214,.82);color:#3a2412;display:grid;place-items:center;box-shadow:none}
+.ldg-back svg{width:calc(16 * var(--u));height:calc(16 * var(--u))}
+.ledger-body{display:flex;flex-direction:column;gap:0}
+.ledger-board{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:calc(8 * var(--u));margin:calc(14 * var(--u)) 0 calc(8 * var(--u));pointer-events:none}
+.ldg-cross{width:auto;height:calc(28 * var(--u));flex:none;filter:drop-shadow(0 1px 0 #3a2412)}
+.ledger-board .btn{pointer-events:auto;flex:0 0 auto;min-width:0;height:calc(32 * var(--u));display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:4px;background:none;color:#f0d59a;box-shadow:none}
+.ledger-board .btn img{display:block;height:calc(32 * var(--u));width:auto;max-width:none}
+.ledger-board .btn[disabled]{background:none;opacity:.78;box-shadow:none}
+.ldg-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.ldg-title{position:relative;margin:0 calc(36 * var(--u)) calc(2 * var(--u));text-align:center}
+.ldg-title img{display:block;height:calc(49 * var(--u));width:auto;max-width:100%;margin:0 auto}
+.ldg-sub{margin:0}
+.ldg-verse{margin:0 0 calc(4 * var(--u));padding:calc(8 * var(--u)) calc(12 * var(--u));border-radius:calc(10 * var(--u));border:1px solid #6e4a22;background:linear-gradient(180deg,#f6e2b8,#e4c07a);color:#342214;font-family:"IM Fell English",var(--display);font-style:italic;font-size:calc(13 * var(--u));line-height:calc(18.5 * var(--u));text-align:center}
+.ldg-sec{display:flex;flex-direction:column;align-items:stretch;gap:calc(8 * var(--u));min-height:min-content}
+.ldg-rule{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:calc(16 * var(--u));margin:calc(16 * var(--u)) 0 calc(8 * var(--u))}
+.ldg-rule img{position:absolute;inset:0;width:100%;height:calc(16 * var(--u));object-fit:fill;pointer-events:none}
+.ldg-rule span{position:relative;z-index:1;font-family:var(--display);font-weight:600;font-size:calc(16 * var(--u));line-height:1;color:#342214;white-space:nowrap}
+.ldg-roam-h{display:flex;flex-flow:row nowrap;align-items:center;gap:calc(8 * var(--u));width:100%;margin:calc(12 * var(--u)) 0 0;font-family:var(--display);font-weight:600;font-size:calc(16 * var(--u));line-height:calc(21 * var(--u));color:#342214}
+.ldg-roam-h b{font-family:"Cinzel",var(--display);font-weight:700;font-size:.75em}
+.ldg-roam-h > span:last-child{flex:1 1 auto;min-width:0}
+.ldg-drop{flex:0 0 auto;width:calc(20 * var(--u));height:calc(24 * var(--u));display:block}
+.ldg-drop img{display:block;width:calc(20 * var(--u));height:calc(24 * var(--u));object-fit:contain}
+.ldg-grid{display:grid;width:100%;height:auto;margin:0;padding:0;list-style:none;align-items:start}
+.ldg-roam-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(8 * var(--u))}
+.ldg-stall-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(6 * var(--u))}
+.ldg-pcard,.ldg-stall{position:relative;display:block;width:100%;min-width:0;height:auto;margin:0;padding:0;cursor:pointer;font:inherit;line-height:1;border:0;background-color:transparent;background-repeat:no-repeat;background-position:center;background-size:100% 100%;box-shadow:none;align-self:start}
+.ldg-pcard,.ldg-slot{aspect-ratio:176/231}
+.ldg-pcard{background-image:url("art/keep/ledger-ui/card-frame.webp");color:#342214}
+.ldg-stall{aspect-ratio:144/172;background-image:url("art/keep/ledger-ui/stall-frame.webp");color:#f0e4c8}
+.ldg-pcard.is-on,.ldg-stall.is-on{box-shadow:0 0 0 2px #f4d78f,0 0 10px 2px rgba(244,215,143,.95)}
+.ldg-slot{border:0;background:url("art/keep/ledger-ui/card-empty.webp") center / 100% 100% no-repeat}
+.ldg-port{position:absolute;left:50%;transform:translateX(-50%);object-fit:contain;image-rendering:pixelated;pointer-events:none}
+.ldg-pcard .ldg-port{top:8%;width:78%;height:46%}
+.ldg-stall .ldg-port{top:6%;width:78%;height:48%}
+.ldg-name{position:absolute;left:6%;right:6%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--display);font-weight:600;text-align:center;color:#342214}
+.ldg-pcard .ldg-name{top:68%;font-size:calc(13 * var(--u));line-height:1.15}
+.ldg-stall .ldg-name{top:68%;right:26%;font-size:calc(11 * var(--u));line-height:1.1;color:#f0e4c8;text-shadow:0 1px 0 #1a0e08}
+.ldg-star{position:absolute;left:50%;width:calc(14 * var(--u));height:auto;transform:translateX(-50%);pointer-events:none}
+.ldg-pcard .ldg-star{top:84%}
+.ldg-stall .ldg-star{top:84%;width:calc(12 * var(--u))}
+.ldg-wax{position:absolute;right:8%;bottom:18%;width:calc(18 * var(--u));height:auto;pointer-events:none}
+.ldg-swap{margin:calc(8 * var(--u)) 0 0;text-align:center;color:#3a2412;font-family:var(--display);font-size:calc(13 * var(--u));line-height:1.3}
+.ldg-swap .btn{min-width:0;padding:calc(6 * var(--u)) calc(10 * var(--u));font-size:calc(13 * var(--u))}
+.ldg-hint{margin:0;color:#6b3e12;font-size:calc(13 * var(--u));line-height:1.3;text-align:center}
 .care{width:min(100%,420px);height:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
 .care-ov{z-index:24}
 .care-sheet{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;border:1px solid var(--gold-lo);border-radius:16px;background:linear-gradient(180deg,#2a241c,#14110e);padding:12px 12px 14px}
@@ -774,6 +778,13 @@ button.dexchip{cursor:pointer}
     </div>
     <a class="keep-credit" id="keepCredit" href="https://open-meteo.com/" hidden>Weather by Open-Meteo</a>
     <button type="button" class="keep-build" data-act="keep-build">Build</button>
+    <div id="ledgerOv" hidden>
+      <div class="ledger pad" role="dialog" aria-modal="true" aria-label="Keeper's Ledger">
+        <button type="button" class="ldg-back" data-act="close-ledger" aria-label="Back to the Keep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div class="ledger-body" id="ledgerBody"></div>
+        <div class="ledger-board" id="ledgerBoard"></div>
+      </div>
+    </div>
   </main>
 
   <main id="bestiary" class="screen bst-journal" aria-label="Bestiary" hidden>
@@ -805,18 +816,6 @@ button.dexchip{cursor:pointer}
   <div class="overlay" id="shareOv" hidden></div>
   <div class="overlay bst-journal" id="dexOv" hidden></div>
   <div class="overlay reveal-ov" id="revealOv" hidden></div>
-  <div class="overlay" id="ledgerOv" hidden>
-    <div class="ledger" role="dialog" aria-modal="true" aria-label="Keeper's Ledger">
-      <div class="ledger-sheet">
-        <div class="ledger-fit" id="ledgerFit">
-          <img class="ledger-bg" alt="">
-          <div class="ledger-body" id="ledgerBody"></div>
-          <div class="ledger-board" id="ledgerBoard"></div>
-        </div>
-      </div>
-      <button type="button" class="btn" data-act="close-ledger">Close</button>
-    </div>
-  </div>
   <div class="overlay care-ov" id="careOv" hidden>
     <div class="care" role="dialog" aria-modal="true" aria-label="Care">
       <div class="care-sheet" id="careBody"></div>
@@ -2694,8 +2693,6 @@ const KEEP_W = 1008, KEEP_H = 1792;
 /* Painted spots on keep-v6.webp, shared by every weather painting. Percentages of 1008×1792. */
 /* Plaque pixels on the 1008×1792 painting. ledgerPlaque wins, then plaques.ledger. */
 const LEDGER_PLAQUE = {file:"ledger-plaque.webp", x:653, y:836, w:166, h:49};
-/* Blank ledger page. One path: a clean file at this address replaces the CSS parchment. */
-const LEDGER_BG = "art/keep/ledger-v3.webp";
 const KEEP_BUILD = {x:70, y:88.2, w:26, h:3.6};
 const KEEP_FORGE = {x:42.0, y:30.2, w:13.5, h:7.8};
 const KEEP_POOL = {x:16.2, y:42.4, w:18.0, h:5.2};
@@ -2984,6 +2981,7 @@ function measureKeepWorld(){
   world.style.height = "100%";
   penMetrics = {rw, rh, cw: availW, ch: availH, scale};
   placeLedgerPlaque();
+  layoutLedger();
   placeKeepBox($(".keep-forge"), KEEP_FORGE);
   placeKeepBox($(".keep-pool"), KEEP_POOL);
   placeKeepBox($("#keepWing"), KEEP_WING);
@@ -3635,18 +3633,26 @@ function trapTab(ev, root){
   return true;
 }
 function ledgerDragon(id){ return S.dragons.find(d => dragonKey(d) === id) || null; }
-const LEDGER_STAR = `<svg class="ldg-star" viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" stroke="#6b3e12" stroke-width=".5" d="M6 .7 7.5 4.2l3.8.3-2.9 2.4.9 3.6L6 8.6 2.7 10.5l.9-3.6L.7 4.5l3.8-.3z"/></svg>`;
-const BREED_GEM = {cinder:"#c23b2e", inferno:"#d3541a", brine:"#2f6fbf", moss:"#3d8a45", stormling:"#3a62c4", voidling:"#6a3d9a", tempest:"#7a4ea3"};
+const LEDGER_UI = "art/keep/ledger-ui";
+const LEDGER_STAR = `<img class="ldg-star" src="${LEDGER_UI}/star.webp" alt="">`;
+const LEDGER_STAGE = ["hatchling", "juvenile", "adult", "elder"];
+const LEDGER_SEAL = {Common:"brown", Uncommon:"green", Rare:"blue", Epic:"purple", Legendary:"gold"};
+function ledgerPortrait(d){
+  const stage = LEDGER_STAGE[stageIdx(d)] || "hatchling";
+  const mut = d.mut && MUTATIONS[d.mut] ? d.mut + "-" : "";
+  return `${LEDGER_UI}/portraits/${d.line}-${mut}${stage}.webp`;
+}
 function ledgerCard(id, kind){
   const d = ledgerDragon(id); if (!d) return "";
   const on = ledgerFocus === id || ledgerPick === id;
   const name = d.name || d.species;
   const pressed = ledgerFocus === id ? "true" : "false";
+  const port = `<img class="ldg-port" src="${ledgerPortrait(d)}" alt="" draggable="false">`;
   if (kind === "roam"){
-    return `<button type="button" class="ldg-pcard${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}">${dragonArt(d)}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
+    return `<button type="button" class="ldg-pcard${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}">${port}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
   }
-  const gem = BREED_GEM[d.line] || "#8a6a3a";
-  return `<button type="button" class="ldg-stall${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}"><i class="ldg-gem" style="background:${gem}" aria-hidden="true"></i>${dragonArt(d)}<span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
+  const seal = LEDGER_SEAL[rarityOf(d)] || "grey";
+  return `<button type="button" class="ldg-stall${on ? " is-on" : ""}" data-act="ledger-focus" data-id="${esc(id)}" aria-pressed="${pressed}" aria-label="${esc(name)}, ${esc(rarityOf(d))}">${port}<img class="ldg-wax" src="${LEDGER_UI}/seals/seal-${seal}.webp" alt="" draggable="false"><span class="ldg-name">${esc(name)}</span>${LEDGER_STAR}</button>`;
 }
 function ledgerVerseCard(){
   if (!verseOn()) return "";
@@ -3668,15 +3674,14 @@ function renderLedger(){
   const opt = (act, label, on) => `<button type="button" class="ldg-opt" data-act="${act}" role="switch" aria-pressed="${on ? "true" : "false"}"><span>${label}</span><i aria-hidden="true"></i></button>`;
   if (ledgerFocus && keep.roaming.indexOf(ledgerFocus) < 0 && keep.stables.indexOf(ledgerFocus) < 0) ledgerFocus = null;
   renderLedgerBoard(keep);
-  body.innerHTML = `<h2 class="ldg-title">The Keeper's Ledger</h2>
-    <p class="ldg-sub">Stewards of every creature entrusted to us</p>
+  body.innerHTML = `<h2 class="ldg-title"><img src="${LEDGER_UI}/title.webp" alt="" draggable="false"><span class="ldg-sr">The Keeper's Ledger</span></h2>
+    <p class="ldg-sub ldg-sr">Stewards of every creature entrusted to us</p>
     <div class="ldg-opts">${opt("ledger-verse", "Morning Blessing", verseOn())}${opt("ledger-weather", "Live weather", weatherOn())}</div>
     ${ledgerVerseCard()}
     ${pick ? `<p class="ldg-swap" role="status">Swap with ${esc(pick.name || pick.species)}. <button type="button" class="btn ghost" data-act="ledger-swap-cancel">Cancel</button></p>` : ""}
-    <section class="ldg-sec ldg-roam"><h3 class="ldg-roam-h"><span class="ldg-drop" aria-hidden="true">T</span><span>Roaming in the Keep (${keep.roaming.length}/${keepCap()})</span></h3><div class="ldg-grid ldg-roam-grid">${roamRows}${emptySlots}</div></section>
-    <h3 class="ldg-rule"><span>Resting in the Stables</span></h3>
+    <section class="ldg-sec ldg-roam"><h3 class="ldg-roam-h"><span class="ldg-drop" aria-hidden="true"><img src="${LEDGER_UI}/capital-T.webp" alt=""></span><span>Roaming in the Keep (<b>${keep.roaming.length}/${keepCap()}</b>)</span></h3><div class="ldg-grid ldg-roam-grid">${roamRows}${emptySlots}</div></section>
+    <h3 class="ldg-rule"><img src="${LEDGER_UI}/divider.webp" alt=""><span>Resting in the Stables</span></h3>
     <section class="ldg-sec ldg-stables-sec">${noRoom ? `<p class="ldg-hint" id="ldgFull">Keep is full</p>` : ""}<div class="ldg-grid ldg-stall-grid ldg-stables">${stabRows}</div></section>`;
-  layoutLedger();
   syncPens();
 }
 function renderLedgerBoard(keep){
@@ -3690,26 +3695,49 @@ function renderLedgerBoard(keep){
   const canSend = stable && !keepFullFor(keep, id);
   const swapAct = stable && armed ? "ledger-swap-do" : "ledger-swap";
   const swapId = stable && armed ? id : (roaming ? id : ledgerPick || "");
-  const quill = `<svg viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" d="M2 10.2 3.2 7C6.2 3.2 9.2 1.2 11 1c-.2 1.8-2.2 4.8-6 7.8L1.8 10l.2.2z"/></svg>`;
-  const crown = `<span class="ldg-seal"><svg viewBox="0 0 12 12" aria-hidden="true"><path fill="#e8bd5f" d="M1.2 8.2 2.2 3.6l2.6 2.2L6 2.2l1.2 3.6 2.6-2.2 1 4.6z"/></svg></span>`;
-  const cross = `<svg class="ldg-cross" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="#e8bd5f" stroke-width="1.7" stroke-linecap="square" d="M8 2.2v11.6M3.2 6.2h9.6"/></svg>`;
-  board.innerHTML = `${cross}<button type="button" class="btn" data-act="${swapAct}" data-id="${esc(swapId)}"${canSwap ? "" : " disabled"} aria-pressed="${armed && ledgerPick === id ? "true" : "false"}">${quill}Swap</button><button type="button" class="btn" data-act="ledger-send" data-id="${esc(stable ? id : "")}"${canSend ? "" : " disabled"}${!canSend && stable ? ` aria-describedby="ldgFull"` : ""}>${crown}Send to Keep</button>`;
+  const cross = `<img class="ldg-cross" src="${LEDGER_UI}/cross.webp" alt="">`;
+  board.innerHTML = `${cross}<button type="button" class="btn" data-act="${swapAct}" data-id="${esc(swapId)}"${canSwap ? "" : " disabled"} aria-pressed="${armed && ledgerPick === id ? "true" : "false"}"><img src="${LEDGER_UI}/btn-swap.webp" alt="" draggable="false"><span class="ldg-sr">Swap</span></button><button type="button" class="btn" data-act="ledger-send" data-id="${esc(stable ? id : "")}"${canSend ? "" : " disabled"}${!canSend && stable ? ` aria-describedby="ldgFull"` : ""}><img src="${LEDGER_UI}/btn-send.webp" alt="" draggable="false"><span class="ldg-sr">Send to Keep</span></button>`;
 }
-/* Same width fit as the Keep painting: scale to the sheet width, and grow to its height when that would leave the page short. */
+const LEDGER_TILE = "art/keep/ledger-ui/parchment-tile.webp";
+const LEDGER_PAGE = "art/keep/ledger-v3.webp";
+let ledgerBg = "tile";
+function applyLedgerBg(){
+  const ov = $("#ledgerOv");
+  if (!ov) return;
+  if (ledgerBg === "page"){
+    ov.style.backgroundImage = `url("${LEDGER_PAGE}")`;
+    ov.style.backgroundRepeat = "no-repeat";
+    layoutLedger();
+    return;
+  }
+  if (ledgerBg === "flat"){ ov.style.backgroundImage = "none"; return; }
+  ov.style.backgroundImage = "";
+  ov.style.backgroundRepeat = "";
+  ov.style.backgroundSize = "";
+  ov.style.backgroundPosition = "";
+}
+function probeLedgerBg(){
+  const tile = new Image();
+  tile.onload = () => { ledgerBg = "tile"; applyLedgerBg(); };
+  tile.onerror = () => {
+    const page = new Image();
+    page.onload = () => { ledgerBg = "page"; applyLedgerBg(); };
+    page.onerror = () => { ledgerBg = "flat"; applyLedgerBg(); };
+    page.src = LEDGER_PAGE;
+  };
+  tile.src = LEDGER_TILE;
+}
+/* ledger-v3 covers the column only when the parchment tile is missing. */
 function layoutLedger(){
-  const sheet = $(".ledger-sheet"), fit = $("#ledgerFit");
-  if (!sheet || !fit || !keepOn()) return;
+  if (ledgerBg !== "page") return;
   const ov = $("#ledgerOv");
   if (!ov || ov.hidden) return;
-  const availW = sheet.clientWidth, availH = sheet.clientHeight;
-  if (availW < 20 || availH < 20) return;
-  let scale = availW / KEEP_W;
-  if (KEEP_H * scale < availH - 0.5) scale = availH / KEEP_H;
-  const rw = KEEP_W * scale, rh = KEEP_H * scale;
-  fit.style.width = rw + "px";
-  fit.style.height = rh + "px";
-  fit.style.left = ((availW - rw) / 2) + "px";
-  fit.style.top = "0px";
+  const W = ov.clientWidth, H = ov.clientHeight;
+  if (W < 20 || H < 20) return;
+  const iw = 1008, ih = 1792, sx = 22, sy = 114, sw = 964, sh = 1310;
+  const scale = Math.max(W / sw, H / sh);
+  ov.style.backgroundSize = (iw * scale) + "px " + (ih * scale) + "px";
+  ov.style.backgroundPosition = ((W - sw * scale) / 2 - sx * scale) + "px " + ((H - sh * scale) / 2 - sy * scale) + "px";
 }
 function openLedgerDragon(id){
   if (!keepOn()) return;
@@ -3725,9 +3753,8 @@ function openLedger(){
   if (note) note.classList.remove("show");
   renderLedger();
   ov.hidden = false;
-  void ov.offsetWidth;
+  ov.scrollTop = 0;
   layoutLedger();
-  keepArt(ov.querySelector(".ledger-bg"), LEDGER_BG);
   const first = focusables(ov)[0];
   if (first) first.focus();
 }
@@ -3746,6 +3773,7 @@ function closeLedger(opts){
 window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); layoutLedger(); penSig = ""; syncPens(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncKeepCover);
 mountKeepArt();
+probeLedgerBg();
 
 /* ================= debug panel ================= */
 /* For testing late-game states without thousands of taps. Only shown with ?debug=1 or #debug. */
