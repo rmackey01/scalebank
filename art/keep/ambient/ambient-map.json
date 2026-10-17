@@ -11,10 +11,15 @@
     "y": 744,
     "w": 269,
     "h": 104,
-    "amp": 1,
-    "period": 4.2,
-    "glints": 22,
-    "ripples": 5
+    "amp": 7.5,
+    "period": 2.4,
+    "glints": 90,
+    "rings": 3,
+    "ringC": [
+     275,
+     800
+    ],
+    "bands": 1
    },
    "fountain": {
     "file": "water-mask-fountain.png",
@@ -22,10 +27,15 @@
     "y": 898,
     "w": 278,
     "h": 89,
-    "amp": 1.4,
-    "period": 2.6,
-    "glints": 18,
-    "ripples": 4,
+    "amp": 6,
+    "period": 2,
+    "glints": 60,
+    "rings": 4,
+    "ringC": [
+     470,
+     952
+    ],
+    "bands": 1.2,
     "churn": [
      470,
      950
@@ -37,8 +47,7 @@
     "y": 862,
     "w": 57,
     "h": 106,
-    "fall": 230,
-    "streaks": 14
+    "fall": 150
    },
    "pond": {
     "file": "water-mask-pond.png",
@@ -46,26 +55,14 @@
     "y": 1446,
     "w": 485,
     "h": 113,
-    "amp": 1.2,
-    "period": 5,
-    "glints": 26,
-    "ripples": 8
+    "amp": 9,
+    "period": 2.6,
+    "glints": 120,
+    "rings": 5,
+    "bands": 1
    }
   },
   "glows": [
-   {
-    "id": "forge",
-    "x": 475,
-    "y": 562,
-    "r": 92,
-    "c": [
-     255,
-     150,
-     50
-    ],
-    "a": 0.34,
-    "f": 1.7
-   },
    {
     "id": "torch-hoardL",
     "x": 183,
@@ -499,8 +496,8 @@
    "fire": 1,
    "stars": 0,
    "ff": 0,
-   "water": 0.35,
-   "glint": 0.8,
+   "water": 0.55,
+   "glint": 0.7,
    "ripple": 0,
    "rain": 0,
    "snow": 1,
@@ -513,7 +510,7 @@
     0.95,
     1.08
    ],
-   "slow": 3
+   "slow": 2
   },
   "fog": {
    "glow": 0.85,

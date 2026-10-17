@@ -10,11 +10,11 @@
   "use strict";
   const W = 1008, H = 1792, TAU = Math.PI * 2;
   const MAP = {
-    water: {
-      moonpool:  {file: "water-mask-moonpool.png",  x: 141, y: 744,  w: 269, h: 104, amp: 1.0, period: 4.2, glints: 22, ripples: 5},
-      fountain:  {file: "water-mask-fountain.png",  x: 351, y: 898,  w: 278, h: 89,  amp: 1.4, period: 2.6, glints: 18, ripples: 4, churn: [470, 950]},
-      waterfall: {file: "water-mask-waterfall.png", x: 444, y: 862,  w: 57,  h: 106, fall: 230, streaks: 14},
-      pond:      {file: "water-mask-pond.png",      x: 125, y: 1446, w: 485, h: 113, amp: 1.2, period: 5.0, glints: 26, ripples: 8}
+    water: { // amp = sway in scene px (snapped to the 3 px art grid), period s, glints, rings = always-on ripple rings, bands = shimmer
+      moonpool:  {file: "water-mask-moonpool.png",  x: 141, y: 744,  w: 269, h: 104, amp: 7.5, period: 2.4, glints: 90, rings: 3, ringC: [275, 800], bands: 1},
+      fountain:  {file: "water-mask-fountain.png",  x: 351, y: 898,  w: 278, h: 89,  amp: 6,   period: 2.0, glints: 60, rings: 4, ringC: [470, 952], bands: 1.2, churn: [470, 950]},
+      waterfall: {file: "water-mask-waterfall.png", x: 444, y: 862,  w: 57,  h: 106, fall: 150},
+      pond:      {file: "water-mask-pond.png",      x: 125, y: 1446, w: 485, h: 113, amp: 9,   period: 2.6, glints: 120, rings: 5, bands: 1}
     },
     glows: [ // x, y, radius, rgb, strength, flicker speed. Additive. Forge glow is the .keep-forge.is-live light already in index.html.
       {id: "torch-hoardL",x: 183, y: 455,  r: 34, c: [255, 170, 70],  a: .40, f: 2.6},
@@ -49,7 +49,7 @@
     overcast: {glow: .9,  fire: 1, stars: 0,  ff: .8, water: .9,  glint: .7,  ripple: 0,  rain: 0,   snow: 0,   fog: 0,   bolt: 0, mist: 1,  ember: 1,  tint: [.92, .95, 1]},
     rain:     {glow: .8,  fire: .8,stars: 0,  ff: 0,  water: 1.2, glint: .6,  ripple: 1,  rain: 1,   snow: 0,   fog: 0,   bolt: 0, mist: 1.2,ember: .4, tint: [.82, .88, 1]},
     storm:    {glow: .75, fire: .7,stars: 0,  ff: 0,  water: 1.6, glint: .5,  ripple: 1.7,rain: 1.5, snow: 0,   fog: 0,   bolt: 1, mist: 1.2,ember: .3, tint: [.68, .72, .9]},
-    snow:     {glow: 1.0, fire: 1, stars: 0,  ff: 0,  water: .35, glint: .8,  ripple: 0,  rain: 0,   snow: 1,   fog: 0,   bolt: 0, mist: .6, ember: .6, tint: [.9, .95, 1.08], slow: 3},
+    snow:     {glow: 1.0, fire: 1, stars: 0,  ff: 0,  water: .55, glint: .7,  ripple: 0,  rain: 0,   snow: 1,   fog: 0,   bolt: 0, mist: .6, ember: .6, tint: [.9, .95, 1.08], slow: 2},
     fog:      {glow: .85, fire: .9,stars: 0,  ff: .4, water: .8,  glint: .5,  ripple: 0,  rain: 0,   snow: 0,   fog: 1,   bolt: 0, mist: 1.6,ember: .8, tint: [.92, .94, .97]}
   };
   // ---- deterministic helpers ----
@@ -74,54 +74,84 @@
   }
   const scratch = {};
   function buf(k, w, h) { let c = scratch[k]; if (!c) { c = scratch[k] = document.createElement("canvas"); } if (c.width !== w || c.height !== h) { c.width = w; c.height = h; } return c; }
-  // ---- water: surface wobble resampled from the live background, glints, rain ripples. Masked to the water. ----
+  /* Water: masked to each water body, updated at 15 fps in 3 px steps so it reads as pixel-art animation.
+     1 sway: 3 px rows of the live background shifted sideways (carries each weather's colours)
+     2 shimmer: light and dark dashes along drifting wave lines
+     3 rings: slow expanding ripple rings (plus 0.9 s raindrop rings in rain/storm)
+     4 glints: 3 px twinkles, crossed when bright
+     waterfall: bright and dark streak bands scrolling down, each 3 px column on its own phase */
+  const WSTEP = 1 / 15;
   function drawWater(ctx, t, wx, bg, A) {
-    const slow = wx.slow || 1;
-    Object.keys(MAP.water).forEach(k => {
-      const b = MAP.water[k], mask = A.masks[k]; if (!mask) return;
-      const c = buf("w" + k, b.w, b.h), g = c.getContext("2d");
-      g.globalCompositeOperation = "source-over"; g.clearRect(0, 0, b.w, b.h);
-      if (b.fall) {                                  // waterfall: falling light streaks
-        if (bg) g.drawImage(bg, b.x, b.y, b.w, b.h, 0, 0, b.w, b.h);
-        for (let i = 0; i < b.streaks; i++) {
-          const sx = snap(hash(i + 3) * b.w), len = 12 + hash(i + 9) * 18;
-          const y = fr(t * b.fall / slow / (b.h + 40) + hash(i + 17)) * (b.h + 40) - 20;
-          g.fillStyle = rgba([225, 248, 255], .35 * wx.water, wx.tint); g.fillRect(sx, y, 3, len);
-        }
-      } else {
-        if (bg) {                                    // gentle surface movement: 3 px rows shifted by a slow sine
-          const amp = b.amp * wx.water, ph = TAU * t / (b.period * slow);
-          for (let y = 0; y < b.h; y += 3) {
-            const dx = amp * Math.sin(ph + y * .19) + amp * .5 * Math.sin(ph * 1.7 - y * .07);
-            g.drawImage(bg, b.x, b.y + y, b.w, 3, dx, y, b.w, 3);
+    const slow = wx.slow || 1, tq = Math.floor(t / WSTEP) * WSTEP, k = wx.tint;
+    Object.keys(MAP.water).forEach(name => {
+      const b = MAP.water[name], mask = A.masks[name]; if (!mask) return;
+      const c = buf("w" + name, b.w, b.h), g = c.getContext("2d");
+      if (c._tq !== tq || c._v !== wx || c._bg !== !!bg) {
+        c._tq = tq; c._v = wx; c._bg = !!bg;
+        g.globalCompositeOperation = "source-over"; g.globalAlpha = 1; g.clearRect(0, 0, b.w, b.h);
+        g.imageSmoothingEnabled = false;
+        if (b.fall) {
+          if (bg) g.drawImage(bg, b.x, b.y, b.w, b.h, 0, 0, b.w, b.h);
+          const sp = b.fall / slow;
+          for (let x = 0; x < b.w; x += 3) {
+            const ph = hash(x * .37 + 1) * 60, rate = sp * (.8 + .4 * hash(x + 5));
+            for (let y = -36; y < b.h; y += 36) {               // one light + one dark band per 36 px period
+              const yy = snap(fr((tq * rate + ph) / 36) * 36 + y);
+              g.fillStyle = rgba([255, 255, 255], .14 * wx.water + .06, k); g.fillRect(x, yy, 3, 9);
+              g.fillStyle = "rgba(0,18,40," + (.14 * wx.water + .05).toFixed(3) + ")"; g.fillRect(x, yy + 15, 3, 6);
+            }
           }
-        }
-        g.globalCompositeOperation = "lighter";
-        const n = Math.round(b.glints * wx.glint);   // twinkling glints, each lives on its own 2-5 s cycle
-        for (let i = 0; i < n; i++) {
-          const per = (2 + hash(i * 7 + b.x) * 3) * slow, cyc = Math.floor((t + hash(i) * per) / per);
-          const ph = fr((t + hash(i) * per) / per), on = Math.pow(Math.sin(Math.PI * ph), 6);
-          const gx = snap(hash(i * 13 + cyc * 3.1 + b.y) * b.w), gy = snap(hash(i * 29 + cyc * 5.3 + b.x) * b.h);
-          g.fillStyle = rgba([200, 240, 255], .55 * on, wx.tint); g.fillRect(gx, gy, 3, 3);
-          if (on > .6) { g.fillStyle = rgba([200, 240, 255], .25 * on, wx.tint); g.fillRect(gx - 3, gy, 9, 3); }
-        }
-        g.globalCompositeOperation = "source-over";
-        const rn = Math.round(b.ripples * wx.ripple * 2);   // raindrop rings: 0.9 s each
-        for (let i = 0; i < rn; i++) {
-          const life = .9, off = hash(i * 3.3 + b.w) * life, cyc = Math.floor((t + off) / life), p = fr((t + off) / life);
-          const rx0 = hash(i * 11 + cyc * 1.7 + b.h) * b.w, ry0 = hash(i * 17 + cyc * 2.9 + b.w) * b.h;
-          g.strokeStyle = rgba([210, 235, 255], .5 * (1 - p), wx.tint); g.lineWidth = 2;
-          g.beginPath(); g.ellipse(rx0, ry0, 2 + p * 11, (2 + p * 11) * .38, 0, 0, TAU); g.stroke();
-        }
-        if (b.churn) {                               // foam where the waterfall lands
-          for (let i = 0; i < 6; i++) {
-            const p = fr(t * .9 / slow + i / 6), r = 6 + p * 22;
-            g.strokeStyle = rgba([220, 245, 255], .35 * (1 - p) * wx.water, wx.tint); g.lineWidth = 2;
+        } else {
+          const ph = TAU * tq / (b.period * slow), amp = b.amp * Math.min(1.4, wx.water);
+          if (bg) for (let y = 0; y < b.h; y += 3) {
+            const dx = snap(amp * Math.sin(ph + y * .16) + amp * .45 * Math.sin(ph * 1.6 - y * .09));
+            g.drawImage(bg, b.x, b.y + y, b.w, 3, dx, y, b.w, 3);
+            if (dx > 0) g.drawImage(bg, b.x, b.y + y, dx, 3, 0, y, dx, 3);          // fill the gap the shift leaves
+            else if (dx < 0) g.drawImage(bg, b.x + b.w + dx, b.y + y, -dx, 3, b.w + dx, y, -dx, 3);
+          }
+          const bs = (b.bands || 1), drift = tq * 60 / slow;     // shimmer dashes on wave lines
+          for (let y = 0; y < b.h; y += 3) {
+            for (let x = 0; x < b.w; x += 3) {
+              const s = Math.sin((x + drift) * .07 + y * .35 + Math.sin(y * .11 + ph * .5) * 2) * Math.sin(x * .013 - ph * 1.1 + y * .05);
+              if (s > .4) { g.fillStyle = rgba([210, 245, 255], (.22 + .35 * (s - .4)) * bs * Math.max(.6, wx.glint), k); g.fillRect(x, y, 3, 3); }
+              else if (s < -.5) { g.fillStyle = "rgba(0,14,34," + (.26 * bs).toFixed(3) + ")"; g.fillRect(x, y, 3, 3); }
+            }
+          }
+          g.lineWidth = 3;                                        // slow rings, always on
+          for (let i = 0; i < b.rings; i++) {
+            const life = 2.6 * slow, off = i / b.rings * life, cyc = Math.floor((tq + off) / life), p = fr((tq + off) / life);
+            const cx = b.ringC ? b.ringC[0] - b.x + (hash(i + cyc) - .5) * b.w * .5 : (.15 + .7 * hash(i * 7 + cyc * 1.3)) * b.w;
+            const cy = b.ringC ? b.ringC[1] - b.y + (hash(i * 3 + cyc) - .5) * b.h * .4 : (.2 + .6 * hash(i * 11 + cyc * 2.1)) * b.h;
+            const r = snap(6 + p * 42);
+            g.strokeStyle = rgba([215, 245, 255], .45 * (1 - p) * Math.min(1, wx.water + .3), k);
+            g.beginPath(); g.ellipse(cx, cy, r, r * .36, 0, 0, TAU); g.stroke();
+          }
+          const rn = Math.round(b.rings * 2 * wx.ripple);        // raindrop rings
+          for (let i = 0; i < rn; i++) {
+            const life = .9, off = hash(i * 3.3 + b.w) * life, cyc = Math.floor((tq + off) / life), p = fr((tq + off) / life);
+            const rx0 = hash(i * 11 + cyc * 1.7 + b.h) * b.w, ry0 = hash(i * 17 + cyc * 2.9 + b.w) * b.h, r = 3 + p * 15;
+            g.strokeStyle = rgba([220, 240, 255], .55 * (1 - p), k);
+            g.beginPath(); g.ellipse(rx0, ry0, r, r * .38, 0, 0, TAU); g.stroke();
+          }
+          if (b.churn) for (let i = 0; i < 4; i++) {               // foam where the waterfall lands
+            const p = fr(tq * .9 / slow + i / 4), r = 6 + p * 20;
+            g.strokeStyle = rgba([235, 250, 255], .5 * (1 - p), k);
             g.beginPath(); g.ellipse(b.churn[0] - b.x, b.churn[1] - b.y, r, r * .35, 0, 0, TAU); g.stroke();
           }
+          g.globalCompositeOperation = "lighter";
+          const n = Math.round(b.glints * wx.glint);
+          for (let i = 0; i < n; i++) {
+            const per = (1.4 + hash(i * 7 + b.x) * 2.2) * slow, o = hash(i) * per, cyc = Math.floor((tq + o) / per);
+            const on = Math.pow(Math.sin(Math.PI * fr((tq + o) / per)), 4);
+            const gx = snap(hash(i * 13 + cyc * 3.1 + b.y) * b.w), gy = snap(hash(i * 29 + cyc * 5.3 + b.x) * b.h);
+            g.fillStyle = rgba([220, 248, 255], .8 * on, k); g.fillRect(gx, gy, 3, 3);
+            if (on > .5) { g.fillStyle = rgba([220, 248, 255], .35 * on, k); g.fillRect(gx - 3, gy, 9, 3); g.fillRect(gx, gy - 3, 3, 9); }
+          }
+          g.globalCompositeOperation = "source-over";
         }
+        g.globalCompositeOperation = "destination-in"; g.drawImage(mask, 0, 0);
+        g.globalCompositeOperation = "source-over";
       }
-      g.globalCompositeOperation = "destination-in"; g.drawImage(mask, 0, 0);
       ctx.drawImage(c, b.x, b.y);
     });
   }
