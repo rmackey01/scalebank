@@ -133,7 +133,7 @@ html.keep-open .tabs{position:relative;z-index:2}
 .pen-sprite svg{display:none;width:100%;height:100%}
 .pen-sprite.is-ph svg{display:block}
 /* Page between the Keep header and the tab bar. Type tracks the Nest screen (--u at 390). */
-#ledgerOv{container-type:inline-size;position:absolute;z-index:8;left:0;right:0;top:var(--keep-head,0px);bottom:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background:#c4a15a url("art/keep/ledger-v3.webp") center / cover no-repeat}
+#ledgerOv{container-type:inline-size;position:absolute;z-index:8;left:0;right:0;top:var(--keep-head,0px);bottom:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;background-color:#c4a15a;background-image:url("art/keep/ledger-ui/parchment-tile.webp");background-repeat:repeat-y;background-size:100% auto;background-position:center top}
 .ledger{--u:calc(100cqw / 390);position:relative;z-index:1;width:100%;min-height:100%;margin:0;padding-top:calc(10 * var(--u));padding-bottom:calc(16 * var(--u));padding-inline:calc(20 * var(--u));box-sizing:border-box;color:#342214}
 .ldg-back{position:absolute;z-index:6;top:calc(8 * var(--u));left:calc(8 * var(--u));width:calc(32 * var(--u));height:calc(32 * var(--u));padding:0;border-radius:50%;border:1px solid rgba(90,56,16,.55);background:rgba(255,244,214,.82);color:#3a2412;display:grid;place-items:center;box-shadow:none}
 .ldg-back svg{width:calc(16 * var(--u));height:calc(16 * var(--u))}
@@ -3698,8 +3698,38 @@ function renderLedgerBoard(keep){
   const cross = `<img class="ldg-cross" src="${LEDGER_UI}/cross.webp" alt="">`;
   board.innerHTML = `${cross}<button type="button" class="btn" data-act="${swapAct}" data-id="${esc(swapId)}"${canSwap ? "" : " disabled"} aria-pressed="${armed && ledgerPick === id ? "true" : "false"}"><img src="${LEDGER_UI}/btn-swap.webp" alt="" draggable="false"><span class="ldg-sr">Swap</span></button><button type="button" class="btn" data-act="ledger-send" data-id="${esc(stable ? id : "")}"${canSend ? "" : " disabled"}${!canSend && stable ? ` aria-describedby="ldgFull"` : ""}><img src="${LEDGER_UI}/btn-send.webp" alt="" draggable="false"><span class="ldg-sr">Send to Keep</span></button>`;
 }
-/* Cover the ledger box with the parchment interior of ledger-v3 (x22 y114, 964×1310). */
+const LEDGER_TILE = "art/keep/ledger-ui/parchment-tile.webp";
+const LEDGER_PAGE = "art/keep/ledger-v3.webp";
+let ledgerBg = "tile";
+function applyLedgerBg(){
+  const ov = $("#ledgerOv");
+  if (!ov) return;
+  if (ledgerBg === "page"){
+    ov.style.backgroundImage = `url("${LEDGER_PAGE}")`;
+    ov.style.backgroundRepeat = "no-repeat";
+    layoutLedger();
+    return;
+  }
+  if (ledgerBg === "flat"){ ov.style.backgroundImage = "none"; return; }
+  ov.style.backgroundImage = "";
+  ov.style.backgroundRepeat = "";
+  ov.style.backgroundSize = "";
+  ov.style.backgroundPosition = "";
+}
+function probeLedgerBg(){
+  const tile = new Image();
+  tile.onload = () => { ledgerBg = "tile"; applyLedgerBg(); };
+  tile.onerror = () => {
+    const page = new Image();
+    page.onload = () => { ledgerBg = "page"; applyLedgerBg(); };
+    page.onerror = () => { ledgerBg = "flat"; applyLedgerBg(); };
+    page.src = LEDGER_PAGE;
+  };
+  tile.src = LEDGER_TILE;
+}
+/* ledger-v3 covers the column only when the parchment tile is missing. */
 function layoutLedger(){
+  if (ledgerBg !== "page") return;
   const ov = $("#ledgerOv");
   if (!ov || ov.hidden) return;
   const W = ov.clientWidth, H = ov.clientHeight;
@@ -3743,6 +3773,7 @@ function closeLedger(opts){
 window.addEventListener("resize", () => { if (S.tab === "vendors") scrollToScene(S.scene, false); syncKeepCover(); layoutLedger(); penSig = ""; syncPens(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncKeepCover);
 mountKeepArt();
+probeLedgerBg();
 
 /* ================= debug panel ================= */
 /* For testing late-game states without thousands of taps. Only shown with ?debug=1 or #debug. */
