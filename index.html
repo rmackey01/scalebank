@@ -203,6 +203,8 @@ html.keep-open .tabs{position:relative;z-index:2}
 @keyframes careHop{0%{transform:translateY(0)}35%{transform:translateY(-10px)}70%{transform:translateY(0)}85%{transform:translateY(-3px)}100%{transform:translateY(0)}}
 .care-top.is-happy .dart{animation:careHop .7s ease}
 @media (prefers-reduced-motion:reduce){.care-top.is-happy .dart{animation:none}}
+/* Dev account. The badge sits on the tab bar, and only with ?dev=1. */
+.dev-badge{position:absolute;z-index:4;top:-9px;left:50%;transform:translateX(-50%);margin:0;padding:2px 7px;border-radius:999px;border:1px solid var(--gold);background:#1b1206;color:var(--gold-hi);font-size:9px;font-weight:700;letter-spacing:.16em;line-height:1.4;pointer-events:none}
 
 /* ---------- shared bits ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
@@ -728,6 +730,7 @@ button.dexchip{cursor:pointer}
       </div>
       <div class="sim-note">Simulated walking. Real step tracking comes in a later build.</div>
       <button class="reset" id="reset" data-act="reset">Reset to first run<small>Wipes all progress · tap twice</small></button>
+      <button class="reset" id="devReset" data-act="reset-dev" hidden>Reset dev save<small>Restores the finished account · tap twice</small></button>
     </div>
   </main>
 
@@ -810,6 +813,7 @@ button.dexchip{cursor:pointer}
     <button class="tab" data-tab="dragon"><img class="ti off" src="art/nest/icon_dragon_inactive.webp" alt=""><img class="ti on" src="art/nest/icon_dragon_active.webp" alt="">Dragon</button>
     <button class="tab tab-keep" data-tab="keep"><img class="ti off keep-art" alt=""><img class="ti on keep-art" alt="">Keep</button>
     <i class="tab-ul" aria-hidden="true"></i>
+    <p class="dev-badge" id="devBadge" hidden>DEV</p>
   </nav>
 
   <div class="overlay" id="hatchOv" hidden></div>
@@ -917,7 +921,10 @@ const SCENES = [
   {id:"kiln", name:"Moon Kiln", keeper:"The Kilnwright \u00B7 kiln-fired eggs and sparks", quip:"\u201CFired at moonrise. Priced accordingly.\u201D", art:artKilnVideo, keys:["ember","tide"]},
   {id:"roost", name:"Cliff Roost", keeper:"A stranger \u00B7 storm eggs and night trails", quip:"Sells what the storm leaves behind. Doesn\u2019t haggle.", art:artRoostVideo, keys:["storm","tsparks"]}
 ];
-const KEY = "scalebank.v1";
+const REAL_KEY = "scalebank.v1";
+const DEV_KEY = "scalebank.dev";
+const DEV = /[?&]dev=1(&|$)/.test(location.search);
+const KEY = DEV ? DEV_KEY : REAL_KEY;
 const BAK_KEY = "scalebank.bak.v3";
 const CORRUPT_KEY = "scalebank.corrupt";
 const SAVE_VER = 4;
@@ -2232,8 +2239,9 @@ function openShare(){
   ov.querySelector("[data-act=copy]").focus();
 }
 
-let resetArmed = false, resetT;
+let resetArmed = false, resetT, devResetArmed = false, devResetT;
 const RESET_IDLE = "Reset to first run<small>Wipes all progress \u00B7 tap twice</small>", RESET_ARMED = "Tap again to wipe everything<small>Cancels in 3 seconds</small>";
+const DEV_RESET_IDLE = "Reset dev save<small>Restores the finished account \u00B7 tap twice</small>", DEV_RESET_ARMED = "Tap again to restore it<small>Cancels in 3 seconds</small>";
 document.addEventListener("click", ev => {
   /* Handle reveal overlay clicks */
   if (!$("#revealOv").hidden){
@@ -2322,6 +2330,16 @@ document.addEventListener("click", ev => {
     }
     clearTimeout(resetT); resetArmed = false; b.classList.remove("armed"); b.innerHTML = RESET_IDLE;
     S = fresh(); shown = 0; save(); scrollToScene(0, false); setTab("bank"); toast("Back to a first run. Bank at 0.");
+  }
+  else if (a === "reset-dev"){
+    if (!DEV) return;
+    if (!devResetArmed){
+      devResetArmed = true; b.classList.add("armed"); b.innerHTML = DEV_RESET_ARMED;
+      clearTimeout(devResetT); devResetT = setTimeout(() => { devResetArmed = false; b.classList.remove("armed"); b.innerHTML = DEV_RESET_IDLE; }, 3000);
+      return;
+    }
+    clearTimeout(devResetT); devResetArmed = false; b.classList.remove("armed"); b.innerHTML = DEV_RESET_IDLE;
+    S = devAccount(); shown = 0; save(); scrollToScene(0, false); setTab(S.tab || "dragon"); toast("Dev save restored.");
   }
 });
 document.addEventListener("keydown", ev => {
@@ -2988,8 +3006,11 @@ function measureKeepWorld(){
   trackKeepScroll();
   return true;
 }
-/* The wing is not a pen. It stays locked, and the plaque hides if that ever changes. */
-function wingLocked(){ return true; }
+/* The wing is not a pen. A normal save leaves it locked. The finished dev account opens it once every breed is owned. */
+function wingLocked(){
+  if (!DEV) return true;
+  return breedCount() < DEX_LINES.length;
+}
 const PEN_LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 10V8a4 4 0 0 1 8 0v2h1.2c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-7.4c0-1 .8-1.8 1.8-1.8H8zm2 0h4V8a2 2 0 0 0-4 0v2z"/></svg><span><b>Locked</b><small>New dragon</small></span>';
 function mountPenShell(){
   const plates = $("#keepPlates");
@@ -3717,6 +3738,7 @@ function applyLedgerBg(){
   ov.style.backgroundPosition = "";
 }
 function probeLedgerBg(){
+  if (typeof Image !== "function") return;
   const tile = new Image();
   tile.onload = () => { ledgerBg = "tile"; applyLedgerBg(); };
   tile.onerror = () => {
@@ -4477,24 +4499,101 @@ function renderCare(hop){
   const notes = keeperNotes(d).map(n => `<p class="care-note${n.open ? "" : " locked"}">${esc(n.text)}</p>`).join("");
   body.innerHTML = `<div class="care-top${hop ? " is-happy" : ""}"><div>${dragonArt(d)}</div><div><p class="care-name">${esc(d.name || d.species)}</p><div class="ldg-meta">${esc(STAGES[stageIdx(d)].name)} \u00B7 <span class="r ${rcls(rarityOf(d))}">${esc(rarityOf(d))}</span></div><div class="bond" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${rec.bond}" aria-label="Bond ${rec.bond} of 100"><i style="width:${rec.bond}%"></i></div><div class="bond-n">Bond ${rec.bond} / 100</div></div></div>${seals ? `<div class="wax-row">${seals}</div>` : ""}${hop ? `<p class="care-pleased" role="status">It looks pleased.</p>` : ""}<div class="care-acts">${acts}</div><h3>Keeper's Notes</h3>${notes}`;
 }
+/* A finished account, built from the live tables so a new breed, mutation, item, or streak prize is included. */
+function devAccount(){
+  const st = fresh();
+  const top = Math.max(0, STAGES.length - 1);
+  const xp = STAGES[top].at;
+  const reveals = {};
+  REVEAL_KEY.forEach(k => { if (k) reveals[k] = true; });
+  const forms = [];
+  DEX_LINES.forEach(line => {
+    forms.push({line, mut:null});
+    MUT_KEYS.forEach(m => forms.push({line, mut:m}));
+  });
+  const dragons = [], roaming = [], stables = [];
+  const shownMap = {};
+  let seq = 1;
+  const hatched = Date.now();
+  forms.forEach(f => {
+    const it = eggOf(f.line);
+    if (!it) return;
+    const id = "drg" + seq++;
+    const species = DRAGONS[f.line].name;
+    dragons.push({
+      id, item:it.id, line:f.line, species, mut:f.mut, xp, seenStage:top,
+      name:dexName(f.line, f.mut), trail:null, reveals:Object.assign({}, reveals)
+    });
+    if (!f.mut){ roaming.push(id); shownMap[f.line] = id; }
+    else stables.push(id);
+  });
+  const trails = ITEMS.filter(i => i.kind === "trail");
+  const legend = dragons.find(d => !d.mut && eggOf(d.line) && eggOf(d.line).rarity === "Legendary") || dragons[0];
+  if (legend && trails.length) legend.trail = trails[trails.length - 1].id;
+  st.dragons = dragons;
+  st.prize = legend ? legend.id : null;
+  st.seq = seq;
+  st.eggs = [];
+  st.tab = "dragon";
+  st.scene = Math.max(0, SCENES.length - 1);
+  const perEgg = 1 + MUT_KEYS.length;
+  ITEMS.forEach(it => {
+    st.owned[it.id] = true;
+    if (it.kind === "egg") st.bought[it.id] = perEgg;
+  });
+  SCENES.forEach((sc, i) => { if (i > 0) st.opened[i] = true; });
+  const spent = ITEMS.reduce((n, it) => n + (it.price || 0) * (it.kind === "egg" ? perEgg : 1), 0);
+  const grown = xp * dragons.length;
+  st.bank = grown;
+  st.lifetime = grown + spent;
+  const noteAts = NOTE_AT.filter(n => Number.isFinite(n));
+  const bond = Math.max(100, noteAts.length ? Math.max.apply(null, noteAts) : 0);
+  const care = {};
+  dragons.forEach(d => { care[d.id] = {bond}; });
+  const prizeAts = STREAK_PRIZES.map(p => p.at).filter(n => Number.isFinite(n));
+  const streakN = Math.max(100, prizeAts.length ? Math.max.apply(null, prizeAts) : 0);
+  const day = today();
+  st.keep = freshKeep();
+  st.keep.roaming = roaming;
+  st.keep.stables = stables;
+  st.keep.shown = shownMap;
+  st.keep.care = care;
+  st.keep.streak = {last:day, count:streakN, best:streakN, claimedDay:day, claimed:day, seen:day};
+  st.dex = {};
+  dragons.forEach(d => {
+    dexKeys(d).forEach(k => {
+      const e = st.dex[k] || (st.dex[k] = {first:hatched, n:0, top:0});
+      e.n += 1;
+      e.top = Math.max(e.top, top);
+    });
+  });
+  st.ver = SAVE_VER;
+  return st;
+}
+function showDevChrome(){
+  const badge = $("#devBadge"), btn = $("#devReset");
+  if (badge) badge.hidden = !DEV;
+  if (btn) btn.hidden = !DEV;
+}
 function start(data){
   let raw = null;
   try { raw = localStorage.getItem(KEY); } catch(e){}
   const injected = !!(data && data.state);
   let corrupt = false;
   if (!injected && raw != null){ try { JSON.parse(raw); } catch(e){ corrupt = true; } }
-  if (corrupt) backupCorrupt(raw);
-  S = injected ? hydrate(data.state) : (load() || fresh());
+  if (corrupt && !DEV) backupCorrupt(raw);
+  const made = !injected && DEV && (corrupt || raw == null);
+  S = injected ? hydrate(data.state) : (made ? devAccount() : (load() || fresh()));
   if (!S.opened || typeof S.opened !== "object" || Array.isArray(S.opened)) S.opened = {};
   const migrating = corrupt || (S.ver || 1) < 4;
-  if (migrating) backupV3(raw);
+  if (migrating && !DEV) backupV3(raw);
   try {
     migrate();
     if ((S.ver || 1) < 3){ migrateV3(); S.ver = 3; }
     if ((S.ver || 1) < 4){ migrateV4(); S.ver = 4; }
   } catch(e){ S = fresh(); }
   reconcileKeep();
-  if (migrating) save();
+  if (migrating || made) save();
   ITEMS.forEach(it => { if (S.owned[it.id]) for (let k = 1; k <= it.scene; k++) S.opened[k] = true; });
   applyDebugParams();
   noteDailyVisit();
@@ -4503,6 +4602,7 @@ function start(data){
   $("#balance").textContent = fmt(S.bank);
   buildScenes();
   if (DEBUG) debugPanel();
+  showDevChrome();
   setTab(S.tab || "bank");
   loadMutArt();
   setTimeout(autoHatch, 600);
